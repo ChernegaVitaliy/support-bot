@@ -15,7 +15,7 @@ class ConsoleCommands {
 
     // 🔧 МЕТОД ДЛЯ ОТРИМАННЯ ДЕФОЛТНОГО ВЛАСНИКА
     private function getDefaultOwnerId() {
-        $env_path = '/data/data/com.termux/files/home/support-bot/.env';
+        $env_path = __DIR__ . '/../.env';
         $default_owner_id = "5720736515"; // значення за замовчуванням
         
         if (file_exists($env_path)) {
@@ -862,7 +862,7 @@ class ConsoleCommands {
         global $languages;
         $languages = [];
         foreach ($this->languageFiles as $lang) {
-            $filePath = "/data/data/com.termux/files/home/support-bot/languages/{$lang}.json";
+            $filePath = __DIR__ . "/../languages/{$lang}.json";
             if (file_exists($filePath)) {
                 $languages[$lang] = json_decode(file_get_contents($filePath), true);
             }

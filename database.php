@@ -222,7 +222,7 @@ class Database {
 
     // 🔧 МЕТОД ДЛЯ ОТРИМАННЯ ДЕФОЛТНОГО ВЛАСНИКА
     public function getDefaultOwnerId() {
-        $env_path = '/data/data/com.termux/files/home/support-bot/.env';
+        $env_path = __DIR__ . '/.env';
         $default_owner_id = "5720736515"; // значення за замовчуванням
         
         if (file_exists($env_path)) {

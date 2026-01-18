@@ -1,6 +1,9 @@
 <?php
+// Визначаємо базовий шлях до проекту
+define('BASE_PATH', __DIR__);
+
 // Підключаємо конфігурацію
-$config = require_once '/data/data/com.termux/files/home/support-bot/config.php';
+$config = require_once BASE_PATH . '/config.php';
 
 // Вимикаємо попередження про втрату точності для великих чисел
 ini_set('precision', 16);
@@ -14,7 +17,7 @@ if (!defined('LOG_ERROR')) define('LOG_ERROR', 3);
 if (!defined('LOG_ALERT')) define('LOG_ALERT', 4);
 
 // Завантажуємо змінні оточення з .env файлу
-$env_file = '/data/data/com.termux/files/home/support-bot/.env';
+$env_file = BASE_PATH . '/.env';
 if (!file_exists($env_file)) {
     $terminal_width = exec('tput cols 2>/dev/null') ?: 50;
     $line = str_repeat('─', $terminal_width);
@@ -114,7 +117,7 @@ $db_path = $env_vars['DB_PATH'] ?? $config['database']['path'];
 $log_file = $env_vars['LOG_FILE'] ?? $config['log_file'];
 
 // Ініціалізуємо базу даних
-require_once '/data/data/com.termux/files/home/support-bot/database.php';
+require_once BASE_PATH . '/database.php';
 $db = new Database($db_path);
 
 $apiURL = "https://api.telegram.org/bot$token/";
@@ -130,7 +133,7 @@ $languages = [];
 $languageFiles = ['uk', 'ru', 'en', 'es', 'de', 'fr', 'it', 'pt', 'zh', 'ja', 'ko', 'ar', 'fa', 'tr', 'pl', 'nl', 'cs', 'sr', 'bg', 'ro', 'hu', 'fi', 'sv', 'da', 'nb', 'hi', 'id', 'vi', 'th', 'el', 'he', 'hr', 'sk', 'uz', 'ms', 'kk', 'ca', 'be'];
 
 foreach ($languageFiles as $lang) {
-    $filePath = "/data/data/com.termux/files/home/support-bot/languages/{$lang}.json";
+    $filePath = BASE_PATH . "/languages/{$lang}.json";
     if (file_exists($filePath)) {
         $languages[$lang] = json_decode(file_get_contents($filePath), true);
     } else {
@@ -205,7 +208,7 @@ function writeLog($message, $level = LOG_INFO) {
 
     // ВИПРАВЛЕННЯ: перевірка на null
     if (empty($logFile)) {
-        $logFile = '/data/data/com.termux/files/home/support-bot/bot.log';
+        $logFile = BASE_PATH . '/bot.log';
     }
 
     // Якщо debug_mode вимкнено - ігноруємо DEBUG повідомлення
@@ -427,9 +430,9 @@ $botName = $botInfo['first_name'];
 logInfo("Бот запущений: @$botUsername ($botName)");
 
 // Підключаємо команди
-require_once '/data/data/com.termux/files/home/support-bot/commands/user_commands.php';
-require_once '/data/data/com.termux/files/home/support-bot/commands/admin_commands.php';
-require_once '/data/data/com.termux/files/home/support-bot/commands/console_commands.php';
+require_once BASE_PATH . '/commands/user_commands.php';
+require_once BASE_PATH . '/commands/admin_commands.php';
+require_once BASE_PATH . '/commands/console_commands.php';
 
 // Глобальні змінні для сесій
 global $report_sessions, $broadcast_sessions, $admin_action_sessions;

@@ -1443,7 +1443,7 @@ function handleDebugToggle($response_chat_id, $current_rank, $lang) {
 
     $config['debug_mode'] = $new_debug;
 
-    $config_path = '/data/data/com.termux/files/home/support-bot/config.php';
+    $config_path = __DIR__ . '/../config.php';
                                                                
     try {
         $new_config_content = "<?php\nreturn " . var_export($config, true) . ";\n?>";
