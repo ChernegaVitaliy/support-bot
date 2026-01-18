@@ -927,7 +927,8 @@ class ConsoleCommands {
         curl_setopt_array($ch, [
             CURLOPT_URL => $apiURL . "getMe",
             CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_TIMEOUT => 10
+            CURLOPT_TIMEOUT => 10,
+            CURLOPT_SSL_VERIFYPEER => false
         ]);
 
         $response = curl_exec($ch);

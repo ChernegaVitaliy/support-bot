@@ -297,7 +297,8 @@ function getUserLanguageFromAPI($user_id) {
         curl_setopt_array($ch, [
             CURLOPT_URL => $apiURL . "getChat?chat_id=" . strval($user_id ?? ''),
             CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_TIMEOUT => 3
+            CURLOPT_TIMEOUT => 3,
+            CURLOPT_SSL_VERIFYPEER => false
         ]);
 
         $response = curl_exec($ch);
@@ -388,7 +389,8 @@ function getBotInfo() {
     curl_setopt_array($ch, [
         CURLOPT_URL => $apiURL . "getMe",
         CURLOPT_RETURNTRANSFER => true,
-        CURLOPT_TIMEOUT => 10
+        CURLOPT_TIMEOUT => 10,
+        CURLOPT_SSL_VERIFYPEER => false
     ]);
 
     $response = curl_exec($ch);
@@ -488,7 +490,8 @@ function answerCallbackQuery($callback_query_id, $text = "") {
         CURLOPT_POST => true,
         CURLOPT_POSTFIELDS => http_build_query($data),
         CURLOPT_RETURNTRANSFER => true,
-        CURLOPT_TIMEOUT => 2
+        CURLOPT_TIMEOUT => 2,
+        CURLOPT_SSL_VERIFYPEER => false
     ]);
 
     $result = curl_exec($ch);
@@ -515,10 +518,11 @@ while (true) {
 
     // ================== TELEGRAM ОНОВЛЕННЯ ==================
     $ch = curl_init();
-    curl_setopt($ch, CURLOPT_URL, $apiURL . "getUpdates?offset=" . ($last_update_id + 1) . "&timeout=1"); // Зменшив timeout до 1 секунди
+    curl_setopt($ch, CURLOPT_URL, $apiURL . "getUpdates?offset=" . ($last_update_id + 1) . "&timeout=1");
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($ch, CURLOPT_TIMEOUT, 5);
     curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 3);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 
     $response = curl_exec($ch);
     if ($response === false) {
@@ -668,7 +672,8 @@ function sendMessage($chat_id, $text, $reply_markup = null, $disable_web_page_pr
         CURLOPT_URL => $apiURL . "sendMessage",
         CURLOPT_POST => true,
         CURLOPT_POSTFIELDS => http_build_query($data),
-        CURLOPT_RETURNTRANSFER => true
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_SSL_VERIFYPEER => false
     ]);
 
     $result = curl_exec($ch);
@@ -695,7 +700,8 @@ function deleteMessage($chat_id, $message_id) {
         CURLOPT_URL => $apiURL . "deleteMessage",
         CURLOPT_POST => true,
         CURLOPT_POSTFIELDS => http_build_query($data),
-        CURLOPT_RETURNTRANSFER => true
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_SSL_VERIFYPEER => false
     ]);
 
     $result = curl_exec($ch);
@@ -733,7 +739,8 @@ function sendMedia($chat_id, $file_id, $media_type, $caption = '', $reply_markup
         CURLOPT_URL => $apiURL . $method,
         CURLOPT_POST => true,
         CURLOPT_POSTFIELDS => $data,
-        CURLOPT_RETURNTRANSFER => true
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_SSL_VERIFYPEER => false
     ]);
 
     $result = curl_exec($ch);
@@ -783,7 +790,8 @@ function sendMediaGroup($chat_id, $media_files, $caption = '', $reply_markup = n
         CURLOPT_URL => $apiURL . "sendMediaGroup",
         CURLOPT_POST => true,
         CURLOPT_POSTFIELDS => http_build_query($data),
-        CURLOPT_RETURNTRANSFER => true
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_SSL_VERIFYPEER => false
     ]);
 
     $result = curl_exec($ch);
@@ -808,7 +816,8 @@ function sendAPIRequest($method, $data) {
         CURLOPT_URL => $apiURL . $method,
         CURLOPT_POST => true,
         CURLOPT_POSTFIELDS => http_build_query($data),
-        CURLOPT_RETURNTRANSFER => true
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_SSL_VERIFYPEER => false
     ]);
 
     $result = curl_exec($ch);

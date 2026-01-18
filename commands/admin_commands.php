@@ -985,9 +985,10 @@ function editMessage($chat_id, $message_id, $text, $reply_markup = null) {
     curl_setopt_array($ch, [
         CURLOPT_URL => $apiURL . "editMessageText",
         CURLOPT_POST => true,
-        CURLOPT_POSTFIELDS => http_build_query($data),             
-        CURLOPT_RETURNTRANSFER => true
-    ]);                                                    
+        CURLOPT_POSTFIELDS => http_build_query($data),
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_SSL_VERIFYPEER => false
+    ]);
     $result = curl_exec($ch);                                  
     curl_close($ch);                                       
     return $result;
