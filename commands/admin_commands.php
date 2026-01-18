@@ -854,7 +854,7 @@ function executeBroadcast($chat_id, $session, $lang) {
     $target_type = $session['target_type'] ?? 'all';
 
     foreach ($all_users as $user) {
-        $user_id = $user['chat_id'];
+        $user_id = $user['user_id'];
         $is_admin = $db->isAdmin($user_id);
         $user_lang = $db->getUserLanguage($user_id) ?? 'uk';
 
@@ -915,7 +915,7 @@ function executeBroadcast($chat_id, $session, $lang) {
 
     foreach ($users as $user) {
         $current++;
-        $user_chat_id = $user['chat_id'];
+        $user_chat_id = $user['user_id'];
 
         try {
             // Відправляємо контент
