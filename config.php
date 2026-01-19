@@ -1,0 +1,11 @@
+<?php
+
+return array (
+  'logging' => 
+  array (
+    'level' => 'DEBUG',
+    'max_file_size' => 10485760,
+    'backup_count' => 5,
+    'colors_in_file' => false,
+  ),
+);

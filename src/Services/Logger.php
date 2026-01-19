@@ -12,10 +12,10 @@ class Logger
     private bool $debugMode;
     private string $logFile;
 
-    public function __construct(string $logFile, string $logLevel = 'INFO', bool $debugMode = false)
+    public function __construct(string $logFile, string $logLevel = 'INFO')
     {
         $this->logFile = $logFile;
-        $this->debugMode = $debugMode;
+        $this->debugMode = ($logLevel === 'DEBUG');
 
         $this->ensureLogFileExists();
 

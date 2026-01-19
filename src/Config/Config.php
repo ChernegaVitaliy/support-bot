@@ -8,6 +8,7 @@ class Config
 {
     private array $config;
     private string $basePath;
+    private array $logLevels = ['DEBUG', 'INFO', 'WARNING', 'ERROR'];
 
     public function __construct(string $basePath = null)
     {
@@ -49,12 +50,17 @@ class Config
                     'backup_count' => 5,
                     'colors_in_file' => false,
                 ],
-                'debug_mode' => false,
             ];
         }
     }
 
-    // Helper to get env var safely from $_ENV or $_SERVER
+    private function saveConfig(): void
+    {
+        $configFile = $this->basePath . '/config.php';
+        $content = "<?php\n\nreturn " . var_export($this->config, true) . ";\n";
+        file_put_contents($configFile, $content);
+    }
+
     private function getEnv(string $key, $default = null)
     {
         return $_ENV[$key] ?? $_SERVER[$key] ?? $default;
@@ -62,7 +68,6 @@ class Config
 
     public function get(string $key, $default = null)
     {
-        // Check env/server first
         $envValue = $this->getEnv($key);
         if ($envValue !== null) {
             return $envValue;
@@ -119,32 +124,41 @@ class Config
             exit(1);
         }
 
-        if (strlen($letters) < 30 || strlen($letters) > 35) {
-            $this->printError('INCORRECT NUMBER OF CHARACTERS IN SECOND PART!');
-            exit(1);
-        }
-
-        if (!preg_match('/^[a-zA-Z0-9_-]+$/', $letters)) {
-            $this->printError('FORBIDDEN CHARACTERS IN TOKEN!');
+        if (strlen($letters) !== 35) {
+            $this->printError('INCORRECT TOKEN LENGTH!');
             exit(1);
         }
 
         return $token;
     }
 
-    public function getDbPath(): string
-    {
-        return $this->getEnv('DB_PATH', $this->basePath . '/bot.db');
-    }
-
     public function getLogFile(): string
     {
-        return $this->getEnv('LOG_FILE', $this->basePath . '/bot.log');
+        return $this->getEnv('LOG_FILE', 'bot.log');
     }
 
     public function getLogLevel(): string
     {
         return $this->get('logging.level', 'INFO');
+    }
+
+    public function toggleLogLevel(): string
+    {
+        $currentLevel = $this->getLogLevel();
+        $currentIndex = array_search($currentLevel, $this->logLevels);
+        $nextIndex = ($currentIndex + 1) % count($this->logLevels);
+        $newLevel = $this->logLevels[$nextIndex];
+        $this->setLogLevel($newLevel);
+        return $newLevel;
+    }
+
+    public function setLogLevel(string $level): void
+    {
+        if (in_array($level, $this->logLevels)) {
+            $this->config['logging']['level'] = $level;
+            unset($this->config['debug_mode']);
+            $this->saveConfig();
+        }
     }
 
     public function getMaxFileSize(): int
@@ -155,11 +169,6 @@ class Config
     public function getBackupCount(): int
     {
         return $this->get('logging.backup_count', 5);
-    }
-
-    public function isDebugMode(): bool
-    {
-        return $this->get('debug_mode', false);
     }
 
     public function getDefaultOwnerId(): string
@@ -175,6 +184,11 @@ class Config
     public function getLanguagesPath(): string
     {
         return $this->basePath . '/languages';
+    }
+
+    public function getDbPath(): string
+    {
+        return $this->getEnv('DB_PATH', 'bot.db');
     }
 
     private function printError(string $message): void

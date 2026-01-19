@@ -35,8 +35,7 @@ class Bot
         // 2. Logger
         $this->container->register('logger', fn($c) => new Logger(
             $c->get('config')->getLogFile(),
-            $c->get('config')->getLogLevel(),
-            $c->get('config')->isDebugMode()
+            $c->get('config')->getLogLevel()
         ));
         $this->logger = $this->container->get('logger');
 
@@ -957,6 +956,43 @@ class Bot
         }
     }
 
+    private function handleDebugCallback(string $callbackData, string $chatId, int $messageId, string $language): void
+    {
+        $parts = explode('_', $callbackData);
+        if (count($parts) >= 3 && $parts[0] === 'debug' && $parts[1] === 'set') {
+            $newLevel = $parts[2];
+            $config = $this->container->get('config');
+            $config->setLogLevel($newLevel);
+
+            $currentLevel = $config->getLogLevel();
+            $keyboard = $this->buildDebugKeyboard($currentLevel, $language);
+
+            $this->telegram->editMessageText($chatId, $messageId,
+                $this->translator->translate('admin.debug.current', $language, [$currentLevel]),
+                'HTML',
+                $keyboard
+            );
+
+            $this->telegram->sendMessage($chatId,
+                $this->translator->translate('admin.debug.changed', $language, [$newLevel]),
+                'HTML'
+            );
+        }
+    }
+
+    private function buildDebugKeyboard(string $currentLevel, string $language): \TelegramBot\Api\Types\Inline\InlineKeyboardMarkup
+    {
+        $levels = ['DEBUG', 'INFO', 'WARNING', 'ERROR'];
+        $buttons = [];
+
+        foreach ($levels as $level) {
+            $indicator = ($level === $currentLevel) ? '✅ ' : '';
+            $buttons[] = ['text' => $indicator . $level, 'callback_data' => "debug_set_{$level}"];
+        }
+
+        return new \TelegramBot\Api\Types\Inline\InlineKeyboardMarkup([$buttons]);
+    }
+
     private function handleProfileCallback(string $callbackData, string $chatId, int $messageId, string $language): void
     {
         $this->logger->debug("Обробка profile callback: $callbackData");
@@ -1006,6 +1042,9 @@ class Bot
                 break;
             case 'profile':
                 $this->handleProfileCallback($callbackData, $chatId, $messageId, $language);
+                break;
+            case 'debug':
+                $this->handleDebugCallback($callbackData, $chatId, $messageId, $language);
                 break;
             default:
                 $this->logger->warning("Невідомий тип callback: $type");
