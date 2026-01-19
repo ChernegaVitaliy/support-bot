@@ -88,12 +88,12 @@ class ReportService
             foreach ($mediaFiles as $index => $item) {
                 if ($item['type'] === 'photo') {
                     $media = new \TelegramBot\Api\Types\InputMedia\InputMediaPhoto();
-                    $media->setMedia($item['file_id']);
                 } else {
                     $media = new \TelegramBot\Api\Types\InputMedia\InputMediaVideo();
-                    $media->setMedia($item['file_id']);
                 }
-                
+                $media->setType($item['type']);
+                $media->setMedia($item['file_id']);
+
                 if ($index === 0) {
                     $media->setCaption($caption);
                     $media->setParseMode('HTML');
@@ -103,7 +103,7 @@ class ReportService
 
             $this->telegram->sendMediaGroup($chatId, $inputMedia);
             if ($keyboard) {
-                $this->telegram->sendMessage($chatId, "⚙️ <b>" . $this->translator->translate('common.choose_action', $language) . "</b>", 'HTML', false, null, $keyboard);
+                $this->telegram->sendMessage($chatId, "<b>" . $this->translator->translate('common.choose_action', $language) . "</b>", 'HTML', false, null, $keyboard);
             }
         } else {
             $this->telegram->sendMessage($chatId, $caption, 'HTML', false, null, $keyboard);
@@ -127,9 +127,9 @@ class ReportService
             $session['data']['reporter_nick'],
             $session['data']['reported_nick'],
             $session['data']['reason'],
-            $session['data']['text_proof'] ?? null,
+            !empty($session['data']['media_files']) ? json_encode($session['data']['media_files']) : ($session['data']['text_proof'] ?? null),
             !empty($session['data']['media_files']) ? 'multiple_media' : 'text',
-            !empty($session['data']['media_files']) ? json_encode($session['data']['media_files']) : null
+            null
         );
 
         if ($reportId) {
@@ -143,18 +143,61 @@ class ReportService
     private function notifyAdmins(int $reportId, array $session, string $language): void
     {
         $admins = $this->db->getAllAdmins();
-        $message = $this->translator->translate('report.new_notification', $language, [
-            $reportId,
-            $session['data']['reporter_nick'],
-            $session['data']['reported_nick'],
-            $session['data']['reason']
+
+        $caption = "<b>#{$reportId}</b>\n\n";
+        $caption .= "<b>" . $this->translator->translate('report.reporter', $language) . ":</b> <code>{$session['data']['reporter_nick']}</code>\n";
+        $caption .= "<b>" . $this->translator->translate('report.violator', $language) . ":</b> <code>{$session['data']['reported_nick']}</code>\n";
+        $caption .= "<b>" . $this->translator->translate('common.reason', $language) . ":</b> <code>{$session['data']['reason']}</code>\n";
+        $caption .= "<b>" . $this->translator->translate('common.date', $language) . ":</b> " . date("d.m.Y H:i") . "\n";
+        $caption .= "<b>" . $this->translator->translate('common.status', $language) . ":</b> " . $this->translator->translate('report.pending', $language) . "\n";
+
+        if (!empty($session['data']['text_proof'])) {
+            $caption .= "<b>" . $this->translator->translate('report.proof', $language) . ":</b> {$session['data']['text_proof']}\n";
+        }
+
+        $keyboard = new InlineKeyboardMarkup([
+            [
+                ['text' => $this->translator->translate('report.buttons.accept', $language), 'callback_data' => "accept_{$reportId}_0"],
+                ['text' => $this->translator->translate('report.buttons.reject', $language), 'callback_data' => "reject_{$reportId}_0"]
+            ]
         ]);
-        
-        $message .= "\n\n🔍 /report $reportId";
+
+        $mediaFiles = $session['data']['media_files'] ?? [];
 
         foreach ($admins as $admin) {
             try {
-                $this->telegram->sendMessage($admin['user_id'], $message, 'HTML');
+                if (!empty($admin['user_id'])) {
+                    if (count($mediaFiles) === 1) {
+                        $item = $mediaFiles[0];
+                        if ($item['type'] === 'photo') {
+                            $this->telegram->sendPhoto($admin['user_id'], $item['file_id'], $caption, 'HTML', $keyboard);
+                        } else {
+                            $this->telegram->sendVideo($admin['user_id'], $item['file_id'], $caption, 'HTML', $keyboard);
+                        }
+                    } elseif (count($mediaFiles) > 1) {
+                        $inputMedia = new \TelegramBot\Api\Types\InputMedia\ArrayOfInputMedia();
+                        foreach ($mediaFiles as $index => $item) {
+                            if ($item['type'] === 'photo') {
+                                $media = new \TelegramBot\Api\Types\InputMedia\InputMediaPhoto();
+                            } else {
+                                $media = new \TelegramBot\Api\Types\InputMedia\InputMediaVideo();
+                            }
+                            $media->setType($item['type']);
+                            $media->setMedia($item['file_id']);
+
+                            if ($index === 0) {
+                                $media->setCaption($caption);
+                                $media->setParseMode('HTML');
+                            }
+                            $inputMedia->addItem($media);
+                        }
+
+                        $this->telegram->sendMediaGroup($admin['user_id'], $inputMedia);
+                        $this->telegram->sendMessage($admin['user_id'], "<b>" . $this->translator->translate('common.choose_action', $language) . "</b>", 'HTML', false, null, $keyboard);
+                    } else {
+                        $this->telegram->sendMessage($admin['user_id'], $caption, 'HTML', false, null, $keyboard);
+                    }
+                }
             } catch (\Exception $e) {
                 // Ignore
             }

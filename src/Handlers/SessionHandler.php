@@ -174,15 +174,16 @@ class SessionHandler
         $message = "<b>" . $this->translator->translate('report.title', $language) . "</b>\n\n";
 
         if ($mediaCount > 0) {
-            $message .= $this->translator->translate('report.media_added', $language, [$mediaCount]) . "\n";
+            $message .= $this->translator->translate('report.media_added', $language, [$mediaCount]);
+            if ($hasTextProof) {
+                $message .= "\n" . $this->translator->translate('common.success', $language);
+            }
+            $message .= "\n\n";
+        } elseif ($hasTextProof) {
+            $message .= $this->translator->translate('common.success', $language) . "\n\n";
         }
 
-        if ($hasTextProof) {
-            $message .= $this->translator->translate('common.success', $language) . "\n";
-        }
-
-        $message .= "\n<i>" . $this->translator->translate('common.info', $language) . "</i>";
-        $message .= "\n\n" . $this->translator->translate('report.cancel_hint', $language);
+        $message .= $this->translator->translate('report.cancel_hint', $language);
 
         $keyboard = new InlineKeyboardMarkup([
             [
@@ -208,5 +209,53 @@ class SessionHandler
         } else {
             $this->telegram->sendMessage($chatId, $this->translator->translate('errors.save_error', $language));
         }
+    }
+
+    public function handleAdminActionSession(Message $message, string $language): void
+    {
+        $chatId = (string)$message->getChat()->getId();
+        $text = $message->getText() ?? '';
+
+        if ($text === '/cancel') {
+            $this->sessionManager->clearAdminActionSession($chatId);
+            $this->telegram->sendMessage($chatId, $this->translator->translate('report.process.cancel', $language));
+            return;
+        }
+
+        $session = $this->sessionManager->getAdminActionSession($chatId);
+        if (!$session || $session['type'] !== 'report_comment') return;
+
+        $reportId = $session['report_id'];
+        $action = $session['action'];
+        $messageId = $session['message_id'];
+        $comment = trim($text);
+
+        $report = $this->db->getReportById($reportId);
+        if (!$report || $report['status'] !== 'pending') {
+            $this->sessionManager->clearAdminActionSession($chatId);
+            return;
+        }
+
+        $newStatus = ($action === 'accept') ? 'accepted' : 'rejected';
+        $this->db->updateReportStatus($reportId, $newStatus, $comment, $chatId);
+
+        $statusText = $this->translator->translate("report.$newStatus", $language);
+        $updatedText = $this->translator->translate("report.status_updated", $language, [$reportId, $statusText]);
+        if (!empty($comment)) {
+            $updatedText .= "\n" . $this->translator->translate('report.admin_comment', $language, [$comment]);
+        }
+
+        $this->telegram->editMessageText($chatId, $messageId, $updatedText);
+
+        if (!empty($report['user_id'])) {
+            $notifyText = $this->translator->translate("report.notification_status_changed", $language, [$reportId, $statusText]);
+            if (!empty($comment)) {
+                $notifyText .= "\n" . $this->translator->translate('report.admin_comment', $language, [$comment]);
+            }
+            $this->telegram->sendMessage($report['user_id'], $notifyText);
+        }
+
+        $this->sessionManager->clearAdminActionSession($chatId);
+        $this->telegram->sendMessage($chatId, $this->translator->translate("report.process.complete", $language));
     }
 }

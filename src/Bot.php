@@ -103,13 +103,10 @@ class Bot
             $c->get('translator')
         ));
 
+        // 11. ReportsCommand (for pagination)
+        $this->container->register('reports_command', fn($c) => new \App\Commands\Admin\ReportsCommand($c));
+
         $this->registerDefaultCommands();
-
-        // Set bot profile information from translations
-        $this->setBotProfileInfo();
-
-        // Register bot commands with Telegram
-        $this->registerBotCommands();
 
         $this->displayBanner();
     }
@@ -136,6 +133,7 @@ class Bot
         $this->commands[] = new \App\Commands\Admin\SetRankCommand($this->container);
         $this->commands[] = new \App\Commands\Admin\RemoveAdminCommand($this->container);
         $this->commands[] = new \App\Commands\Admin\AddAdminCommand($this->container);
+        $this->commands[] = new \App\Commands\Admin\AdminListCommand($this->container);
     }
 
     private function displayBanner(): void
@@ -403,7 +401,7 @@ class Bot
         }
 
         if ($this->sessionManager->hasAdminActionSession($chatId)) {
-            $this->logger->info("АДМІН-СЕСІЯ для $chatId");
+            $this->container->get('session_handler')->handleAdminActionSession($message, $language);
             return;
         }
 
@@ -443,9 +441,9 @@ class Bot
                     'target_type' => 'all'
                 ]));
                 $this->telegram->editMessageText($chatId, $messageId,
-                    "✅ <b>" . $this->translator->translate('broadcast_selected_all', $language) . "</b>\n\n" .
-                    "📝 " . $this->translator->translate('broadcast_send_message', $language) . "\n\n" .
-                    "💡 <i>" . $this->translator->translate('broadcast_media_album_hint', $language) . "</i>"
+                    "<b>" . $this->translator->translate('broadcast_selected_all', $language) . "</b>\n\n" .
+                    $this->translator->translate('broadcast_send_message', $language) . "\n\n" .
+                    "<i>" . $this->translator->translate('broadcast_media_album_hint', $language) . "</i>"
                 );
                 $this->showMediaControls($chatId, $session, $language);
                 break;
@@ -465,9 +463,9 @@ class Bot
                     'target_type' => 'admins'
                 ]));
                 $this->telegram->editMessageText($chatId, $messageId,
-                    "✅ <b>" . $this->translator->translate('broadcast_selected_admins', $language) . "</b>\n\n" .
-                    "📝 " . $this->translator->translate('broadcast_send_message', $language) . "\n\n" .
-                    "💡 <i>" . $this->translator->translate('broadcast_media_album_hint', $language) . "</i>"
+                    "<b>" . $this->translator->translate('broadcast_selected_admins', $language) . "</b>\n\n" .
+                    $this->translator->translate('broadcast_send_message', $language) . "\n\n" .
+                    "<i>" . $this->translator->translate('broadcast_media_album_hint', $language) . "</i>"
                 );
                 $this->showMediaControls($chatId, $session, $language);
                 break;
@@ -479,9 +477,9 @@ class Bot
                     'target_type' => 'users'
                 ]));
                 $this->telegram->editMessageText($chatId, $messageId,
-                    "✅ <b>" . $this->translator->translate('broadcast_selected_users', $language) . "</b>\n\n" .
-                    "📝 " . $this->translator->translate('broadcast_send_message', $language) . "\n\n" .
-                    "💡 <i>" . $this->translator->translate('broadcast_media_album_hint', $language) . "</i>"
+                    "<b>" . $this->translator->translate('broadcast_selected_users', $language) . "</b>\n\n" .
+                    $this->translator->translate('broadcast_send_message', $language) . "\n\n" .
+                    "<i>" . $this->translator->translate('broadcast_media_album_hint', $language) . "</i>"
                 );
                 $this->showMediaControls($chatId, $session, $language);
                 break;
@@ -494,13 +492,13 @@ class Bot
             case 'broadcast_add_photo':
                 $session = $this->sessionManager->getBroadcastSession($chatId);
                 $this->sessionManager->setBroadcastSession($chatId, array_merge($session, ['awaiting_media_type' => 'photo']));
-                $this->telegram->sendMessage($chatId, "📸 <b>" . $this->translator->translate('add_photo_title', $language) . "</b>\n\n" . $this->translator->translate('broadcast_send_photo', $language));
+                $this->telegram->sendMessage($chatId, "<b>" . $this->translator->translate('add_photo_title', $language) . "</b>\n\n" . $this->translator->translate('broadcast_send_photo', $language));
                 break;
 
             case 'broadcast_add_video':
                 $session = $this->sessionManager->getBroadcastSession($chatId);
                 $this->sessionManager->setBroadcastSession($chatId, array_merge($session, ['awaiting_media_type' => 'video']));
-                $this->telegram->sendMessage($chatId, "🎬 <b>" . $this->translator->translate('add_video_title', $language) . "</b>\n\n" . $this->translator->translate('broadcast_send_video', $language));
+                $this->telegram->sendMessage($chatId, "<b>" . $this->translator->translate('add_video_title', $language) . "</b>\n\n" . $this->translator->translate('broadcast_send_video', $language));
                 break;
 
             case 'broadcast_view_media':
@@ -512,7 +510,7 @@ class Bot
                 $session = $this->sessionManager->getBroadcastSession($chatId);
                 $session['media'] = [];
                 $this->sessionManager->setBroadcastSession($chatId, $session);
-                $this->telegram->sendMessage($chatId, "🗑️ <b>" . $this->translator->translate('media_cleared', $language) . "</b>");
+                $this->telegram->sendMessage($chatId, "<b>" . $this->translator->translate('media_cleared', $language) . "</b>");
                 $this->showMediaControls($chatId, $session, $language);
                 break;
 
@@ -570,8 +568,8 @@ class Bot
                 $session['step'] = 'message';
                 $this->sessionManager->setBroadcastSession($chatId, $session);
                 $this->telegram->editMessageText($chatId, $messageId,
-                    "✅ <b>" . $this->translator->translate('broadcast_selected_for', $language) . ":</b> $langsText\n\n" .
-                    "📝 " . $this->translator->translate('broadcast_send_message', $language)
+                    "<b>" . $this->translator->translate('broadcast_selected_for', $language) . ":</b> $langsText\n\n" .
+                    $this->translator->translate('broadcast_send_message', $language)
                 );
                 $this->showMediaControls($chatId, $session, $language);
                 break;
@@ -643,19 +641,18 @@ class Bot
         $selectedLangs = $session['selected_languages'] ?? [];
         if (!empty($selectedLangs)) {
             $selectedText = implode(', ', array_map([$this, 'getLanguageName'], $selectedLangs));
-            $message .= "✅ <b>" . $this->translator->translate('selected', $language) . ":</b> $selectedText\n\n";
+            $message .= "<b>" . $this->translator->translate('selected', $language) . ":</b> $selectedText\n\n";
         }
 
-        $message .= "📋 <i>" . $this->translator->translate('page', $language) . " " . ($currentPage + 1) . " " . $this->translator->translate('of', $language) . " $totalPages</i>\n";
-        $message .= "💡 <i>" . $this->translator->translate('select_multiple_languages', $language) . "</i>\n\n";
-        $message .= "🔘 <b>" . $this->translator->translate('broadcast_or_send_all', $language) . " $targetName</b>";
+        $message .= "<i>" . $this->translator->translate('page', $language) . " " . ($currentPage + 1) . " " . $this->translator->translate('of', $language) . " $totalPages</i>\n";
+        $message .= "<i>" . $this->translator->translate('select_multiple_languages', $language) . "</i>\n\n";
+        $message .= "<b>" . $this->translator->translate('broadcast_or_send_all', $language) . " $targetName</b>";
 
         $keyboard = [];
         $row = [];
         foreach ($pageLanguages as $langCode) {
             $isSelected = in_array($langCode, $selectedLangs);
-            $emoji = $isSelected ? '✅ ' : '';
-            $row[] = ['text' => $emoji . $this->getLanguageName($langCode), 'callback_data' => 'broadcast_lang_' . $langCode];
+            $row[] = ['text' => ($isSelected ? '[x] ' : '[ ] ') . $this->getLanguageName($langCode), 'callback_data' => 'broadcast_lang_' . $langCode];
             if (count($row) == 2) {
                 $keyboard[] = $row;
                 $row = [];
@@ -667,14 +664,14 @@ class Bot
 
         $navButtons = [];
         if ($currentPage > 0) {
-            $navButtons[] = ['text' => '⬅️ ' . $this->translator->translate('back', $language), 'callback_data' => 'broadcast_lang_prev'];
+            $navButtons[] = ['text' => $this->translator->translate('back', $language), 'callback_data' => 'broadcast_lang_prev'];
         }
-        $navButtons[] = ['text' => '✅ ' . $this->translator->translate('next', $language), 'callback_data' => 'broadcast_lang_next'];
+        $navButtons[] = ['text' => $this->translator->translate('next', $language), 'callback_data' => 'broadcast_lang_next'];
         if ($currentPage < $totalPages - 1) {
-            $navButtons[] = ['text' => $this->translator->translate('next', $language) . ' ➡️', 'callback_data' => 'broadcast_lang_next_page'];
+            $navButtons[] = ['text' => $this->translator->translate('next', $language), 'callback_data' => 'broadcast_lang_next_page'];
         }
         $keyboard[] = $navButtons;
-        $keyboard[] = [['text' => '❌ ' . $this->translator->translate('cancel', $language), 'callback_data' => 'broadcast_cancel']];
+        $keyboard[] = [['text' => $this->translator->translate('cancel', $language), 'callback_data' => 'broadcast_cancel']];
 
         $this->telegram->editMessageText($chatId, $messageId, $message, 'HTML', new \TelegramBot\Api\Types\Inline\InlineKeyboardMarkup($keyboard));
     }
@@ -682,44 +679,15 @@ class Bot
     private function getLanguageName(string $langCode): string
     {
         $languageNames = [
-            'uk' => '🇺🇦 Українська',
-            'ru' => '🇷🇺 Русский',
-            'en' => '🇺🇸 English',
-            'es' => '🇪🇸 Español',
-            'de' => '🇩🇪 Deutsch',
-            'fr' => '🇫🇷 Français',
-            'it' => '🇮🇹 Italiano',
-            'pt' => '🇵🇹 Português',
-            'zh' => '🇨🇳 中文',
-            'ja' => '🇯🇵 日本語',
-            'ko' => '🇰🇷 한국어',
-            'ar' => '🇸🇦 العربية',
-            'fa' => '🇮🇷 فارسی',
-            'tr' => '🇹🇷 Türkçe',
-            'pl' => '🇵🇱 Polski',
-            'nl' => '🇳🇱 Nederlands',
-            'cs' => '🇨🇿 Čeština',
-            'sr' => '🇷🇸 Сranzки',
-            'bg' => '🇧🇬 Български',
-            'ro' => '🇷🇴 Română',
-            'hu' => '🇭🇺 Magyar',
-            'fi' => '🇫🇮 Suomi',
-            'sv' => '🇸🇪 Svenska',
-            'da' => '🇩🇰 Dansk',
-            'nb' => '🇳🇴 Norsk',
-            'hi' => '🇮🇳 हिन्दी',
-            'id' => '🇮🇩 Indonesia',
-            'vi' => '🇻🇳 Tiếng Việt',
-            'th' => '🇹🇭 ไทย',
-            'el' => '🇬🇷 Ελληνικά',
-            'he' => '🇮🇱 עברית',
-            'hr' => '🇭🇷 Hrvatski',
-            'sk' => '🇸🇰 Slovenčina',
-            'uz' => '🇺🇿 Oʻzbekcha',
-            'ms' => '🇲🇾 Bahasa Melayu',
-            'kk' => '🇰🇿 Қазақша',
-            'ca' => '🇪🇸 Català',
-            'be' => '🇧🇾 Беларуская'
+            'uk' => 'Українська',
+            'ru' => 'Русский',
+            'en' => 'English',
+            'es' => 'Español',
+            'de' => 'Deutsch',
+            'fr' => 'Français',
+            'it' => 'Italiano',
+            'pt' => 'Português',
+            'zh' => '中文',
         ];
         return $languageNames[$langCode] ?? $langCode;
     }
@@ -734,8 +702,8 @@ class Bot
             return;
         }
 
-        $message = "🎛️ <b>" . $this->translator->translate('media_gallery', $language) . "</b>\n\n";
-        $message .= "📊 " . $this->translator->translate('total_files', $language) . ": $mediaCount\n\n";
+        $message = "<b>" . $this->translator->translate('media_gallery', $language) . "</b>\n\n";
+        $message .= $this->translator->translate('total_files', $language) . ": $mediaCount\n\n";
 
         $keyboard = [];
         $photos = array_filter($media, fn($m) => $m['type'] === 'photo');
@@ -745,17 +713,17 @@ class Bot
         $videoCount = count($videos);
 
         if ($photoCount > 0) {
-            $message .= "📸 <b>" . $this->translator->translate('photos', $language) . ":</b> $photoCount\n";
+            $message .= "<b>" . $this->translator->translate('photos', $language) . ":</b> $photoCount\n";
         }
         if ($videoCount > 0) {
-            $message .= "🎬 <b>" . $this->translator->translate('videos', $language) . ":</b> $videoCount\n";
+            $message .= "<b>" . $this->translator->translate('videos', $language) . ":</b> $videoCount\n";
         }
 
-        $message .= "\n💡 <i>" . $this->translator->translate('media_album_will_be_sent', $language) . "</i>";
+        $message .= "\n<i>" . $this->translator->translate('media_album_will_be_sent', $language) . "</i>";
 
         $keyboard[] = [
-            ['text' => '🗑️ ' . $this->translator->translate('clear_all', $language), 'callback_data' => 'broadcast_clear_media'],
-            ['text' => '✅ ' . $this->translator->translate('back', $language), 'callback_data' => 'broadcast_back_to_media']
+            ['text' => $this->translator->translate('clear_all', $language), 'callback_data' => 'broadcast_clear_media'],
+            ['text' => $this->translator->translate('back', $language), 'callback_data' => 'broadcast_back_to_media']
         ];
 
         $this->telegram->sendMessage($chatId, $message, 'HTML', false, null, new \TelegramBot\Api\Types\Inline\InlineKeyboardMarkup($keyboard));
@@ -767,38 +735,38 @@ class Bot
         $photosCount = count(array_filter($session['media'] ?? [], fn($m) => $m['type'] === 'photo'));
         $videosCount = count(array_filter($session['media'] ?? [], fn($m) => $m['type'] === 'video'));
 
-        $message = "📦 <b>" . $this->translator->translate('media_management', $language) . "</b>\n\n";
+        $message = "<b>" . $this->translator->translate('media_management', $language) . "</b>\n\n";
 
         if (!empty($session['message_text'])) {
-            $message .= "📝 <b>" . $this->translator->translate('text', $language) . ":</b> " . substr($session['message_text'], 0, 100) . (strlen($session['message_text']) > 100 ? "..." : "") . "\n\n";
+            $message .= "<b>" . $this->translator->translate('text', $language) . ":</b> " . substr($session['message_text'], 0, 100) . (strlen($session['message_text']) > 100 ? "..." : "") . "\n\n";
         }
 
-        $message .= "📊 <b>" . $this->translator->translate('media_statistics', $language) . ":</b>\n";
-        $message .= "📸 " . $this->translator->translate('photos', $language) . ": $photosCount " . $this->translator->translate('items', $language) . "\n";
-        $message .= "🎬 " . $this->translator->translate('videos', $language) . ": $videosCount " . $this->translator->translate('items', $language) . "\n";
-        $message .= "📦 " . $this->translator->translate('total', $language) . ": $mediaCount " . $this->translator->translate('files', $language) . "\n\n";
+        $message .= "<b>" . $this->translator->translate('media_statistics', $language) . ":</b>\n";
+        $message .= $this->translator->translate('photos', $language) . ": $photosCount " . $this->translator->translate('items', $language) . "\n";
+        $message .= $this->translator->translate('videos', $language) . ": $videosCount " . $this->translator->translate('items', $language) . "\n";
+        $message .= $this->translator->translate('total', $language) . ": $mediaCount " . $this->translator->translate('files', $language) . "\n\n";
 
         if ($mediaCount > 0) {
-            $message .= "💡 <i>" . $this->translator->translate('media_album_hint', $language) . "</i>\n\n";
+            $message .= "<i>" . $this->translator->translate('media_album_hint', $language) . "</i>\n\n";
         }
 
         $message .= $this->translator->translate('choose_action', $language);
 
         $keyboardArray = [];
         $keyboardArray[] = [
-            ['text' => '📸 ' . $this->translator->translate('add_photo', $language), 'callback_data' => 'broadcast_add_photo'],
-            ['text' => '🎬 ' . $this->translator->translate('add_video', $language), 'callback_data' => 'broadcast_add_video']
+            ['text' => $this->translator->translate('add_photo', $language), 'callback_data' => 'broadcast_add_photo'],
+            ['text' => $this->translator->translate('add_video', $language), 'callback_data' => 'broadcast_add_video']
         ];
 
         if ($mediaCount > 0) {
             $keyboardArray[] = [
-                ['text' => '🎛️ ' . $this->translator->translate('media_management', $language), 'callback_data' => 'broadcast_view_media'],
-                ['text' => '🗑️ ' . $this->translator->translate('clear_all', $language), 'callback_data' => 'broadcast_clear_media']
+                ['text' => $this->translator->translate('media_management', $language), 'callback_data' => 'broadcast_view_media'],
+                ['text' => $this->translator->translate('clear_all', $language), 'callback_data' => 'broadcast_clear_media']
             ];
         }
 
         $keyboardArray[] = [
-            ['text' => '✅ ' . $this->translator->translate('finish_adding', $language), 'callback_data' => 'broadcast_finish_media']
+            ['text' => $this->translator->translate('finish_adding', $language), 'callback_data' => 'broadcast_finish_media']
         ];
 
         $keyboard = new \TelegramBot\Api\Types\Inline\InlineKeyboardMarkup($keyboardArray);
@@ -808,16 +776,16 @@ class Bot
 
     private function showBroadcastPreview(string $chatId, array $session, string $language): void
     {
-        $previewMessage = "👁️ <b>" . $this->translator->translate('broadcast_preview', $language) . "</b>\n\n";
+        $previewMessage = "<b>" . $this->translator->translate('broadcast_preview', $language) . "</b>\n\n";
 
         if (in_array('all', $session['selected_languages'])) {
-            $previewMessage .= "👥 <b>" . $this->translator->translate('recipients', $language) . ":</b> " . $this->translator->translate('all_users', $language) . "\n";
+            $previewMessage .= "<b>" . $this->translator->translate('recipients', $language) . ":</b> " . $this->translator->translate('all_users', $language) . "\n";
         } else {
             $langsText = implode(', ', array_map([$this, 'getLanguageName'], $session['selected_languages']));
-            $previewMessage .= "🌍 <b>" . $this->translator->translate('languages', $language) . ":</b> $langsText\n";
+            $previewMessage .= "<b>" . $this->translator->translate('languages', $language) . ":</b> $langsText\n";
         }
 
-        $previewMessage .= "📝 <b>" . $this->translator->translate('text', $language) . ":</b> " . ($session['message_text'] ?: $this->translator->translate('none', $language)) . "\n";
+        $previewMessage .= "<b>" . $this->translator->translate('text', $language) . ":</b> " . ($session['message_text'] ?: $this->translator->translate('none', $language)) . "\n";
 
         $mediaCount = count($session['media'] ?? []);
         $photosCount = count(array_filter($session['media'] ?? [], fn($m) => $m['type'] === 'photo'));
@@ -826,15 +794,15 @@ class Bot
         $previewMessage .= "📦 <b>" . $this->translator->translate('media', $language) . ":</b> $mediaCount " . $this->translator->translate('files', $language) . " ($photosCount " . $this->translator->translate('photos', $language) . ", $videosCount " . $this->translator->translate('videos', $language) . ")\n\n";
         $previewMessage .= "💡 <i>" . $this->translator->translate('media_album_hint', $language) . "</i>\n\n";
 
-        $previewMessage .= "❓ <b>" . $this->translator->translate('everything_correct_confirm', $language) . "</b>";
+        $previewMessage .= "<b>" . $this->translator->translate('everything_correct_confirm', $language) . "</b>";
 
         $keyboard = new \TelegramBot\Api\Types\Inline\InlineKeyboardMarkup([
             [
-                ['text' => '✅ ' . $this->translator->translate('yes_start_broadcast', $language), 'callback_data' => 'broadcast_confirm'],
-                ['text' => '✏️ ' . $this->translator->translate('edit', $language), 'callback_data' => 'broadcast_edit']
+                ['text' => $this->translator->translate('yes_start_broadcast', $language), 'callback_data' => 'broadcast_confirm'],
+                ['text' => $this->translator->translate('edit', $language), 'callback_data' => 'broadcast_edit']
             ],
             [
-                ['text' => '❌ ' . $this->translator->translate('cancel', $language), 'callback_data' => 'broadcast_cancel_final']
+                ['text' => $this->translator->translate('cancel', $language), 'callback_data' => 'broadcast_cancel_final']
             ]
         ]);
 
@@ -885,11 +853,11 @@ class Bot
                 'users' => $this->translator->translate('broadcast_no_users', $language),
                 default => $this->translator->translate('broadcast_no_users', $language)
             };
-            $this->telegram->sendMessage($chatId, "❌ <b>" . $this->translator->translate('broadcast_error', $language) . "</b>\n\n$targetName");
+            $this->telegram->sendMessage($chatId, "<b>" . $this->translator->translate('broadcast_error', $language) . "</b>\n\n$targetName");
             return;
         }
 
-        $this->telegram->sendMessage($chatId, "📊 <b>" . $this->translator->translate('broadcast_progress', $language) . "</b>\n\n" . $this->translator->translate('progress', $language) . ": 0/$totalUsers\n✅ " . $this->translator->translate('successful', $language) . ": 0");
+        $this->telegram->sendMessage($chatId, "<b>" . $this->translator->translate('broadcast_progress', $language) . "</b>\n\n" . $this->translator->translate('progress', $language) . ": 0/$totalUsers\n" . $this->translator->translate('successful', $language) . ": 0");
 
         $success = 0;
         $failed = 0;
@@ -914,9 +882,9 @@ class Bot
             }
 
             if ($current % 5 === 0 || $current === $totalUsers) {
-                $progressMessage = "📊 <b>" . $this->translator->translate('broadcast_progress', $language) . "</b>\n\n" . 
-                    $this->translator->translate('progress', $language) . ": $current/$totalUsers\n✅ " . 
-                    $this->translator->translate('successful', $language) . ": $success\n❌ " . 
+                $progressMessage = "<b>" . $this->translator->translate('broadcast_progress', $language) . "</b>\n\n" .
+                    $this->translator->translate('progress', $language) . ": $current/$totalUsers\n" .
+                    $this->translator->translate('successful', $language) . ": $success\n" .
                     $this->translator->translate('errors', $language) . ": $failed";
                 $this->telegram->sendMessage($chatId, $progressMessage, 'HTML');
             }
@@ -930,9 +898,9 @@ class Bot
             default => $this->translator->translate('broadcast_all_target', $language)
         };
 
-        $finalMessage = "🎉 <b>" . $this->translator->translate('broadcast_completed', $language) . " $targetName!</b>\n\n✅ " . 
-            $this->translator->translate('successful', $language) . ": $success\n❌ " . 
-            $this->translator->translate('errors', $language) . ": $failed\n👥 " . 
+        $finalMessage = "<b>" . $this->translator->translate('broadcast_completed', $language) . " $targetName!</b>\n\n" .
+            $this->translator->translate('successful', $language) . ": $success\n" .
+            $this->translator->translate('errors', $language) . ": $failed\n" .
             $this->translator->translate('total', $language) . ": $totalUsers";
         $this->telegram->sendMessage($chatId, $finalMessage, 'HTML');
     }
@@ -980,6 +948,15 @@ class Bot
         $this->container->get('callback_handler')->handleReportActionCallback($callbackData, $chatId, $messageId, $language);
     }
 
+    private function handleReportsPageCallback(string $callbackData, string $chatId, int $messageId, string $language): void
+    {
+        $parts = explode('_', $callbackData);
+        if (count($parts) >= 3 && $parts[0] === 'reports' && $parts[1] === 'page') {
+            $page = (int)$parts[2];
+            $this->container->get('reports_command')->executeWithPage($chatId, $page, $messageId, $language);
+        }
+    }
+
     private function handleProfileCallback(string $callbackData, string $chatId, int $messageId, string $language): void
     {
         $this->logger->debug("Обробка profile callback: $callbackData");
@@ -1020,6 +997,9 @@ class Bot
             case 'accept':
             case 'reject':
                 $this->handleReportActionCallback($callbackData, $chatId, $messageId, $language);
+                break;
+            case 'reports':
+                $this->handleReportsPageCallback($callbackData, $chatId, $messageId, $language);
                 break;
             case 'admin':
                 $this->handleAdminCallback($callbackData, $chatId, $messageId, $language);

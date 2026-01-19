@@ -22,10 +22,11 @@ class SetupBotCommand extends Command
     protected function configure(): void
     {
         $this->setName('bot:setup')
-            ->setDescription('Setup bot name, description and short description')
+            ->setDescription('Setup bot name, description, short description and register commands')
             ->addOption('name', null, InputOption::VALUE_OPTIONAL, 'Bot name')
             ->addOption('description', null, InputOption::VALUE_OPTIONAL, 'Bot description')
             ->addOption('short-description', null, InputOption::VALUE_OPTIONAL, 'Bot short description')
+            ->addOption('register-commands', null, InputOption::VALUE_NONE, 'Register bot commands')
             ->addOption('language', 'l', InputOption::VALUE_OPTIONAL, 'Language code', 'uk');
     }
 
@@ -33,11 +34,13 @@ class SetupBotCommand extends Command
     {
         $telegram = $this->container->get('telegram');
         $translator = $this->container->get('translator');
+        $logger = $this->container->get('logger');
 
         $language = $input->getOption('language');
         $name = $input->getOption('name');
         $description = $input->getOption('description');
         $shortDescription = $input->getOption('short-description');
+        $registerCommands = $input->getOption('register-commands');
 
         if (!$name) {
             $name = $translator->translate('bot.name', $language);
@@ -69,11 +72,53 @@ class SetupBotCommand extends Command
             $result = $telegram->setMyShortDescription($shortDescription, $language) && $result;
         }
 
+        if ($registerCommands) {
+            $output->writeln('Registering bot commands...');
+            $commands = [];
+
+            $commandClasses = [
+                'App\Commands\AboutCommand',
+                'App\Commands\StartCommand',
+                'App\Commands\HelpCommand',
+                'App\Commands\ReportCommand',
+                'App\Commands\StatsCommand',
+                'App\Commands\CancelCommand',
+                'App\Commands\MyRankCommand',
+                'App\Commands\ProfileCommand',
+                'App\Commands\MyIdCommand',
+                'App\Commands\Admin\ReportsCommand',
+                'App\Commands\Admin\BroadcastCommand',
+                'App\Commands\Admin\RejectReportCommand',
+                'App\Commands\Admin\AcceptReportCommand',
+                'App\Commands\Admin\DebugCommand',
+                'App\Commands\Admin\SetRankCommand',
+                'App\Commands\Admin\RemoveAdminCommand',
+                'App\Commands\Admin\AddAdminCommand',
+            ];
+
+            foreach ($commandClasses as $className) {
+                if (class_exists($className)) {
+                    $command = new $className($this->container);
+                    $commands[] = [
+                        'command' => ltrim($command->getName(), '/'),
+                        'description' => $command->getDescription($language)
+                    ];
+                }
+            }
+
+            if ($telegram->setMyCommands($commands, null, $language)) {
+                $output->writeln('<info>Bot commands registered successfully</info>');
+            } else {
+                $output->writeln('<error>Failed to register bot commands</error>');
+                $result = false;
+            }
+        }
+
         if ($result) {
-            $output->writeln('<info>Bot profile setup completed successfully</info>');
+            $output->writeln('<info>Bot setup completed successfully</info>');
             return Command::SUCCESS;
         } else {
-            $output->writeln('<error>Bot profile setup failed. Check logs for details.</error>');
+            $output->writeln('<error>Bot setup failed. Check logs for details.</error>');
             return Command::FAILURE;
         }
     }

@@ -52,7 +52,7 @@ class RemoveAdminCommand extends BaseCommand
             $this->reply($chatId, $this->t('admin.remove.cannot_remove_owner', $language));
             return;
         }
-        
+
         if ($admin['user_id'] == $currentUserId) {
             $this->reply($chatId, $this->t('admin.remove.cannot_remove_self', $language));
             return;
@@ -60,8 +60,9 @@ class RemoveAdminCommand extends BaseCommand
 
         $targetRankLevel = $this->getRankLevel($admin['rank']);
         $currentRankLevel = $this->getRankLevel($currentRank);
+        $isDefaultOwner = ($currentUserId === $this->db->getDefaultOwnerId());
 
-        if ($currentRankLevel <= $targetRankLevel) {
+        if (!$isDefaultOwner && $currentRankLevel <= $targetRankLevel) {
             $this->reply($chatId, $this->t('errors.no_permission', $language));
             return;
         }

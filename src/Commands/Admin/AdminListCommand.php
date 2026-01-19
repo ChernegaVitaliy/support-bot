@@ -37,17 +37,28 @@ class AdminListCommand extends BaseCommand
             return;
         }
 
-        $text = $this->t('admin.list.title', $language) . ":\n\n";
+        $text = "👑 " . $this->t('admin.list.title', $language) . ":\n\n";
 
         foreach ($admins as $admin) {
             $icon = match($admin['rank']) {
                 'owner' => '👑',
-                'admin' => '🛡️',
-                'moderator' => '🔧',
+                'admin' => '⭐️',
+                'moderator' => '🛡',
                 default => '❓'
             };
-            $username = $admin['username'] ? "@{$admin['username']}" : ($admin['first_name'] ?? $admin['user_id']);
-            $text .= "$icon $username ({$admin['rank']})\n";
+
+            $rankName = match($admin['rank']) {
+                'owner' => 'owner',
+                'admin' => 'admin',
+                'moderator' => 'moderator',
+                default => $admin['rank']
+            };
+
+            $firstName = $admin['first_name'] ?? 'без імені';
+            $username = $admin['username'] ? "@{$admin['username']}" : 'без username';
+            $userId = $admin['user_id'] ?? 'не встановлено';
+
+            $text .= "{$icon} {$rankName} • {$firstName} • {$username} • ID: {$userId}\n";
         }
 
         $this->reply($chatId, $text);

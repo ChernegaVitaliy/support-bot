@@ -63,7 +63,7 @@ class CallbackHandler
         }
     }
 
-    private function handleReportCallback(string $callbackData, string $chatId, string $language): void
+    public function handleReportCallback(string $callbackData, string $chatId, string $language): void
     {
         $session = $this->sessionManager->getReportSession($chatId);
         if (!$session) return;
@@ -89,25 +89,63 @@ class CallbackHandler
         }
     }
 
-    private function handleReportActionCallback(string $callbackData, string $chatId, int $messageId, string $language): void
+    public function handleReportActionCallback(string $callbackData, string $chatId, int $messageId, string $language): void
     {
+        $session = $this->sessionManager->getAdminActionSession($chatId);
+
+        if ($session && isset($session['type']) && $session['type'] === 'report_comment') {
+            $parts = explode('_', $callbackData);
+            $action = $parts[0];
+            $reportId = (int)$parts[1];
+            $comment = trim($callbackData);
+
+            $report = $this->db->getReportById($reportId);
+            if (!$report || $report['status'] !== 'pending') {
+                $this->sessionManager->clearAdminActionSession($chatId);
+                return;
+            }
+
+            $newStatus = ($action === 'accept') ? 'accepted' : 'rejected';
+            $this->db->updateReportStatus($reportId, $newStatus, $comment, $chatId);
+
+            $this->telegram->editMessageText($chatId, $messageId,
+                $this->translator->translate("report.status_updated", $language, [$reportId, $this->translator->translate("report.$newStatus", $language)])
+            );
+
+            if (!empty($report['user_id'])) {
+                $statusText = $this->translator->translate("report.$newStatus", $language);
+                $notifyText = $this->translator->translate("report.notification_status_changed", $language, [$reportId, $statusText]);
+                if (!empty($comment)) {
+                    $notifyText .= "\n" . $this->translator->translate('report.admin_comment', $language, [$comment]);
+                }
+                $this->telegram->sendMessage($report['user_id'], $notifyText);
+            }
+
+            $this->sessionManager->clearAdminActionSession($chatId);
+            return;
+        }
+
         $parts = explode('_', $callbackData);
-        $action = $parts[0]; // accept or reject
+        $action = $parts[0];
         $reportId = (int)$parts[1];
 
         $report = $this->db->getReportById($reportId);
         if (!$report || $report['status'] !== 'pending') return;
 
-        $newStatus = ($action === 'accept') ? 'accepted' : 'rejected';
-        $this->db->updateReportStatus($reportId, $newStatus);
+        $this->sessionManager->setAdminActionSession($chatId, [
+            'type' => 'report_comment',
+            'report_id' => $reportId,
+            'action' => $action,
+            'message_id' => $messageId
+        ]);
 
-        $this->telegram->editMessageText($chatId, $messageId, 
-            $this->translator->translate("report.status_updated", $language, [$reportId, $this->translator->translate("report.$newStatus", $language)])
-        );
-        
-        // Notify reporter
-        $this->telegram->sendMessage($report['user_id'], 
-            $this->translator->translate("report.notification_status_changed", $language, [$reportId, $this->translator->translate("report.$newStatus", $language)])
+        $actionText = ($action === 'accept')
+            ? $this->translator->translate('report.buttons.accept', $language)
+            : $this->translator->translate('report.buttons.reject', $language);
+
+        $this->telegram->sendMessage($chatId,
+            $this->translator->translate('report.process.enter_comment', $language) . "\n\n" .
+            "<b>$actionText</b> #$reportId"
         );
     }
 }

@@ -62,12 +62,14 @@ class AcceptReportCommand extends BaseCommand
             
             // Notify user
             try {
-                $statusText = $this->t('report.accepted', $language);
-                $notifyText = $this->t('report.status_changed', $language, [$reportId, $statusText]);
-                if (!empty($comment)) {
-                    $notifyText .= "\n" . $this->t('report.admin_comment', $language, [$comment]);
+                if (!empty($report['user_id'])) {
+                    $statusText = $this->t('report.accepted', $language);
+                    $notifyText = $this->t('report.status_changed', $language, [$reportId, $statusText]);
+                    if (!empty($comment)) {
+                        $notifyText .= "\n" . $this->t('report.admin_comment', $language, [$comment]);
+                    }
+                    $this->telegram->sendMessage($report['user_id'], $notifyText);
                 }
-                $this->telegram->sendMessage($report['user_id'], $notifyText);
             } catch (\Exception $e) {
                 // Ignore
             }

@@ -62,12 +62,14 @@ class RejectReportCommand extends BaseCommand
             
             // Notify user
             try {
-                $statusText = $this->t('report.rejected', $language);
-                $notifyText = $this->t('report.status_changed', $language, [$reportId, $statusText]);
-                if (!empty($reason)) {
-                    $notifyText .= "\n" . $this->t('report.admin_comment', $language, [$reason]);
+                if (!empty($report['user_id'])) {
+                    $statusText = $this->t('report.rejected', $language);
+                    $notifyText = $this->t('report.status_changed', $language, [$reportId, $statusText]);
+                    if (!empty($reason)) {
+                        $notifyText .= "\n" . $this->t('report.admin_comment', $language, [$reason]);
+                    }
+                    $this->telegram->sendMessage($report['user_id'], $notifyText);
                 }
-                $this->telegram->sendMessage($report['user_id'], $notifyText);
             } catch (\Exception $e) {
                 // Ignore
             }

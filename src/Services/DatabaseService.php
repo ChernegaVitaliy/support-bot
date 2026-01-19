@@ -383,10 +383,10 @@ class DatabaseService
     {
         try {
             if ($status) {
-                $stmt = $this->pdo->prepare("SELECT * FROM reports WHERE status = ? ORDER BY created_at DESC");
+                $stmt = $this->pdo->prepare("SELECT * FROM reports WHERE status = ? ORDER BY created_at ASC");
                 $stmt->execute([$status]);
             } else {
-                $stmt = $this->pdo->prepare("SELECT * FROM reports ORDER BY created_at DESC");
+                $stmt = $this->pdo->prepare("SELECT * FROM reports ORDER BY created_at ASC");
                 $stmt->execute();
             }
             $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -398,10 +398,44 @@ class DatabaseService
         }
     }
 
+    public function getReportsCount(?string $status = null): int
+    {
+        try {
+            if ($status) {
+                $stmt = $this->pdo->prepare("SELECT COUNT(*) FROM reports WHERE status = ?");
+                $stmt->execute([$status]);
+            } else {
+                $stmt = $this->pdo->prepare("SELECT COUNT(*) FROM reports");
+                $stmt->execute();
+            }
+            return (int)$stmt->fetchColumn();
+        } catch (Exception $e) {
+            $this->logger->error("Помилка підрахунку репортів: " . $e->getMessage());
+            return 0;
+        }
+    }
+
+    public function getReportsPaginated(?string $status = null, int $limit = 10, int $offset = 0): array
+    {
+        try {
+            if ($status) {
+                $stmt = $this->pdo->prepare("SELECT * FROM reports WHERE status = ? ORDER BY created_at ASC LIMIT ? OFFSET ?");
+                $stmt->execute([$status, $limit, $offset]);
+            } else {
+                $stmt = $this->pdo->prepare("SELECT * FROM reports ORDER BY created_at ASC LIMIT ? OFFSET ?");
+                $stmt->execute([$limit, $offset]);
+            }
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (Exception $e) {
+            $this->logger->error("Помилка отримання репортів (пагінація): " . $e->getMessage());
+            return [];
+        }
+    }
+
     public function getAllReportsForStats(): array
     {
         try {
-            $stmt = $this->pdo->prepare("SELECT * FROM reports ORDER BY created_at DESC");
+            $stmt = $this->pdo->prepare("SELECT * FROM reports ORDER BY created_at ASC");
             $stmt->execute();
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
         } catch (Exception $e) {
