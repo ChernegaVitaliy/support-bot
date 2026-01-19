@@ -12,9 +12,9 @@ class ReportsCommand extends BaseCommand
         return '/reports';
     }
 
-    public function getDescription(): string
+    public function getDescription(string $language = 'uk'): string
     {
-        return 'Список активних репортів';
+        return $this->translator->translate('commands.descriptions.reports', $language);
     }
 
     public function isAdminOnly(): bool

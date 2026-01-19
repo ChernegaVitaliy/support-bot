@@ -11,9 +11,9 @@ class MyIdCommand extends BaseCommand
         return '/myid';
     }
 
-    public function getDescription(): string
+    public function getDescription(string $language = 'uk'): string
     {
-        return 'Показати ваш ID та інформацію';
+        return $this->translator->translate('commands.descriptions.my_id', $language);
     }
 
     public function execute(Message $message, string $language = 'uk'): void

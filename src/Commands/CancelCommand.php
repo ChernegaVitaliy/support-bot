@@ -11,9 +11,9 @@ class CancelCommand extends BaseCommand
         return '/cancel';
     }
 
-    public function getDescription(): string
+    public function getDescription(string $language = 'uk'): string
     {
-        return 'Скасувати поточну дію';
+        return $this->translator->translate('commands.descriptions.cancel', $language);
     }
 
     public function execute(Message $message, string $language = 'uk'): void

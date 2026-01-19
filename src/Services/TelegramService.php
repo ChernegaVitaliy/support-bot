@@ -3,6 +3,8 @@
 namespace App\Services;
 
 use TelegramBot\Api\BotApi;
+use TelegramBot\Api\Types\ArrayOfBotCommand;
+use TelegramBot\Api\Types\BotCommand;
 use TelegramBot\Api\Types\Message;
 use TelegramBot\Api\Types\Update;
 use TelegramBot\Api\Types\Inline\InlineKeyboardMarkup;
@@ -244,6 +246,73 @@ class TelegramService
         }
 
         return null;
+    }
+
+    public function setMyName(string $name, ?string $languageCode = null): bool
+    {
+        try {
+            $params = ['name' => $name];
+            if ($languageCode) {
+                $params['language_code'] = $languageCode;
+            }
+            $this->bot->call('setMyName', $params);
+            $this->logger->info("Bot name set to: $name" . ($languageCode ? " for language: $languageCode" : ""));
+            return true;
+        } catch (\Exception $e) {
+            $this->logger->error("Error setting bot name: " . $e->getMessage());
+            return false;
+        }
+    }
+
+    public function setMyDescription(string $description, ?string $languageCode = null): bool
+    {
+        try {
+            $params = ['description' => $description];
+            if ($languageCode) {
+                $params['language_code'] = $languageCode;
+            }
+            $this->bot->call('setMyDescription', $params);
+            $this->logger->info("Bot description set" . ($languageCode ? " for language: $languageCode" : ""));
+            return true;
+        } catch (\Exception $e) {
+            $this->logger->error("Error setting bot description: " . $e->getMessage());
+            return false;
+        }
+    }
+
+    public function setMyShortDescription(string $shortDescription, ?string $languageCode = null): bool
+    {
+        try {
+            $params = ['short_description' => $shortDescription];
+            if ($languageCode) {
+                $params['language_code'] = $languageCode;
+            }
+            $this->bot->call('setMyShortDescription', $params);
+            $this->logger->info("Bot short description set" . ($languageCode ? " for language: $languageCode" : ""));
+            return true;
+        } catch (\Exception $e) {
+            $this->logger->error("Error setting bot short description: " . $e->getMessage());
+            return false;
+        }
+    }
+
+    public function setMyCommands(array $commands, ?array $scope = null, ?string $languageCode = null): bool
+    {
+        try {
+            $botCommands = [];
+            foreach ($commands as $cmd) {
+                $botCommand = new BotCommand();
+                $botCommand->setCommand($cmd['command']);
+                $botCommand->setDescription($cmd['description']);
+                $botCommands[] = $botCommand;
+            }
+            $this->bot->setMyCommands(new ArrayOfBotCommand($botCommands), $scope, $languageCode);
+            $this->logger->info("Bot commands set" . ($languageCode ? " for language: $languageCode" : ""));
+            return true;
+        } catch (\Exception $e) {
+            $this->logger->error("Error setting bot commands: " . $e->getMessage());
+            return false;
+        }
     }
 
     public function getBot(): BotApi

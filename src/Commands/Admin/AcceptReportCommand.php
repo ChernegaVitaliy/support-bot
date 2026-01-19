@@ -12,9 +12,9 @@ class AcceptReportCommand extends BaseCommand
         return '/accept';
     }
 
-    public function getDescription(): string
+    public function getDescription(string $language = 'uk'): string
     {
-        return 'Прийняти репорт';
+        return $this->translator->translate('commands.descriptions.accept_report', $language);
     }
 
     public function isAdminOnly(): bool

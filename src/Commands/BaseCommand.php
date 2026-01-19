@@ -33,7 +33,7 @@ abstract class BaseCommand implements CommandInterface
 
     abstract public function getName(): string;
 
-    public function getDescription(): string
+    public function getDescription(string $language = 'uk'): string
     {
         return 'No description';
     }

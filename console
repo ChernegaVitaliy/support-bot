@@ -21,6 +21,7 @@ use App\Console\Commands\FindUserCommand;
 use App\Console\Commands\BroadcastCommand;
 use App\Console\Commands\VersionCommand;
 use App\Console\Commands\HelloCommand;
+use App\Console\Commands\SetupBotCommand;
 
 // Initialize Config to load .env (Config is lightweight enough to be eager, but we can make it lazy if needed)
 // Actually, Config checks .env existence and exits if missing. This is fine for CLI start.
@@ -64,6 +65,14 @@ $container->register(SessionManager::class, function($c) {
     return new SessionManager($c->get(Logger::class));
 });
 
+$container->register('telegram', function($c) {
+    return $c->get(TelegramService::class);
+});
+
+$container->register('translator', function($c) {
+    return $c->get(Translator::class);
+});
+
 $application = new Application('Support Bot CLI', '2.0.0');
 
 // Register commands, injecting the container
@@ -77,6 +86,7 @@ $application->add(new SetRankCommand($container));
 $application->add(new FindUserCommand($container));
 $application->add(new BroadcastCommand($container));
 $application->add(new VersionCommand($container));
+$application->add(new SetupBotCommand($container));
 
 // Run application
 $application->run();

@@ -12,9 +12,9 @@ class RejectReportCommand extends BaseCommand
         return '/reject';
     }
 
-    public function getDescription(): string
+    public function getDescription(string $language = 'uk'): string
     {
-        return 'Відхилити репорт';
+        return $this->translator->translate('commands.descriptions.reject_report', $language);
     }
 
     public function isAdminOnly(): bool

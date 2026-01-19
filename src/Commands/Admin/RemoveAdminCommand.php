@@ -12,9 +12,9 @@ class RemoveAdminCommand extends BaseCommand
         return '/removeadmin';
     }
 
-    public function getDescription(): string
+    public function getDescription(string $language = 'uk'): string
     {
-        return 'Видалити адміністратора';
+        return $this->translator->translate('commands.descriptions.remove_admin', $language);
     }
 
     public function isAdminOnly(): bool

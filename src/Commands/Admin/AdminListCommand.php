@@ -12,9 +12,9 @@ class AdminListCommand extends BaseCommand
         return '/adminlist';
     }
 
-    public function getDescription(): string
+    public function getDescription(string $language = 'uk'): string
     {
-        return 'Список адміністраторів';
+        return $this->translator->translate('commands.descriptions.adminlist', $language);
     }
 
     public function isAdminOnly(): bool

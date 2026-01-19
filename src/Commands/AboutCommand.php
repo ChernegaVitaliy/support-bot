@@ -11,9 +11,9 @@ class AboutCommand extends BaseCommand
         return '/about';
     }
 
-    public function getDescription(): string
+    public function getDescription(string $language = 'uk'): string
     {
-        return 'Про бота';
+        return $this->translator->translate('commands.descriptions.about', $language);
     }
 
     public function execute(Message $message, string $language = 'uk'): void

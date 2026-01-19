@@ -11,9 +11,9 @@ class StartCommand extends BaseCommand
         return '/start';
     }
 
-    public function getDescription(): string
+    public function getDescription(string $language = 'uk'): string
     {
-        return 'Почати роботу з ботом';
+        return $this->translator->translate('commands.descriptions.start', $language);
     }
 
     public function execute(Message $message, string $language = 'uk'): void

@@ -8,7 +8,7 @@ interface CommandInterface
 {
     public function getName(): string;
 
-    public function getDescription(): string;
+    public function getDescription(string $language = 'uk'): string;
 
     public function execute(Message $message, string $language = 'uk'): void;
 

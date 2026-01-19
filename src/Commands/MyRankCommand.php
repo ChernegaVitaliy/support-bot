@@ -11,9 +11,9 @@ class MyRankCommand extends BaseCommand
         return '/myrank';
     }
 
-    public function getDescription(): string
+    public function getDescription(string $language = 'uk'): string
     {
-        return 'Показати ваш ранг';
+        return $this->translator->translate('commands.descriptions.my_rank', $language);
     }
 
     public function execute(Message $message, string $language = 'uk'): void

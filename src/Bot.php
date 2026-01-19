@@ -104,84 +104,101 @@ class Bot
         ));
 
         $this->registerDefaultCommands();
+
+        // Set bot profile information from translations
+        $this->setBotProfileInfo();
+
+        // Register bot commands with Telegram
+        $this->registerBotCommands();
+
+        $this->displayBanner();
     }
 
     private function registerDefaultCommands(): void
     {
-        $commands = [
-            new \App\Commands\HelpCommand($this->container),
-            new \App\Commands\StartCommand($this->container),
-            new \App\Commands\AboutCommand($this->container),
-            new \App\Commands\ProfileCommand($this->container),
-            new \App\Commands\MyIdCommand($this->container),
-            new \App\Commands\MyRankCommand($this->container),
-            new \App\Commands\StatsCommand($this->container),
-            new \App\Commands\ReportCommand($this->container),
-            new \App\Commands\CancelCommand($this->container),
+        // Register all available commands
+        $this->commands[] = new \App\Commands\AboutCommand($this->container);
+        $this->commands[] = new \App\Commands\StartCommand($this->container);
+        $this->commands[] = new \App\Commands\HelpCommand($this->container);
+        $this->commands[] = new \App\Commands\ReportCommand($this->container);
+        $this->commands[] = new \App\Commands\StatsCommand($this->container);
+        $this->commands[] = new \App\Commands\CancelCommand($this->container);
+        $this->commands[] = new \App\Commands\MyRankCommand($this->container);
+        $this->commands[] = new \App\Commands\ProfileCommand($this->container);
+        $this->commands[] = new \App\Commands\MyIdCommand($this->container);
 
-            // Admin commands
-            new \App\Commands\Admin\AdminListCommand($this->container),
-            new \App\Commands\Admin\AddAdminCommand($this->container),
-            new \App\Commands\Admin\RemoveAdminCommand($this->container),
-            new \App\Commands\Admin\SetRankCommand($this->container),
-            new \App\Commands\Admin\ReportsCommand($this->container),
-            new \App\Commands\Admin\AcceptReportCommand($this->container),
-            new \App\Commands\Admin\RejectReportCommand($this->container),
-            new \App\Commands\Admin\BroadcastCommand($this->container),
-            new \App\Commands\Admin\DebugCommand($this->container),
-        ];
-
-        foreach ($commands as $command) {
-            $this->registerCommand($command);
-        }
-    }
-
-    public function registerCommand(CommandInterface $command): void
-    {
-        $this->commands[$command->getName()] = $command;
-        $this->logger->debug("Зареєстровано команду: " . $command->getName());
-    }
-
-    public function getCommand(string $name): ?CommandInterface
-    {
-        return $this->commands[$name] ?? null;
-    }
-
-    public function getCommands(): array
-    {
-        return $this->commands;
+        // Admin commands
+        $this->commands[] = new \App\Commands\Admin\ReportsCommand($this->container);
+        $this->commands[] = new \App\Commands\Admin\BroadcastCommand($this->container);
+        $this->commands[] = new \App\Commands\Admin\RejectReportCommand($this->container);
+        $this->commands[] = new \App\Commands\Admin\AcceptReportCommand($this->container);
+        $this->commands[] = new \App\Commands\Admin\DebugCommand($this->container);
+        $this->commands[] = new \App\Commands\Admin\SetRankCommand($this->container);
+        $this->commands[] = new \App\Commands\Admin\RemoveAdminCommand($this->container);
+        $this->commands[] = new \App\Commands\Admin\AddAdminCommand($this->container);
     }
 
     private function displayBanner(): void
     {
-        echo "\033[1;35m";
-        echo "╔══════════════════════════════════════╗\n";
-        echo "║           TELEGRAM BOT v3.0          ║\n";
-        echo "║            🤖 ЗАПУЩЕНО!              ║\n";
-        echo "╚══════════════════════════════════════╝\n";
-        echo "\033[0m";
+        $this->logger->info("=====================================");
+        $this->logger->info("   Support Bot Started Successfully");
+        $this->logger->info("=====================================");
+    }
 
-        echo "\033[1;32m";
-        echo "✅ Support Bot запущений з ООП архітектурою\n";
-        echo "🤖 Юзернейм бота: @{$this->telegram->getBotUsername()}\n";
-        echo "🤖 Ім'я бота: {$this->telegram->getBotName()}\n";
-        echo "🌍 Підтримувані мови: " . count($this->translator->getLoadedLanguages()) . "\n";
-        echo "📊 Рівень логування: {$this->config->getLogLevel()}\n";
-        echo "🔧 Debug mode: " . ($this->config->isDebugMode() ? '🟢 Увімкнено' : '🔴 Вимкнено') . "\n";
-        echo "\033[0m";
+    private function getCommand(string $commandName): ?CommandInterface
+    {
+        foreach ($this->commands as $command) {
+            if ($command->getName() === $commandName) {
+                return $command;
+            }
+        }
+        return null;
+    }
 
-        echo "\033[1;36m";
-        echo "======================================================\n";
-        echo "🎯 Бот активний | Очікую повідомлення...\n";
-        echo "⏹️  Для зупинки натисни Ctrl+C\n";
-        echo "======================================================\n";
-        echo "\033[0m";
+    private function setBotProfileInfo(): void
+    {
+        try {
+            $language = 'uk';
+
+            $botDescription = $this->translator->translate('bot.description', $language);
+            $botShortDescription = $this->translator->translate('bot.about', $language);
+
+            $this->telegram->setMyDescription($botDescription, $language);
+            $this->telegram->setMyShortDescription($botShortDescription, $language);
+
+            $this->logger->info("Bot profile information set from translations");
+        } catch (\Exception $e) {
+            $this->logger->warning("Could not set bot profile information: " . $e->getMessage());
+        }
+    }
+
+    private function registerBotCommands(): void
+    {
+        try {
+            $language = 'uk'; // Default language for commands
+            $commands = [];
+
+            // Get all registered commands
+            foreach ($this->commands as $command) {
+                $commands[] = [
+                    'command' => ltrim($command->getName(), '/'),
+                    'description' => $command->getDescription($language)
+                ];
+            }
+
+            // Register commands for Ukrainian
+            if ($this->telegram->setMyCommands($commands, null, $language)) {
+                $this->logger->info("Bot commands registered for language: $language");
+            } else {
+                $this->logger->warning("Failed to register bot commands for language: $language");
+            }
+        } catch (\Exception $e) {
+            $this->logger->warning("Could not register bot commands: " . $e->getMessage());
+        }
     }
 
     public function run(): void
     {
-        $this->displayBanner();
-
         while (true) {
             $this->processConsoleInput();
             $this->processUpdates();

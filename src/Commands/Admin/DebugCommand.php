@@ -12,9 +12,9 @@ class DebugCommand extends BaseCommand
         return '/debug';
     }
 
-    public function getDescription(): string
+    public function getDescription(string $language = 'uk'): string
     {
-        return 'Увімкнути/вимкнути режим налагодження';
+        return $this->translator->translate('commands.descriptions.debug', $language);
     }
 
     public function isAdminOnly(): bool

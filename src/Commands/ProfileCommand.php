@@ -11,9 +11,9 @@ class ProfileCommand extends BaseCommand
         return '/profile';
     }
 
-    public function getDescription(): string
+    public function getDescription(string $language = 'uk'): string
     {
-        return 'Профіль користувача';
+        return $this->translator->translate('commands.descriptions.profile', $language);
     }
 
     public function execute(Message $message, string $language = 'uk'): void

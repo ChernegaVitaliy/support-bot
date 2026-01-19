@@ -12,9 +12,9 @@ class AddAdminCommand extends BaseCommand
         return '/addadmin';
     }
 
-    public function getDescription(): string
+    public function getDescription(string $language = 'uk'): string
     {
-        return 'Додати адміністратора';
+        return $this->translator->translate('commands.descriptions.add_admin', $language);
     }
 
     public function isAdminOnly(): bool

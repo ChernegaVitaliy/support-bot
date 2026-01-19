@@ -11,9 +11,9 @@ class HelpCommand extends BaseCommand
         return '/help';
     }
 
-    public function getDescription(): string
+    public function getDescription(string $language = 'uk'): string
     {
-        return 'Показати список команд';
+        return $this->translator->translate('commands.descriptions.help', $language);
     }
 
     public function execute(Message $message, string $language = 'uk'): void
@@ -46,8 +46,6 @@ class HelpCommand extends BaseCommand
                 $text .= "/broadcast - " . $this->t('admin.commands_desc.broadcast', $language) . "\n";
             }
         }
-
-        $text .= "\n" . $this->t('common.cancel_desc', $language);
 
         $this->reply($chatId, $text);
     }

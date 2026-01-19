@@ -22,9 +22,9 @@ class ReportCommand extends BaseCommand
         return '/report';
     }
 
-    public function getDescription(): string
+    public function getDescription(string $language = 'uk'): string
     {
-        return 'Створити репорт';
+        return $this->translator->translate('commands.descriptions.report', $language);
     }
 
     public function execute(Message $message, string $language = 'uk'): void

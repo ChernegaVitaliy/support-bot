@@ -12,9 +12,9 @@ class SetRankCommand extends BaseCommand
         return '/setrank';
     }
 
-    public function getDescription(): string
+    public function getDescription(string $language = 'uk'): string
     {
-        return 'Змінити ранг адміністратора';
+        return $this->translator->translate('commands.descriptions.set_rank', $language);
     }
 
     public function isAdminOnly(): bool

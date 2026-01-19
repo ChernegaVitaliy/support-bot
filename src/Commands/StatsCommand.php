@@ -11,9 +11,9 @@ class StatsCommand extends BaseCommand
         return '/stats';
     }
 
-    public function getDescription(): string
+    public function getDescription(string $language = 'uk'): string
     {
-        return 'Показати статистику бота';
+        return $this->translator->translate('commands.descriptions.stats', $language);
     }
 
     public function execute(Message $message, string $language = 'uk'): void
