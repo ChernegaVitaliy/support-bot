@@ -1,0 +1,82 @@
+#!/usr/bin/env php
+<?php
+
+require __DIR__ . '/vendor/autoload.php';
+
+use App\Config\Config;
+use App\Services\Logger;
+use App\Services\DatabaseService;
+use App\Services\TelegramService;
+use App\Services\Translator;
+use App\Services\SessionManager;
+use App\Console\ServiceContainer;
+use Symfony\Component\Console\Application;
+use App\Console\Commands\RunCommand;
+use App\Console\Commands\StatsCommand;
+use App\Console\Commands\AdminListCommand;
+use App\Console\Commands\AddAdminCommand;
+use App\Console\Commands\RemoveAdminCommand;
+use App\Console\Commands\SetRankCommand;
+use App\Console\Commands\FindUserCommand;
+use App\Console\Commands\BroadcastCommand;
+use App\Console\Commands\VersionCommand;
+use App\Console\Commands\HelloCommand;
+
+// Initialize Config to load .env (Config is lightweight enough to be eager, but we can make it lazy if needed)
+// Actually, Config checks .env existence and exits if missing. This is fine for CLI start.
+$config = new Config(__DIR__);
+
+$container = new ServiceContainer();
+
+$container->register(Config::class, fn() => $config);
+
+$container->register(Logger::class, function($c) use ($config) {
+    return new Logger(
+        $config->getLogFile(),
+        $config->getLogLevel(),
+        $config->isDebugMode()
+    );
+});
+
+$container->register(DatabaseService::class, function($c) use ($config) {
+    return new DatabaseService(
+        $config->getDbPath(),
+        $c->get(Logger::class),
+        $config->getDefaultOwnerId()
+    );
+});
+
+$container->register(TelegramService::class, function($c) use ($config) {
+    return new TelegramService(
+        $config->getBotToken(),
+        $c->get(Logger::class)
+    );
+});
+
+$container->register(Translator::class, function($c) use ($config) {
+    return new Translator(
+        $config->getLanguagesPath(),
+        $c->get(Logger::class)
+    );
+});
+
+$container->register(SessionManager::class, function($c) {
+    return new SessionManager($c->get(Logger::class));
+});
+
+$application = new Application('Support Bot CLI', '2.0.0');
+
+// Register commands, injecting the container
+$application->add(new HelloCommand());
+$application->add(new RunCommand($container));
+$application->add(new StatsCommand($container));
+$application->add(new AdminListCommand($container));
+$application->add(new AddAdminCommand($container));
+$application->add(new RemoveAdminCommand($container));
+$application->add(new SetRankCommand($container));
+$application->add(new FindUserCommand($container));
+$application->add(new BroadcastCommand($container));
+$application->add(new VersionCommand($container));
+
+// Run application
+$application->run();
