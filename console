@@ -34,8 +34,7 @@ $container->register(Config::class, fn() => $config);
 $container->register(Logger::class, function($c) use ($config) {
     return new Logger(
         $config->getLogFile(),
-        $config->getLogLevel(),
-        $config->isDebugMode()
+        $config->getLogLevel()
     );
 });
 
@@ -65,12 +64,37 @@ $container->register(SessionManager::class, function($c) {
     return new SessionManager($c->get(Logger::class));
 });
 
+$container->register('logger', function($c) {
+    return $c->get(Logger::class);
+});
+
+$container->register('db', function($c) {
+    return $c->get(DatabaseService::class);
+});
+
 $container->register('telegram', function($c) {
     return $c->get(TelegramService::class);
 });
 
 $container->register('translator', function($c) {
     return $c->get(Translator::class);
+});
+
+$container->register('session_manager', function($c) {
+    return $c->get(SessionManager::class);
+});
+
+$container->register('config', function($c) {
+    return $c->get(Config::class);
+});
+
+$container->register('report_service', function($c) {
+    return new \App\Services\ReportService(
+        $c->get('logger'),
+        $c->get('telegram'),
+        $c->get('db'),
+        $c->get('translator')
+    );
 });
 
 $application = new Application('Support Bot CLI', '2.0.0');

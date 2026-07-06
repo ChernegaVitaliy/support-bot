@@ -1,7 +1,7 @@
 <?php
 
 return array (
-  'logging' => 
+  'logging' =>
   array (
     'level' => 'DEBUG',
     'max_file_size' => 10485760,
