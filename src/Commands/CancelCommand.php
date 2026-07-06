@@ -20,8 +20,15 @@ class CancelCommand extends BaseCommand
     {
         $chatId = $this->getChatId($message);
 
-        $this->sessionManager->clearAllSessions($chatId);
+        $hasSession = $this->sessionManager->hasReportSession($chatId) ||
+                      $this->sessionManager->hasBroadcastSession($chatId) ||
+                      $this->sessionManager->hasAdminActionSession($chatId);
 
-        $this->reply($chatId, $this->t('common.action_cancelled', $language));
+        if ($hasSession) {
+            $this->sessionManager->clearAllSessions($chatId);
+            $this->reply($chatId, $this->t('common.action_cancelled', $language));
+        } else {
+            $this->reply($chatId, $this->t('common.nothing_to_cancel', $language));
+        }
     }
 }
