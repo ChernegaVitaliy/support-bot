@@ -576,13 +576,23 @@ class DatabaseService
     public function getAllAdmins(): array
     {
         try {
-            $stmt = $this->pdo->prepare("SELECT * FROM admins ORDER BY
-                CASE rank
-                    WHEN 'owner' THEN 1
-                    WHEN 'admin' THEN 2
-                    WHEN 'moderator' THEN 3
-                    ELSE 4
-                END");
+            $stmt = $this->pdo->prepare("
+                SELECT 
+                    a.user_id,
+                    COALESCE(u.username, a.username) AS username,
+                    COALESCE(u.first_name, a.first_name) AS first_name,
+                    a.rank,
+                    a.added_at
+                FROM admins a
+                LEFT JOIN users u ON a.user_id = u.user_id
+                ORDER BY
+                    CASE a.rank
+                        WHEN 'owner' THEN 1
+                        WHEN 'admin' THEN 2
+                        WHEN 'moderator' THEN 3
+                        ELSE 4
+                    END
+            ");
             $stmt->execute();
             $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
             $this->logger->debug("Отримано список адмінів: " . count($result) . " записів");
@@ -640,7 +650,17 @@ class DatabaseService
     public function getAdminByUserId(string $user_id): ?array
     {
         try {
-            $stmt = $this->pdo->prepare("SELECT * FROM admins WHERE user_id = ?");
+            $stmt = $this->pdo->prepare("
+                SELECT 
+                    a.user_id,
+                    COALESCE(u.username, a.username) AS username,
+                    COALESCE(u.first_name, a.first_name) AS first_name,
+                    a.rank,
+                    a.added_at
+                FROM admins a
+                LEFT JOIN users u ON a.user_id = u.user_id
+                WHERE a.user_id = ?
+            ");
             $stmt->execute([$user_id]);
             $result = $stmt->fetch(PDO::FETCH_ASSOC);
             $this->logger->debug("Пошук адміна по user_id $user_id: " . ($result ? 'знайдено' : 'не знайдено'));
@@ -687,8 +707,18 @@ class DatabaseService
     public function getAdminByUsername(string $username): ?array
     {
         try {
-            $stmt = $this->pdo->prepare("SELECT * FROM admins WHERE username = ?");
-            $stmt->execute([$username]);
+            $stmt = $this->pdo->prepare("
+                SELECT 
+                    a.user_id,
+                    COALESCE(u.username, a.username) AS username,
+                    COALESCE(u.first_name, a.first_name) AS first_name,
+                    a.rank,
+                    a.added_at
+                FROM admins a
+                LEFT JOIN users u ON a.user_id = u.user_id
+                WHERE a.username = ? OR u.username = ?
+            ");
+            $stmt->execute([$username, $username]);
             $result = $stmt->fetch(PDO::FETCH_ASSOC);
             return $result ?: null;
         } catch (Exception $e) {
@@ -760,13 +790,21 @@ class DatabaseService
     public function getAdminsList(): array
     {
         try {
-            $stmt = $this->pdo->prepare("SELECT user_id, username, rank FROM admins ORDER BY
-                CASE rank
-                    WHEN 'owner' THEN 1
-                    WHEN 'admin' THEN 2
-                    WHEN 'moderator' THEN 3
-                    ELSE 4
-                END");
+            $stmt = $this->pdo->prepare("
+                SELECT 
+                    a.user_id,
+                    COALESCE(u.username, a.username) AS username,
+                    a.rank
+                FROM admins a
+                LEFT JOIN users u ON a.user_id = u.user_id
+                ORDER BY
+                    CASE a.rank
+                        WHEN 'owner' THEN 1
+                        WHEN 'admin' THEN 2
+                        WHEN 'moderator' THEN 3
+                        ELSE 4
+                    END
+            ");
             $stmt->execute();
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
         } catch (Exception $e) {
