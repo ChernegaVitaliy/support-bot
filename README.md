@@ -4,12 +4,12 @@ Telegram Support Bot is rewritten in clean OOP code using modern libraries.
 
 ## Features
 
-- ✅ **Clean OOP code** - use of classes, interfaces and dependencies
-- ✅ **telegram-bot/api library** - professional Telegram Bot API integration
-- ✅ **vlucas/phpdotenv** - configuration management via .env
-- ✅ **Monolog** - powerful logging with colored output
-- ✅ **Architecture** - separation into Services, Models, Commands, Config, Handlers
-- ✅ **Scalability** - easy addition of new commands and features
+- **Clean OOP code**: Use of classes, interfaces and dependencies.
+- **Telegram Bot API**: Professional integration with `telegram-bot/api` library.
+- **Configuration management**: Environment-based config with `vlucas/phpdotenv`.
+- **Logging**: Powerful logging with colored output via `Monolog`.
+- **Modular architecture**: Clear separation into Services, Models, Commands, Config, and Handlers.
+- **Scalability**: Easy addition of new commands and features.
 
 ## Installation
 
