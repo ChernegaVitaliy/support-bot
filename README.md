@@ -8,7 +8,7 @@ Telegram Support Bot is rewritten in clean OOP code using modern libraries.
 - ✅ **telegram-bot/api library** - professional Telegram Bot API integration
 - ✅ **vlucas/phpdotenv** - configuration management via .env
 - ✅ **Monolog** - powerful logging with colored output
-- ✅ **Architecture** - separation into Services, Models, Commands, Config
+- ✅ **Architecture** - separation into Services, Models, Commands, Config, Handlers
 - ✅ **Scalability** - easy addition of new commands and features
 
 ## Installation
@@ -37,35 +37,61 @@ php console app:run
 
 ```
 src/
-├── Bot.php              - Main bot class
+├── Bot.php                    - Main bot class
 ├── Config/
-│   └── Config.php       - Configuration
+│   └── Config.php             - Configuration
 ├── Commands/
-│   ├── BaseCommand.php  - Base command class
-│   ├── Admin/           - Admin commands
-│   │   ├── StatsCommand.php
-│   │   ├── AddAdminCommand.php
-│   │   ├── RemoveAdminCommand.php
-│   │   ├── SetRankCommand.php
-│   │   ├── ReportsCommand.php
-│   │   └── BroadcastCommand.php
-│   ├── HelpCommand.php
-│   ├── StartCommand.php
+│   ├── BaseCommand.php        - Base command class
 │   ├── AboutCommand.php
+│   ├── CancelCommand.php
+│   ├── HelpCommand.php
+│   ├── MyIdCommand.php
+│   ├── MyRankCommand.php
 │   ├── ProfileCommand.php
-│   └── CancelCommand.php
+│   ├── ReportCommand.php
+│   ├── StartCommand.php
+│   ├── StatsCommand.php
+│   └── Admin/
+│       ├── AcceptReportCommand.php
+│       ├── AddAdminCommand.php
+│       ├── AdminListCommand.php
+│       ├── BroadcastCommand.php
+│       ├── DebugCommand.php
+│       ├── RejectReportCommand.php
+│       ├── RemoveAdminCommand.php
+│       ├── ReportsCommand.php
+│       └── SetRankCommand.php
+├── Console/
+│   ├── ServiceContainer.php
+│   └── Commands/
+│       ├── AddAdminCommand.php
+│       ├── AdminListCommand.php
+│       ├── BroadcastCommand.php
+│       ├── FindUserCommand.php
+│       ├── HelloCommand.php
+│       ├── RemoveAdminCommand.php
+│       ├── RunCommand.php
+│       ├── SetRankCommand.php
+│       ├── SetupBotCommand.php
+│       ├── StatsCommand.php
+│       └── VersionCommand.php
+├── Handlers/
+│   ├── CallbackHandler.php
+│   └── SessionHandler.php
 ├── Interfaces/
-│   └── CommandInterface.php - Command interface
+│   └── CommandInterface.php
 ├── Models/
-│   ├── User.php         - User model
-│   ├── Admin.php        - Admin model
-│   └── Report.php       - Report model
+│   ├── Admin.php
+│   ├── Report.php
+│   └── User.php
 ├── Services/
-│   ├── Logger.php       - Logging (Monolog)
-│   ├── DatabaseService.php - Database
-│   ├── TelegramService.php  - Telegram API
-│   ├── Translator.php   - Multi-language support
-│   └── SessionManager.php    - Session management
+│   ├── BroadcastService.php
+│   ├── DatabaseService.php
+│   ├── Logger.php
+│   ├── ReportService.php
+│   ├── SessionManager.php
+│   ├── TelegramService.php
+│   └── Translator.php
 ```
 
 ## Commands
@@ -75,26 +101,38 @@ src/
 - `/help` - Help
 - `/about` - About the bot
 - `/profile` - User profile
-- `/cancel` - Cancel action
+- `/myid` - Show your Telegram ID
+- `/myrank` - Show your admin rank
+- `/report` - Submit a report
+- `/cancel` - Cancel current action
 
 ### Admin commands:
 - `/stats` - Bot statistics
 - `/adminlist` - List of admins
-- `/addadmin <username/id> [rank]` - Add admin
-- `/removeadmin <username/id>` - Remove admin
-- `/setrank <username/id> <rank>` - Change rank
-- `/reports [status]` - List of reports
-- `/broadcast` - Broadcast
+- `/addadmin <username/id> [rank]` - Add admin (admin+)
+- `/removeadmin <username/id>` - Remove admin (admin+)
+- `/setrank <username/id> <rank>` - Change rank (owner only)
+- `/reports [status]` - List of reports (moderator+)
+- `/accept <report_id> [comment]` - Accept report (moderator+)
+- `/reject <report_id> [reason]` - Reject report (moderator+)
+- `/broadcast` - Broadcast message (owner only)
+- `/debug <level>` - Debug settings (owner only)
 
 ## Console Commands
 
 While the bot is running, you can use console commands:
 - `help` - Help
+- `hello` - Hello world
 - `stats` - Statistics
-- `users` - Number of users
-- `admins` - List of admins
-- `sessions` - Active sessions
-- `exit` - Exit
+- `version` - Show version
+- `admin:list` - List of admins
+- `admin:add <username/id> [rank]` - Add admin
+- `admin:remove <username/id>` - Remove admin
+- `admin:setrank <username/id> <rank>` - Change rank
+- `broadcast` - Broadcast message
+- `find-user <query>` - Find user
+- `setup` - Setup bot
+- `app:run` - Run the bot
 
 ## Adding New Commands
 
@@ -119,9 +157,9 @@ class MyCommand extends BaseCommand
 }
 ```
 
-2. Register the command in `index.php`:
+2. Register the command in `src/Bot.php` in the `registerDefaultCommands()` method:
 ```php
-$bot->registerCommand(new \App\Commands\MyCommand(...));
+$this->commands[] = new \App\Commands\MyCommand($this->container);
 ```
 
 ## License
