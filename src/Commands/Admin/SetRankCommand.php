@@ -63,13 +63,14 @@ class SetRankCommand extends BaseCommand
         $currentRankLevel = $this->getRankLevel($currentRank);
         $newRankLevel = $this->getRankLevel($newRank);
         $targetRankLevel = $this->getRankLevel($admin['rank']);
+        $isDefaultOwner = ($currentUserId === $this->db->getDefaultOwnerId());
 
-        if ($newRankLevel > $currentRankLevel) {
+        if (!$isDefaultOwner && $newRankLevel >= $currentRankLevel) {
             $this->reply($chatId, $this->t('errors.no_permission', $language));
             return;
         }
 
-        if ($targetRankLevel > $currentRankLevel) {
+        if (!$isDefaultOwner && $targetRankLevel >= $currentRankLevel) {
             $this->reply($chatId, $this->t('errors.no_permission', $language));
             return;
         }
