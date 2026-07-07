@@ -64,12 +64,12 @@ class SetRankCommand extends BaseCommand
         $newRankLevel = $this->getRankLevel($newRank);
         $targetRankLevel = $this->getRankLevel($admin['rank']);
 
-        if ($newRankLevel >= $currentRankLevel) {
+        if ($newRankLevel > $currentRankLevel) {
             $this->reply($chatId, $this->t('errors.no_permission', $language));
             return;
         }
 
-        if ($targetRankLevel >= $currentRankLevel) {
+        if ($targetRankLevel > $currentRankLevel) {
             $this->reply($chatId, $this->t('errors.no_permission', $language));
             return;
         }
