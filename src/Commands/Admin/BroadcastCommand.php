@@ -31,8 +31,9 @@ class BroadcastCommand extends BaseCommand
     public function execute(Message $message, string $language = 'uk'): void
     {
         $chatId = $this->getChatId($message);
+        $userId = $this->getUserId($message);
 
-        $this->sessionManager->setBroadcastSession($chatId, [
+        $this->sessionManager->setBroadcastSession($userId, [
             'step' => 'type',
             'selected_languages' => [],
             'media' => [],

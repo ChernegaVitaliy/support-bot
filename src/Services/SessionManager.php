@@ -14,78 +14,78 @@ class SessionManager
         $this->logger = $logger;
     }
 
-    public function setReportSession(string $chatId, array $data): void
+    public function setReportSession(string $userId, array $data): void
     {
-        $this->reportSessions[$chatId] = $data;
-        $this->logger->debug("Сесія репорту встановлена для $chatId");
+        $this->reportSessions[$userId] = $data;
+        $this->logger->debug("Сесія репорту встановлена для $userId");
     }
 
-    public function getReportSession(string $chatId): ?array
+    public function getReportSession(string $userId): ?array
     {
-        return $this->reportSessions[$chatId] ?? null;
+        return $this->reportSessions[$userId] ?? null;
     }
 
-    public function hasReportSession(string $chatId): bool
+    public function hasReportSession(string $userId): bool
     {
-        return isset($this->reportSessions[$chatId]);
+        return isset($this->reportSessions[$userId]);
     }
 
-    public function clearReportSession(string $chatId): void
+    public function clearReportSession(string $userId): void
     {
-        unset($this->reportSessions[$chatId]);
-        $this->logger->debug("Сесія репорту очищена для $chatId");
+        unset($this->reportSessions[$userId]);
+        $this->logger->debug("Сесія репорту очищена для $userId");
     }
 
-    public function setBroadcastSession(string $chatId, array $data): void
+    public function setBroadcastSession(string $userId, array $data): void
     {
-        $this->broadcastSessions[$chatId] = $data;
-        $this->logger->debug("Сесія розсилки встановлена для $chatId");
+        $this->broadcastSessions[$userId] = $data;
+        $this->logger->debug("Сесія розсилки встановлена для $userId");
     }
 
-    public function getBroadcastSession(string $chatId): ?array
+    public function getBroadcastSession(string $userId): ?array
     {
-        return $this->broadcastSessions[$chatId] ?? null;
+        return $this->broadcastSessions[$userId] ?? null;
     }
 
-    public function hasBroadcastSession(string $chatId): bool
+    public function hasBroadcastSession(string $userId): bool
     {
-        return isset($this->broadcastSessions[$chatId]);
+        return isset($this->broadcastSessions[$userId]);
     }
 
-    public function clearBroadcastSession(string $chatId): void
+    public function clearBroadcastSession(string $userId): void
     {
-        unset($this->broadcastSessions[$chatId]);
-        $this->logger->debug("Сесія розсилки очищена для $chatId");
+        unset($this->broadcastSessions[$userId]);
+        $this->logger->debug("Сесія розсилки очищена для $userId");
     }
 
-    public function setAdminActionSession(string $chatId, array $data): void
+    public function setAdminActionSession(string $userId, array $data): void
     {
-        $this->adminActionSessions[$chatId] = $data;
-        $this->logger->debug("Адмін-сесія встановлена для $chatId");
+        $this->adminActionSessions[$userId] = $data;
+        $this->logger->debug("Адмін-сесія встановлена для $userId");
     }
 
-    public function getAdminActionSession(string $chatId): ?array
+    public function getAdminActionSession(string $userId): ?array
     {
-        return $this->adminActionSessions[$chatId] ?? null;
+        return $this->adminActionSessions[$userId] ?? null;
     }
 
-    public function hasAdminActionSession(string $chatId): bool
+    public function hasAdminActionSession(string $userId): bool
     {
-        return isset($this->adminActionSessions[$chatId]);
+        return isset($this->adminActionSessions[$userId]);
     }
 
-    public function clearAdminActionSession(string $chatId): void
+    public function clearAdminActionSession(string $userId): void
     {
-        unset($this->adminActionSessions[$chatId]);
-        $this->logger->debug("Адмін-сесія очищена для $chatId");
+        unset($this->adminActionSessions[$userId]);
+        $this->logger->debug("Адмін-сесія очищена для $userId");
     }
 
-    public function clearAllSessions(string $chatId): void
+    public function clearAllSessions(string $userId): void
     {
-        $this->clearReportSession($chatId);
-        $this->clearBroadcastSession($chatId);
-        $this->clearAdminActionSession($chatId);
-        $this->logger->debug("Всі сесії очищені для $chatId");
+        $this->clearReportSession($userId);
+        $this->clearBroadcastSession($userId);
+        $this->clearAdminActionSession($userId);
+        $this->logger->debug("Всі сесії очищені для $userId");
     }
 
     public function getActiveReportSessionsCount(): int

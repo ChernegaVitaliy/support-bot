@@ -40,11 +40,12 @@ class SessionHandler
     public function handleReportSession(Message $message, string $language): void
     {
         $chatId = (string)$message->getChat()->getId();
+        $userId = (string)$message->getFrom()->getId();
         $text = $message->getText() ?? '';
-        $session = $this->sessionManager->getReportSession($chatId);
+        $session = $this->sessionManager->getReportSession($userId);
 
         if ($text === '/cancel') {
-            $this->sessionManager->clearReportSession($chatId);
+            $this->sessionManager->clearReportSession($userId);
             $this->telegram->sendMessage($chatId, $this->translator->translate('report_creation_cancelled', $language));
             return;
         }
@@ -53,31 +54,31 @@ class SessionHandler
 
         switch ($session['step']) {
             case 1:
-                $this->handleReportStep1($chatId, $text, $language);
+                $this->handleReportStep1($chatId, $userId, $text, $language);
                 break;
             case 2:
-                $this->handleReportStep2($chatId, $text, $language);
+                $this->handleReportStep2($chatId, $userId, $text, $language);
                 break;
             case 3:
-                $this->handleReportStep3($chatId, $text, $language);
+                $this->handleReportStep3($chatId, $userId, $text, $language);
                 break;
             case 4:
-                $this->handleReportStep4($message, $language);
+                $this->handleReportStep4($message, $userId, $language);
                 break;
         }
     }
 
-    private function handleReportStep1(string $chatId, string $text, string $language): void
+    private function handleReportStep1(string $chatId, string $userId, string $text, string $language): void
     {
         if (empty(trim($text))) {
             $this->telegram->sendMessage($chatId, $this->translator->translate('errors.invalid_format', $language));
             return;
         }
 
-        $session = $this->sessionManager->getReportSession($chatId);
+        $session = $this->sessionManager->getReportSession($userId);
         $session['data']['reporter_nick'] = trim($text);
         $session['step'] = 2;
-        $this->sessionManager->setReportSession($chatId, $session);
+        $this->sessionManager->setReportSession($userId, $session);
 
         $replyText = "<b>" . $this->translator->translate('report.step_2', $language) . "</b>\n" .
             "<code>" . $this->translator->translate('report.example', $language, ['Danylchik123']) . "</code>\n\n" .
@@ -86,17 +87,17 @@ class SessionHandler
         $this->telegram->sendMessage($chatId, $replyText, 'HTML');
     }
 
-    private function handleReportStep2(string $chatId, string $text, string $language): void
+    private function handleReportStep2(string $chatId, string $userId, string $text, string $language): void
     {
         if (empty(trim($text))) {
             $this->telegram->sendMessage($chatId, $this->translator->translate('errors.invalid_format', $language));
             return;
         }
 
-        $session = $this->sessionManager->getReportSession($chatId);
+        $session = $this->sessionManager->getReportSession($userId);
         $session['data']['reported_nick'] = trim($text);
         $session['step'] = 3;
-        $this->sessionManager->setReportSession($chatId, $session);
+        $this->sessionManager->setReportSession($userId, $session);
 
         $reasons = $this->translator->translate('report.reasons_list', $language);
 
@@ -108,17 +109,17 @@ class SessionHandler
         $this->telegram->sendMessage($chatId, $replyText, 'HTML');
     }
 
-    private function handleReportStep3(string $chatId, string $text, string $language): void
+    private function handleReportStep3(string $chatId, string $userId, string $text, string $language): void
     {
         if (empty(trim($text))) {
             $this->telegram->sendMessage($chatId, $this->translator->translate('errors.invalid_format', $language));
             return;
         }
 
-        $session = $this->sessionManager->getReportSession($chatId);
+        $session = $this->sessionManager->getReportSession($userId);
         $session['data']['reason'] = trim($text);
         $session['step'] = 4;
-        $this->sessionManager->setReportSession($chatId, $session);
+        $this->sessionManager->setReportSession($userId, $session);
 
         $replyText = "<b>" . $this->translator->translate('report.step_4', $language) . "</b>\n" .
             $this->translator->translate('report.media_hint', $language) . "\n\n" .
@@ -128,14 +129,14 @@ class SessionHandler
         $this->showReportCompletionButtons($chatId, $session, $language);
     }
 
-    private function handleReportStep4(Message $message, string $language): void
+    private function handleReportStep4(Message $message, string $userId, string $language): void
     {
         $chatId = (string)$message->getChat()->getId();
         $text = $message->getText();
-        $session = $this->sessionManager->getReportSession($chatId);
+        $session = $this->sessionManager->getReportSession($userId);
         
         if ($text && in_array(strtolower($text), ['готово', 'done', 'завершити', 'skip'])) {
-            $this->completeReport($chatId, $session, $language);
+            $this->completeReport($chatId, $userId, $session, $language);
             return;
         }
 
@@ -160,7 +161,7 @@ class SessionHandler
         }
 
         if ($mediaAdded) {
-            $this->sessionManager->setReportSession($chatId, $session);
+            $this->sessionManager->setReportSession($userId, $session);
         }
 
         $this->showReportCompletionButtons($chatId, $session, $language);
@@ -199,12 +200,12 @@ class SessionHandler
         $this->telegram->sendMessage($chatId, $message, 'HTML', false, null, $keyboard);
     }
 
-    private function completeReport(string $chatId, array $session, string $language): void
+    private function completeReport(string $chatId, string $userId, array $session, string $language): void
     {
         $reportId = $this->reportService->saveReport($session, $language);
 
         if ($reportId) {
-            $this->sessionManager->clearReportSession($chatId);
+            $this->sessionManager->clearReportSession($userId);
             $this->telegram->sendMessage($chatId, $this->translator->translate('report.success', $language, [$reportId]));
         } else {
             $this->telegram->sendMessage($chatId, $this->translator->translate('errors.save_error', $language));
@@ -214,15 +215,16 @@ class SessionHandler
     public function handleAdminActionSession(Message $message, string $language): void
     {
         $chatId = (string)$message->getChat()->getId();
+        $userId = (string)$message->getFrom()->getId();
         $text = $message->getText() ?? '';
 
         if ($text === '/cancel') {
-            $this->sessionManager->clearAdminActionSession($chatId);
+            $this->sessionManager->clearAdminActionSession($userId);
             $this->telegram->sendMessage($chatId, $this->translator->translate('report.process.cancel', $language));
             return;
         }
 
-        $session = $this->sessionManager->getAdminActionSession($chatId);
+        $session = $this->sessionManager->getAdminActionSession($userId);
         if (!$session || $session['type'] !== 'report_comment') return;
 
         $reportId = $session['report_id'];
@@ -232,7 +234,7 @@ class SessionHandler
 
         $report = $this->db->getReportById($reportId);
         if (!$report || $report['status'] !== 'pending') {
-            $this->sessionManager->clearAdminActionSession($chatId);
+            $this->sessionManager->clearAdminActionSession($userId);
             return;
         }
 
@@ -255,7 +257,7 @@ class SessionHandler
             $this->telegram->sendMessage($report['user_id'], $notifyText);
         }
 
-        $this->sessionManager->clearAdminActionSession($chatId);
+        $this->sessionManager->clearAdminActionSession($userId);
         $this->telegram->sendMessage($chatId, $this->translator->translate("report.process.complete", $language));
     }
 }

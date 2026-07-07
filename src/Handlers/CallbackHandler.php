@@ -45,6 +45,7 @@ class CallbackHandler
         $chatId = (string)$callbackQuery->getMessage()->getChat()->getId();
         $messageId = $callbackQuery->getMessage()->getMessageId();
         $callbackQueryId = $callbackQuery->getId();
+        $userId = (string)$callbackQuery->getFrom()->getId();
 
         $this->telegram->answerCallbackQuery($callbackQueryId, "OK");
 
@@ -53,26 +54,26 @@ class CallbackHandler
 
         switch ($type) {
             case 'report':
-                $this->handleReportCallback($callbackData, $chatId, $language);
+                $this->handleReportCallback($callbackData, $chatId, $userId, $language);
                 break;
             case 'accept':
             case 'reject':
-                $this->handleReportActionCallback($callbackData, $chatId, $messageId, $language);
+                $this->handleReportActionCallback($callbackData, $chatId, $messageId, $language, $userId);
                 break;
             // Add other types as needed
         }
     }
 
-    public function handleReportCallback(string $callbackData, string $chatId, string $language): void
+    public function handleReportCallback(string $callbackData, string $chatId, string $userId, string $language): void
     {
-        $session = $this->sessionManager->getReportSession($chatId);
+        $session = $this->sessionManager->getReportSession($userId);
         if (!$session) return;
 
         switch ($callbackData) {
             case 'report_complete':
                 $reportId = $this->reportService->saveReport($session, $language);
                 if ($reportId) {
-                    $this->sessionManager->clearReportSession($chatId);
+                    $this->sessionManager->clearReportSession($userId);
                     $this->telegram->sendMessage($chatId, $this->translator->translate('report.success', $language, [$reportId]));
                 }
                 break;
@@ -83,15 +84,15 @@ class CallbackHandler
                 $this->telegram->sendMessage($chatId, $this->translator->translate('report.instruction_video', $language));
                 break;
             case 'report_cancel':
-                $this->sessionManager->clearReportSession($chatId);
+                $this->sessionManager->clearReportSession($userId);
                 $this->telegram->sendMessage($chatId, $this->translator->translate('report_creation_cancelled', $language));
                 break;
         }
     }
 
-    public function handleReportActionCallback(string $callbackData, string $chatId, int $messageId, string $language): void
+    public function handleReportActionCallback(string $callbackData, string $chatId, int $messageId, string $language, string $userId): void
     {
-        $session = $this->sessionManager->getAdminActionSession($chatId);
+        $session = $this->sessionManager->getAdminActionSession($userId);
 
         if ($session && isset($session['type']) && $session['type'] === 'report_comment') {
             $parts = explode('_', $callbackData);
@@ -101,7 +102,7 @@ class CallbackHandler
 
             $report = $this->db->getReportById($reportId);
             if (!$report || $report['status'] !== 'pending') {
-                $this->sessionManager->clearAdminActionSession($chatId);
+                $this->sessionManager->clearAdminActionSession($userId);
                 return;
             }
 
@@ -121,7 +122,7 @@ class CallbackHandler
                 $this->telegram->sendMessage($report['user_id'], $notifyText);
             }
 
-            $this->sessionManager->clearAdminActionSession($chatId);
+            $this->sessionManager->clearAdminActionSession($userId);
             return;
         }
 
@@ -132,7 +133,7 @@ class CallbackHandler
         $report = $this->db->getReportById($reportId);
         if (!$report || $report['status'] !== 'pending') return;
 
-        $this->sessionManager->setAdminActionSession($chatId, [
+        $this->sessionManager->setAdminActionSession($userId, [
             'type' => 'report_comment',
             'report_id' => $reportId,
             'action' => $action,

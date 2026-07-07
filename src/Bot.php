@@ -341,6 +341,10 @@ class Bot
             $this->executeCommand($cleanText, $message, $language);
         } elseif ($chatType === 'private') {
             $this->handlePrivateMessage($message, $language);
+        } elseif ($this->sessionManager->hasReportSession($userId) ||
+                 $this->sessionManager->hasBroadcastSession($userId) ||
+                 $this->sessionManager->hasAdminActionSession($userId)) {
+            $this->handlePrivateMessage($message, $language);
         } else {
             $this->handleGroupMessage($message, $language);
         }
@@ -388,18 +392,19 @@ class Bot
     {
         $chatId = (string)$message->getChat()->getId();
         $text = $message->getText() ?? '';
+        $userId = (string)$message->getFrom()->getId();
 
-        if ($this->sessionManager->hasReportSession($chatId)) {
+        if ($this->sessionManager->hasReportSession($userId)) {
             $this->container->get('session_handler')->handleReportSession($message, $language);
             return;
         }
 
-        if ($this->sessionManager->hasBroadcastSession($chatId)) {
-            $this->container->get('session_handler')->handleBroadcastSession($message, $language);
+        if ($this->sessionManager->hasBroadcastSession($userId)) {
+            $this->handleBroadcastSession($message, $language);
             return;
         }
 
-        if ($this->sessionManager->hasAdminActionSession($chatId)) {
+        if ($this->sessionManager->hasAdminActionSession($userId)) {
             $this->container->get('session_handler')->handleAdminActionSession($message, $language);
             return;
         }
@@ -423,152 +428,151 @@ class Bot
         }
     }
 
-    private function handleBroadcastCallback(string $callbackData, string $chatId, int $messageId, string $language): void
+    private function handleBroadcastCallback(string $callbackData, string $chatId, int $messageId, string $language, string $userId): void
     {
-        $session = $this->sessionManager->getBroadcastSession($chatId);
+        $session = $this->sessionManager->getBroadcastSession($userId);
 
         if (!$session) {
-            $this->telegram->sendMessage($chatId, $this->translator->translate('broadcast_cancelled', $language));
             return;
         }
 
         switch ($callbackData) {
             case 'broadcast_all':
-                $this->sessionManager->setBroadcastSession($chatId, array_merge($session, [
+                $this->sessionManager->setBroadcastSession($userId, array_merge($session, [
                     'step' => 'message',
                     'selected_languages' => ['all'],
                     'target_type' => 'all'
                 ]));
                 $this->telegram->editMessageText($chatId, $messageId,
-                    "<b>" . $this->translator->translate('broadcast_selected_all', $language) . "</b>\n\n" .
-                    $this->translator->translate('broadcast_send_message', $language) . "\n\n" .
-                    "<i>" . $this->translator->translate('broadcast_media_album_hint', $language) . "</i>"
+                    "<b>" . $this->translator->translate('admin.broadcast.selected_all', $language) . "</b>\n\n" .
+                    $this->translator->translate('admin.broadcast.send_message', $language) . "\n\n" .
+                    "<i>" . $this->translator->translate('admin.broadcast.media_album_hint', $language) . "</i>"
                 );
                 $this->showMediaControls($chatId, $session, $language);
                 break;
 
             case 'broadcast_language':
-                $this->sessionManager->setBroadcastSession($chatId, array_merge($session, [
+                $this->sessionManager->setBroadcastSession($userId, array_merge($session, [
                     'step' => 'language',
                     'target_type' => 'all'
                 ]));
-                $this->showLanguageSelection($chatId, $messageId, $session, $language);
+                $this->showLanguageSelection($chatId, $messageId, $session, $language, $userId);
                 break;
 
             case 'broadcast_admins':
-                $this->sessionManager->setBroadcastSession($chatId, array_merge($session, [
+                $this->sessionManager->setBroadcastSession($userId, array_merge($session, [
                     'step' => 'message',
                     'selected_languages' => ['all'],
                     'target_type' => 'admins'
                 ]));
                 $this->telegram->editMessageText($chatId, $messageId,
-                    "<b>" . $this->translator->translate('broadcast_selected_admins', $language) . "</b>\n\n" .
-                    $this->translator->translate('broadcast_send_message', $language) . "\n\n" .
-                    "<i>" . $this->translator->translate('broadcast_media_album_hint', $language) . "</i>"
+                    "<b>" . $this->translator->translate('admin.broadcast.selected_admins', $language) . "</b>\n\n" .
+                    $this->translator->translate('admin.broadcast.send_message', $language) . "\n\n" .
+                    "<i>" . $this->translator->translate('admin.broadcast.media_album_hint', $language) . "</i>"
                 );
                 $this->showMediaControls($chatId, $session, $language);
                 break;
 
             case 'broadcast_users':
-                $this->sessionManager->setBroadcastSession($chatId, array_merge($session, [
+                $this->sessionManager->setBroadcastSession($userId, array_merge($session, [
                     'step' => 'message',
                     'selected_languages' => ['all'],
                     'target_type' => 'users'
                 ]));
                 $this->telegram->editMessageText($chatId, $messageId,
-                    "<b>" . $this->translator->translate('broadcast_selected_users', $language) . "</b>\n\n" .
-                    $this->translator->translate('broadcast_send_message', $language) . "\n\n" .
-                    "<i>" . $this->translator->translate('broadcast_media_album_hint', $language) . "</i>"
+                    "<b>" . $this->translator->translate('admin.broadcast.selected_users', $language) . "</b>\n\n" .
+                    $this->translator->translate('admin.broadcast.send_message', $language) . "\n\n" .
+                    "<i>" . $this->translator->translate('admin.broadcast.media_album_hint', $language) . "</i>"
                 );
                 $this->showMediaControls($chatId, $session, $language);
                 break;
 
             case 'broadcast_cancel':
-                $this->sessionManager->clearBroadcastSession($chatId);
-                $this->telegram->editMessageText($chatId, $messageId, "<b>" . $this->translator->translate('broadcast_cancelled', $language) . "</b>");
+                $this->sessionManager->clearBroadcastSession($userId);
+                $this->telegram->editMessageText($chatId, $messageId, "<b>" . $this->translator->translate('admin.broadcast.cancelled', $language) . "</b>");
                 break;
 
             case 'broadcast_add_photo':
-                $session = $this->sessionManager->getBroadcastSession($chatId);
-                $this->sessionManager->setBroadcastSession($chatId, array_merge($session, ['awaiting_media_type' => 'photo']));
-                $this->telegram->sendMessage($chatId, "<b>" . $this->translator->translate('add_photo_title', $language) . "</b>\n\n" . $this->translator->translate('broadcast_send_photo', $language));
+                $session = $this->sessionManager->getBroadcastSession($userId);
+                $this->sessionManager->setBroadcastSession($userId, array_merge($session, ['awaiting_media_type' => 'photo']));
+                $this->telegram->sendMessage($chatId, "<b>" . $this->translator->translate('common.add_photo_title', $language) . "</b>\n\n" . $this->translator->translate('admin.broadcast.send_photo', $language));
                 break;
 
             case 'broadcast_add_video':
-                $session = $this->sessionManager->getBroadcastSession($chatId);
-                $this->sessionManager->setBroadcastSession($chatId, array_merge($session, ['awaiting_media_type' => 'video']));
-                $this->telegram->sendMessage($chatId, "<b>" . $this->translator->translate('add_video_title', $language) . "</b>\n\n" . $this->translator->translate('broadcast_send_video', $language));
+                $session = $this->sessionManager->getBroadcastSession($userId);
+                $this->sessionManager->setBroadcastSession($userId, array_merge($session, ['awaiting_media_type' => 'video']));
+                $this->telegram->sendMessage($chatId, "<b>" . $this->translator->translate('common.add_video_title', $language) . "</b>\n\n" . $this->translator->translate('admin.broadcast.send_video', $language));
                 break;
 
             case 'broadcast_view_media':
-                $session = $this->sessionManager->getBroadcastSession($chatId);
+                $session = $this->sessionManager->getBroadcastSession($userId);
                 $this->showMediaGallery($chatId, $session, $language);
                 break;
 
             case 'broadcast_clear_media':
-                $session = $this->sessionManager->getBroadcastSession($chatId);
+                $session = $this->sessionManager->getBroadcastSession($userId);
                 $session['media'] = [];
-                $this->sessionManager->setBroadcastSession($chatId, $session);
-                $this->telegram->sendMessage($chatId, "<b>" . $this->translator->translate('media_cleared', $language) . "</b>");
+                $this->sessionManager->setBroadcastSession($userId, $session);
+                $this->telegram->sendMessage($chatId, "<b>" . $this->translator->translate('common.media_cleared', $language) . "</b>");
                 $this->showMediaControls($chatId, $session, $language);
                 break;
 
             case 'broadcast_back_to_media':
-                $session = $this->sessionManager->getBroadcastSession($chatId);
+                $session = $this->sessionManager->getBroadcastSession($userId);
                 $this->showMediaControls($chatId, $session, $language);
                 break;
 
             case 'broadcast_finish_media':
-                $session = $this->sessionManager->getBroadcastSession($chatId);
+                $session = $this->sessionManager->getBroadcastSession($userId);
                 unset($session['awaiting_media_type']);
                 if (empty($session['message_text']) && empty($session['media'])) {
-                    $this->telegram->sendMessage($chatId, "<b>" . $this->translator->translate('error', $language) . "</b>\n\n" . $this->translator->translate('broadcast_no_content', $language));
+                    $this->telegram->sendMessage($chatId, "<b>" . $this->translator->translate('common.error', $language) . "</b>\n\n" . $this->translator->translate('admin.broadcast.no_content', $language));
                     return;
                 }
                 $session['step'] = 'confirm';
-                $this->sessionManager->setBroadcastSession($chatId, $session);
+                $this->sessionManager->setBroadcastSession($userId, $session);
                 $this->showBroadcastPreview($chatId, $session, $language);
                 break;
 
             case 'broadcast_confirm':
-                $session = $this->sessionManager->getBroadcastSession($chatId);
+                $session = $this->sessionManager->getBroadcastSession($userId);
                 $this->executeBroadcast($chatId, $session, $language);
-                $this->sessionManager->clearBroadcastSession($chatId);
-                $this->telegram->editMessageText($chatId, $messageId, "🚀 <b>" . $this->translator->translate('broadcast_started', $language) . "</b>");
+                $this->sessionManager->clearBroadcastSession($userId);
+                $this->telegram->editMessageText($chatId, $messageId, "<b>" . $this->translator->translate('admin.broadcast.started', $language) . "</b>");
                 break;
 
             case 'broadcast_cancel_final':
-                $this->sessionManager->clearBroadcastSession($chatId);
-                $this->telegram->editMessageText($chatId, $messageId, "<b>" . $this->translator->translate('broadcast_cancelled', $language) . "</b>");
+                $this->sessionManager->clearBroadcastSession($userId);
+                $this->telegram->editMessageText($chatId, $messageId, "<b>" . $this->translator->translate('admin.broadcast.cancelled', $language) . "</b>");
                 break;
 
             case 'broadcast_edit':
-                $session = $this->sessionManager->getBroadcastSession($chatId);
+                $session = $this->sessionManager->getBroadcastSession($userId);
                 $session['step'] = 'message';
-                $this->sessionManager->setBroadcastSession($chatId, $session);
-                $this->telegram->sendMessage($chatId, "✏️ <b>" . $this->translator->translate('broadcast_editing', $language) . "</b>\n\n" . $this->translator->translate('broadcast_send_new_message', $language));
+                $this->sessionManager->setBroadcastSession($userId, $session);
+                $this->telegram->sendMessage($chatId, "<b>" . $this->translator->translate('admin.broadcast.editing', $language) . "</b>\n\n" . $this->translator->translate('admin.broadcast.send_new_message', $language));
                 $this->showMediaControls($chatId, $session, $language);
                 break;
 
             case 'broadcast_lang_next':
-                $session = $this->sessionManager->getBroadcastSession($chatId);
+                $session = $this->sessionManager->getBroadcastSession($userId);
                 $targetType = $session['target_type'] ?? 'all';
                 $targetName = match($targetType) {
-                    'admins' => $this->translator->translate('broadcast_admins_target', $language),
-                    'users' => $this->translator->translate('broadcast_users_target', $language),
-                    default => $this->translator->translate('broadcast_all_target', $language)
+                    'admins' => $this->translator->translate('admin.broadcast.admins_target', $language),
+                    'users' => $this->translator->translate('admin.broadcast.users_target', $language),
+                    default => $this->translator->translate('admin.broadcast.all_target', $language)
                 };
                 if (empty($session['selected_languages'])) {
                     $session['selected_languages'] = ['all'];
-                    $langsText = $this->translator->translate('broadcast_all_target', $language) . " $targetName";
+                    $langsText = $this->translator->translate('admin.broadcast.all_target', $language) . " $targetName";
                 } else {
                     $langsText = implode(', ', array_map([$this, 'getLanguageName'], $session['selected_languages'])) . " ($targetName)";
                 }
                 $session['step'] = 'message';
-                $this->sessionManager->setBroadcastSession($chatId, $session);
+                $this->sessionManager->setBroadcastSession($userId, $session);
                 $this->telegram->editMessageText($chatId, $messageId,
-                    "<b>" . $this->translator->translate('broadcast_selected_for', $language) . ":</b> $langsText\n\n" .
-                    $this->translator->translate('broadcast_send_message', $language)
+                    "<b>" . $this->translator->translate('admin.broadcast.selected_for', $language) . ":</b> $langsText\n\n" .
+                    $this->translator->translate('admin.broadcast.send_message', $language)
                 );
                 $this->showMediaControls($chatId, $session, $language);
                 break;
@@ -577,34 +581,34 @@ class Bot
                 if (strpos($callbackData, 'broadcast_lang_') === 0) {
                     $selectedLang = substr($callbackData, 15);
                     if ($callbackData === 'broadcast_lang_prev') {
-                        $session = $this->sessionManager->getBroadcastSession($chatId);
+                        $session = $this->sessionManager->getBroadcastSession($userId);
                         $currentPage = $session['lang_page'] ?? 0;
                         if ($currentPage > 0) {
                             $session['lang_page'] = $currentPage - 1;
-                            $this->sessionManager->setBroadcastSession($chatId, $session);
+                            $this->sessionManager->setBroadcastSession($userId, $session);
                         }
-                        $this->showLanguageSelection($chatId, $messageId, $session, $language);
+                        $this->showLanguageSelection($chatId, $messageId, $session, $language, $userId);
                     } elseif ($callbackData === 'broadcast_lang_next_page') {
-                        $session = $this->sessionManager->getBroadcastSession($chatId);
+                        $session = $this->sessionManager->getBroadcastSession($userId);
                         $currentPage = $session['lang_page'] ?? 0;
                         $allLanguages = ['uk', 'ru', 'en', 'es', 'de', 'fr', 'it', 'pt', 'zh', 'ja', 'ko', 'ar', 'fa', 'tr', 'pl', 'nl', 'cs', 'sr', 'bg', 'ro', 'hu', 'fi', 'sv', 'da', 'nb', 'hi', 'id', 'vi', 'th', 'el', 'he', 'hr', 'sk', 'uz', 'ms', 'kk', 'ca', 'be'];
                         $languagesPerPage = 8;
                         $totalPages = ceil(count($allLanguages) / $languagesPerPage);
                         if ($currentPage < $totalPages - 1) {
                             $session['lang_page'] = $currentPage + 1;
-                            $this->sessionManager->setBroadcastSession($chatId, $session);
+                            $this->sessionManager->setBroadcastSession($userId, $session);
                         }
-                        $this->showLanguageSelection($chatId, $messageId, $session, $language);
+                        $this->showLanguageSelection($chatId, $messageId, $session, $language, $userId);
                     } else {
-                        $this->handleLanguageSelection($chatId, $messageId, $selectedLang, $language);
+                        $this->handleLanguageSelection($chatId, $messageId, $selectedLang, $language, $userId);
                     }
                 }
         }
     }
 
-    private function handleLanguageSelection(string $chatId, int $messageId, string $selectedLang, string $language): void
+    private function handleLanguageSelection(string $chatId, int $messageId, string $selectedLang, string $language, string $userId): void
     {
-        $session = $this->sessionManager->getBroadcastSession($chatId);
+        $session = $this->sessionManager->getBroadcastSession($userId);
         $selectedLangs = $session['selected_languages'] ?? [];
 
         if (in_array($selectedLang, $selectedLangs)) {
@@ -614,7 +618,7 @@ class Bot
         }
 
         $session['selected_languages'] = $selectedLangs;
-        $this->sessionManager->setBroadcastSession($chatId, $session);
+        $this->sessionManager->setBroadcastSession($userId, $session);
         $this->showLanguageSelection($chatId, $messageId, $session, $language);
     }
 
@@ -626,26 +630,26 @@ class Bot
         $targetType = $session['target_type'] ?? 'all';
 
         $targetName = match($targetType) {
-            'admins' => $this->translator->translate('broadcast_admins_target', $language),
-            'users' => $this->translator->translate('broadcast_users_target', $language),
-            default => $this->translator->translate('broadcast_all_target', $language)
+            'admins' => $this->translator->translate('admin.broadcast.admins_target', $language),
+            'users' => $this->translator->translate('admin.broadcast.users_target', $language),
+            default => $this->translator->translate('admin.broadcast.all_target', $language)
         };
 
         $totalPages = ceil(count($allLanguages) / $languagesPerPage);
         $startIndex = $currentPage * $languagesPerPage;
         $pageLanguages = array_slice($allLanguages, $startIndex, $languagesPerPage);
 
-        $message = "🌍 <b>" . $this->translator->translate('select_languages_broadcast', $language) . " $targetName:</b>\n\n";
+        $message = "<b>" . $this->translator->translate('common.select_languages_broadcast', $language) . " $targetName:</b>\n\n";
 
         $selectedLangs = $session['selected_languages'] ?? [];
         if (!empty($selectedLangs)) {
             $selectedText = implode(', ', array_map([$this, 'getLanguageName'], $selectedLangs));
-            $message .= "<b>" . $this->translator->translate('selected', $language) . ":</b> $selectedText\n\n";
+            $message .= "<b>" . $this->translator->translate('common.selected', $language) . ":</b> $selectedText\n\n";
         }
 
-        $message .= "<i>" . $this->translator->translate('page', $language) . " " . ($currentPage + 1) . " " . $this->translator->translate('of', $language) . " $totalPages</i>\n";
-        $message .= "<i>" . $this->translator->translate('select_multiple_languages', $language) . "</i>\n\n";
-        $message .= "<b>" . $this->translator->translate('broadcast_or_send_all', $language) . " $targetName</b>";
+        $message .= "<i>" . $this->translator->translate('common.page', $language) . " " . ($currentPage + 1) . " " . $this->translator->translate('common.of', $language) . " $totalPages</i>\n";
+        $message .= "<i>" . $this->translator->translate('common.select_multiple_languages', $language) . "</i>\n\n";
+        $message .= "<b>" . $this->translator->translate('common.broadcast_or_send_all', $language) . " $targetName</b>";
 
         $keyboard = [];
         $row = [];
@@ -663,14 +667,14 @@ class Bot
 
         $navButtons = [];
         if ($currentPage > 0) {
-            $navButtons[] = ['text' => $this->translator->translate('back', $language), 'callback_data' => 'broadcast_lang_prev'];
+            $navButtons[] = ['text' => $this->translator->translate('common.previous_page', $language), 'callback_data' => 'broadcast_lang_prev'];
         }
-        $navButtons[] = ['text' => $this->translator->translate('next', $language), 'callback_data' => 'broadcast_lang_next'];
+        $navButtons[] = ['text' => $this->translator->translate('common.next', $language), 'callback_data' => 'broadcast_lang_next'];
         if ($currentPage < $totalPages - 1) {
-            $navButtons[] = ['text' => $this->translator->translate('next', $language), 'callback_data' => 'broadcast_lang_next_page'];
+            $navButtons[] = ['text' => $this->translator->translate('common.next_page', $language), 'callback_data' => 'broadcast_lang_next_page'];
         }
         $keyboard[] = $navButtons;
-        $keyboard[] = [['text' => $this->translator->translate('cancel', $language), 'callback_data' => 'broadcast_cancel']];
+        $keyboard[] = [['text' => $this->translator->translate('common.cancel', $language), 'callback_data' => 'broadcast_cancel']];
 
         $this->telegram->editMessageText($chatId, $messageId, $message, 'HTML', new \TelegramBot\Api\Types\Inline\InlineKeyboardMarkup($keyboard));
     }
@@ -697,12 +701,12 @@ class Bot
         $mediaCount = count($media);
 
         if ($mediaCount === 0) {
-            $this->telegram->sendMessage($chatId, $this->translator->translate('no_media_added', $language));
+            $this->telegram->sendMessage($chatId, $this->translator->translate('common.no_media_added', $language));
             return;
         }
 
-        $message = "<b>" . $this->translator->translate('media_gallery', $language) . "</b>\n\n";
-        $message .= $this->translator->translate('total_files', $language) . ": $mediaCount\n\n";
+        $message = "<b>" . $this->translator->translate('common.media_gallery', $language) . "</b>\n\n";
+        $message .= $this->translator->translate('common.total_files', $language) . ": $mediaCount\n\n";
 
         $keyboard = [];
         $photos = array_filter($media, fn($m) => $m['type'] === 'photo');
@@ -712,17 +716,17 @@ class Bot
         $videoCount = count($videos);
 
         if ($photoCount > 0) {
-            $message .= "<b>" . $this->translator->translate('photos', $language) . ":</b> $photoCount\n";
+            $message .= "<b>" . $this->translator->translate('common.photos', $language) . ":</b> $photoCount\n";
         }
         if ($videoCount > 0) {
-            $message .= "<b>" . $this->translator->translate('videos', $language) . ":</b> $videoCount\n";
+            $message .= "<b>" . $this->translator->translate('common.videos', $language) . ":</b> $videoCount\n";
         }
 
-        $message .= "\n<i>" . $this->translator->translate('media_album_will_be_sent', $language) . "</i>";
+        $message .= "\n<i>" . $this->translator->translate('common.media_album_will_be_sent', $language) . "</i>";
 
         $keyboard[] = [
-            ['text' => $this->translator->translate('clear_all', $language), 'callback_data' => 'broadcast_clear_media'],
-            ['text' => $this->translator->translate('back', $language), 'callback_data' => 'broadcast_back_to_media']
+            ['text' => $this->translator->translate('common.clear_all', $language), 'callback_data' => 'broadcast_clear_media'],
+            ['text' => $this->translator->translate('common.back', $language), 'callback_data' => 'broadcast_back_to_media']
         ];
 
         $this->telegram->sendMessage($chatId, $message, 'HTML', false, null, new \TelegramBot\Api\Types\Inline\InlineKeyboardMarkup($keyboard));
@@ -734,38 +738,38 @@ class Bot
         $photosCount = count(array_filter($session['media'] ?? [], fn($m) => $m['type'] === 'photo'));
         $videosCount = count(array_filter($session['media'] ?? [], fn($m) => $m['type'] === 'video'));
 
-        $message = "<b>" . $this->translator->translate('media_management', $language) . "</b>\n\n";
+        $message = "<b>" . $this->translator->translate('common.media_management', $language) . "</b>\n\n";
 
         if (!empty($session['message_text'])) {
-            $message .= "<b>" . $this->translator->translate('text', $language) . ":</b> " . substr($session['message_text'], 0, 100) . (strlen($session['message_text']) > 100 ? "..." : "") . "\n\n";
+            $message .= "<b>" . $this->translator->translate('common.text', $language) . ":</b> " . substr($session['message_text'], 0, 100) . (strlen($session['message_text']) > 100 ? "..." : "") . "\n\n";
         }
 
-        $message .= "<b>" . $this->translator->translate('media_statistics', $language) . ":</b>\n";
-        $message .= $this->translator->translate('photos', $language) . ": $photosCount " . $this->translator->translate('items', $language) . "\n";
-        $message .= $this->translator->translate('videos', $language) . ": $videosCount " . $this->translator->translate('items', $language) . "\n";
-        $message .= $this->translator->translate('total', $language) . ": $mediaCount " . $this->translator->translate('files', $language) . "\n\n";
+        $message .= "<b>" . $this->translator->translate('common.media_statistics', $language) . ":</b>\n";
+        $message .= $this->translator->translate('common.photos', $language) . ": $photosCount " . $this->translator->translate('common.items', $language) . "\n";
+        $message .= $this->translator->translate('common.videos', $language) . ": $videosCount " . $this->translator->translate('common.items', $language) . "\n";
+        $message .= $this->translator->translate('common.total', $language) . ": $mediaCount " . $this->translator->translate('common.files', $language) . "\n\n";
 
         if ($mediaCount > 0) {
-            $message .= "<i>" . $this->translator->translate('media_album_hint', $language) . "</i>\n\n";
+            $message .= "<i>" . $this->translator->translate('admin.broadcast.media_album_hint', $language) . "</i>\n\n";
         }
 
-        $message .= $this->translator->translate('choose_action', $language);
+        $message .= $this->translator->translate('common.choose_action', $language);
 
         $keyboardArray = [];
         $keyboardArray[] = [
-            ['text' => $this->translator->translate('add_photo', $language), 'callback_data' => 'broadcast_add_photo'],
-            ['text' => $this->translator->translate('add_video', $language), 'callback_data' => 'broadcast_add_video']
+            ['text' => $this->translator->translate('common.add_photo', $language), 'callback_data' => 'broadcast_add_photo'],
+            ['text' => $this->translator->translate('common.add_video', $language), 'callback_data' => 'broadcast_add_video']
         ];
 
         if ($mediaCount > 0) {
             $keyboardArray[] = [
-                ['text' => $this->translator->translate('media_management', $language), 'callback_data' => 'broadcast_view_media'],
-                ['text' => $this->translator->translate('clear_all', $language), 'callback_data' => 'broadcast_clear_media']
+                ['text' => $this->translator->translate('common.media_management', $language), 'callback_data' => 'broadcast_view_media'],
+                ['text' => $this->translator->translate('common.clear_all', $language), 'callback_data' => 'broadcast_clear_media']
             ];
         }
 
         $keyboardArray[] = [
-            ['text' => $this->translator->translate('finish_adding', $language), 'callback_data' => 'broadcast_finish_media']
+            ['text' => $this->translator->translate('common.finish_adding', $language), 'callback_data' => 'broadcast_finish_media']
         ];
 
         $keyboard = new \TelegramBot\Api\Types\Inline\InlineKeyboardMarkup($keyboardArray);
@@ -775,33 +779,33 @@ class Bot
 
     private function showBroadcastPreview(string $chatId, array $session, string $language): void
     {
-        $previewMessage = "<b>" . $this->translator->translate('broadcast_preview', $language) . "</b>\n\n";
+        $previewMessage = "<b>" . $this->translator->translate('admin.broadcast.preview', $language) . "</b>\n\n";
 
         if (in_array('all', $session['selected_languages'])) {
-            $previewMessage .= "<b>" . $this->translator->translate('recipients', $language) . ":</b> " . $this->translator->translate('all_users', $language) . "\n";
+            $previewMessage .= "<b>" . $this->translator->translate('common.recipients', $language) . ":</b> " . $this->translator->translate('common.all_users', $language) . "\n";
         } else {
             $langsText = implode(', ', array_map([$this, 'getLanguageName'], $session['selected_languages']));
-            $previewMessage .= "<b>" . $this->translator->translate('languages', $language) . ":</b> $langsText\n";
+            $previewMessage .= "<b>" . $this->translator->translate('common.languages', $language) . ":</b> $langsText\n";
         }
 
-        $previewMessage .= "<b>" . $this->translator->translate('text', $language) . ":</b> " . ($session['message_text'] ?: $this->translator->translate('none', $language)) . "\n";
+        $previewMessage .= "<b>" . $this->translator->translate('common.text', $language) . ":</b> " . ($session['message_text'] ?: $this->translator->translate('common.none', $language)) . "\n";
 
         $mediaCount = count($session['media'] ?? []);
         $photosCount = count(array_filter($session['media'] ?? [], fn($m) => $m['type'] === 'photo'));
         $videosCount = count(array_filter($session['media'] ?? [], fn($m) => $m['type'] === 'video'));
 
-        $previewMessage .= "📦 <b>" . $this->translator->translate('media', $language) . ":</b> $mediaCount " . $this->translator->translate('files', $language) . " ($photosCount " . $this->translator->translate('photos', $language) . ", $videosCount " . $this->translator->translate('videos', $language) . ")\n\n";
-        $previewMessage .= "💡 <i>" . $this->translator->translate('media_album_hint', $language) . "</i>\n\n";
+        $previewMessage .= "<b>" . $this->translator->translate('common.media', $language) . ":</b> $mediaCount " . $this->translator->translate('common.files', $language) . " ($photosCount " . $this->translator->translate('common.photos', $language) . ", $videosCount " . $this->translator->translate('common.videos', $language) . ")\n\n";
+        $previewMessage .= "<i>" . $this->translator->translate('admin.broadcast.media_album_hint', $language) . "</i>\n\n";
 
-        $previewMessage .= "<b>" . $this->translator->translate('everything_correct_confirm', $language) . "</b>";
+        $previewMessage .= "<b>" . $this->translator->translate('common.everything_correct_confirm', $language) . "</b>";
 
         $keyboard = new \TelegramBot\Api\Types\Inline\InlineKeyboardMarkup([
             [
-                ['text' => $this->translator->translate('yes_start_broadcast', $language), 'callback_data' => 'broadcast_confirm'],
-                ['text' => $this->translator->translate('edit', $language), 'callback_data' => 'broadcast_edit']
+                ['text' => $this->translator->translate('common.yes_start_broadcast', $language), 'callback_data' => 'broadcast_confirm'],
+                ['text' => $this->translator->translate('common.edit', $language), 'callback_data' => 'broadcast_edit']
             ],
             [
-                ['text' => $this->translator->translate('cancel', $language), 'callback_data' => 'broadcast_cancel_final']
+                ['text' => $this->translator->translate('common.cancel', $language), 'callback_data' => 'broadcast_cancel_final']
             ]
         ]);
 
@@ -848,15 +852,15 @@ class Bot
 
         if ($totalUsers === 0) {
             $targetName = match($targetType) {
-                'admins' => $this->translator->translate('broadcast_no_admins', $language),
-                'users' => $this->translator->translate('broadcast_no_users', $language),
-                default => $this->translator->translate('broadcast_no_users', $language)
+                'admins' => $this->translator->translate('admin.broadcast.no_admins', $language),
+                'users' => $this->translator->translate('admin.broadcast.no_users', $language),
+                default => $this->translator->translate('admin.broadcast.no_users', $language)
             };
-            $this->telegram->sendMessage($chatId, "<b>" . $this->translator->translate('broadcast_error', $language) . "</b>\n\n$targetName");
+            $this->telegram->sendMessage($chatId, "<b>" . $this->translator->translate('admin.broadcast.error', $language) . "</b>\n\n$targetName");
             return;
         }
 
-        $this->telegram->sendMessage($chatId, "<b>" . $this->translator->translate('broadcast_progress', $language) . "</b>\n\n" . $this->translator->translate('progress', $language) . ": 0/$totalUsers\n" . $this->translator->translate('successful', $language) . ": 0");
+        $this->telegram->sendMessage($chatId, "<b>" . $this->translator->translate('admin.broadcast.progress', $language) . "</b>\n\n" . $this->translator->translate('common.progress', $language) . ": 0/$totalUsers\n" . $this->translator->translate('common.successful', $language) . ": 0");
 
         $success = 0;
         $failed = 0;
@@ -881,10 +885,10 @@ class Bot
             }
 
             if ($current % 5 === 0 || $current === $totalUsers) {
-                $progressMessage = "<b>" . $this->translator->translate('broadcast_progress', $language) . "</b>\n\n" .
-                    $this->translator->translate('progress', $language) . ": $current/$totalUsers\n" .
-                    $this->translator->translate('successful', $language) . ": $success\n" .
-                    $this->translator->translate('errors', $language) . ": $failed";
+                $progressMessage = "<b>" . $this->translator->translate('admin.broadcast.progress', $language) . "</b>\n\n" .
+                    $this->translator->translate('common.progress', $language) . ": $current/$totalUsers\n" .
+                    $this->translator->translate('common.successful', $language) . ": $success\n" .
+                    $this->translator->translate('common.errors', $language) . ": $failed";
                 $this->telegram->sendMessage($chatId, $progressMessage, 'HTML');
             }
 
@@ -892,15 +896,15 @@ class Bot
         }
 
         $targetName = match($targetType) {
-            'admins' => $this->translator->translate('broadcast_admins_target', $language),
-            'users' => $this->translator->translate('broadcast_users_target', $language),
-            default => $this->translator->translate('broadcast_all_target', $language)
+            'admins' => $this->translator->translate('admin.broadcast.admins_target', $language),
+            'users' => $this->translator->translate('admin.broadcast.users_target', $language),
+            default => $this->translator->translate('admin.broadcast.all_target', $language)
         };
 
-        $finalMessage = "<b>" . $this->translator->translate('broadcast_completed', $language) . " $targetName!</b>\n\n" .
-            $this->translator->translate('successful', $language) . ": $success\n" .
-            $this->translator->translate('errors', $language) . ": $failed\n" .
-            $this->translator->translate('total', $language) . ": $totalUsers";
+        $finalMessage = "<b>" . $this->translator->translate('admin.broadcast.completed', $language) . " $targetName!</b>\n\n" .
+            $this->translator->translate('common.successful', $language) . ": $success\n" .
+            $this->translator->translate('common.errors', $language) . ": $failed\n" .
+            $this->translator->translate('common.total', $language) . ": $totalUsers";
         $this->telegram->sendMessage($chatId, $finalMessage, 'HTML');
     }
 
@@ -909,12 +913,11 @@ class Bot
         $this->logger->debug("Обробка admin callback: $callbackData");
     }
 
-    private function handleReportCallback(string $callbackData, string $chatId, int $messageId, string $language): void
+    private function handleReportCallback(string $callbackData, string $chatId, int $messageId, string $language, string $userId): void
     {
-        $session = $this->sessionManager->getReportSession($chatId);
+        $session = $this->sessionManager->getReportSession($userId);
 
         if (!$session) {
-            $this->telegram->sendMessage($chatId, $this->translator->translate('report_session_not_found', $language));
             return;
         }
 
@@ -922,7 +925,7 @@ class Bot
             case 'report_complete':
                 $reportId = $this->container->get('report_service')->saveReport($session, $language);
                 if ($reportId) {
-                    $this->sessionManager->clearReportSession($chatId);
+                    $this->sessionManager->clearReportSession($userId);
                     $this->telegram->sendMessage($chatId, $this->translator->translate('report.success', $language, [$reportId]));
                 }
                 break;
@@ -936,15 +939,15 @@ class Bot
                 break;
 
             case 'report_cancel':
-                $this->sessionManager->clearReportSession($chatId);
+                $this->sessionManager->clearReportSession($userId);
                 $this->telegram->sendMessage($chatId, $this->translator->translate('report_creation_cancelled', $language));
                 break;
         }
     }
 
-    private function handleReportActionCallback(string $callbackData, string $chatId, int $messageId, string $language): void
+    private function handleReportActionCallback(string $callbackData, string $chatId, int $messageId, string $language, string $userId): void
     {
-        $this->container->get('callback_handler')->handleReportActionCallback($callbackData, $chatId, $messageId, $language);
+        $this->container->get('callback_handler')->handleReportActionCallback($callbackData, $chatId, $messageId, $language, $userId);
     }
 
     private function handleReportsPageCallback(string $callbackData, string $chatId, int $messageId, string $language): void
@@ -1004,6 +1007,7 @@ class Bot
         $chatId = (string)$callbackQuery->getMessage()->getChat()->getId();
         $messageId = $callbackQuery->getMessage()->getMessageId();
         $callbackQueryId = $callbackQuery->getId();
+        $userId = (string)$callbackQuery->getFrom()->getId();
 
         $from = $callbackQuery->getFrom();
         if ($from) {
@@ -1017,22 +1021,35 @@ class Bot
             );
         }
 
-        $answerText = $this->getCallbackAnswer($callbackData, $language);
-        $this->telegram->answerCallbackQuery($callbackQueryId, $answerText);
-
         $parts = explode('_', $callbackData);
         $type = $parts[0];
 
+        $hasSession = false;
+        if ($type === 'broadcast') {
+            $hasSession = $this->sessionManager->hasBroadcastSession($userId);
+        } elseif ($type === 'report' || $type === 'accept' || $type === 'reject') {
+            $hasSession = $this->sessionManager->hasReportSession($userId) ||
+                          $this->sessionManager->hasAdminActionSession($userId);
+        }
+
+        if (!$hasSession) {
+            $this->telegram->answerCallbackQuery($callbackQueryId, '');
+            return;
+        }
+
+        $answerText = $this->getCallbackAnswer($callbackData, $language);
+        $this->telegram->answerCallbackQuery($callbackQueryId, $answerText);
+
         switch ($type) {
             case 'broadcast':
-                $this->handleBroadcastCallback($callbackData, $chatId, $messageId, $language);
+                $this->handleBroadcastCallback($callbackData, $chatId, $messageId, $language, $userId);
                 break;
             case 'report':
-                $this->handleReportCallback($callbackData, $chatId, $messageId, $language);
+                $this->handleReportCallback($callbackData, $chatId, $messageId, $language, $userId);
                 break;
             case 'accept':
             case 'reject':
-                $this->handleReportActionCallback($callbackData, $chatId, $messageId, $language);
+                $this->handleReportActionCallback($callbackData, $chatId, $messageId, $language, $userId);
                 break;
             case 'reports':
                 $this->handleReportsPageCallback($callbackData, $chatId, $messageId, $language);
@@ -1122,15 +1139,16 @@ class Bot
     private function handleBroadcastSession(\TelegramBot\Api\Types\Message $message, string $language): void
     {
         $chatId = (string)$message->getChat()->getId();
-        $session = $this->sessionManager->getBroadcastSession($chatId);
+        $userId = (string)$message->getFrom()->getId();
+        $session = $this->sessionManager->getBroadcastSession($userId);
 
         if (!$session) {
             return;
         }
 
         if ($message->getText() === '/cancel') {
-            $this->sessionManager->clearBroadcastSession($chatId);
-            $this->telegram->sendMessage($chatId, $this->translator->translate('broadcast_cancelled', $language));
+            $this->sessionManager->clearBroadcastSession($userId);
+            $this->telegram->sendMessage($chatId, $this->translator->translate('admin.broadcast.cancelled', $language));
             return;
         }
 
@@ -1144,16 +1162,16 @@ class Bot
                 $session['media'] = $session['media'] ?? [];
                 $session['media'][] = ['type' => 'photo', 'file_id' => $fileId];
                 unset($session['awaiting_media_type']);
-                $this->sessionManager->setBroadcastSession($chatId, $session);
+                $this->sessionManager->setBroadcastSession($userId, $session);
 
                 $mediaCount = count($session['media']);
-                $this->telegram->sendMessage($chatId, "✅ <b>" . $this->translator->translate('successfully_added', $language) . "</b> " .
-                    $this->translator->translate('photo', $language) . "!\n" .
-                    $this->translator->translate('total_media_count', $language, [$mediaCount]));
+                $this->telegram->sendMessage($chatId, "<b>" . $this->translator->translate('common.successfully_added', $language) . "</b> " .
+                    $this->translator->translate('common.photo', $language) . "!\n" .
+                    $this->translator->translate('common.total_media_count', $language, [$mediaCount]));
                 $this->showMediaControls($chatId, $session, $language);
                 return;
             } else {
-                $this->telegram->sendMessage($chatId, $this->translator->translate('broadcast_send_photo', $language));
+                $this->telegram->sendMessage($chatId, $this->translator->translate('admin.broadcast.send_photo', $language));
                 return;
             }
         }
@@ -1165,16 +1183,16 @@ class Bot
                 $session['media'] = $session['media'] ?? [];
                 $session['media'][] = ['type' => 'video', 'file_id' => $fileId];
                 unset($session['awaiting_media_type']);
-                $this->sessionManager->setBroadcastSession($chatId, $session);
+                $this->sessionManager->setBroadcastSession($userId, $session);
 
                 $mediaCount = count($session['media']);
-                $this->telegram->sendMessage($chatId, "✅ <b>" . $this->translator->translate('successfully_added', $language) . "</b> " .
-                    $this->translator->translate('video', $language) . "!\n" .
-                    $this->translator->translate('total_media_count', $language, [$mediaCount]));
+                $this->telegram->sendMessage($chatId, "<b>" . $this->translator->translate('common.successfully_added', $language) . "</b> " .
+                    $this->translator->translate('common.video', $language) . "!\n" .
+                    $this->translator->translate('common.total_media_count', $language, [$mediaCount]));
                 $this->showMediaControls($chatId, $session, $language);
                 return;
             } else {
-                $this->telegram->sendMessage($chatId, $this->translator->translate('broadcast_send_video', $language));
+                $this->telegram->sendMessage($chatId, $this->translator->translate('admin.broadcast.send_video', $language));
                 return;
             }
         }
@@ -1183,9 +1201,9 @@ class Bot
             $text = $message->getText() ?? '';
             if (!empty($text)) {
                 $session['message_text'] = $text;
-                $this->sessionManager->setBroadcastSession($chatId, $session);
-                $this->telegram->sendMessage($chatId, "✅ <b>" . $this->translator->translate('text_saved', $language) . "</b>\n\n" .
-                    $this->translator->translate('add_more_media_or_finish', $language));
+                $this->sessionManager->setBroadcastSession($userId, $session);
+                $this->telegram->sendMessage($chatId, "<b>" . $this->translator->translate('common.text_saved', $language) . "</b>\n\n" .
+                    $this->translator->translate('common.add_more_media_or_finish', $language));
                 $this->showMediaControls($chatId, $session, $language);
             }
         }

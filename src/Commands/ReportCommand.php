@@ -57,7 +57,7 @@ class ReportCommand extends BaseCommand
         // Default logic: Create new report
         $from = $message->getFrom();
 
-        $this->sessionManager->setReportSession($chatId, [
+        $this->sessionManager->setReportSession((string)$from->getId(), [
             'step' => 1,
             'user_id' => (string)$from->getId(),
             'data' => [

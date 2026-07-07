@@ -65,11 +65,11 @@ class BroadcastService
         $totalUsers = count($users);
 
         if ($totalUsers === 0) {
-            $this->telegram->sendMessage($chatId, "<b>" . $this->translator->translate('broadcast_error', $language) . "</b>\n\n" . $this->translator->translate('broadcast_no_users', $language));
+            $this->telegram->sendMessage($chatId, "<b>" . $this->translator->translate('admin.broadcast.error', $language) . "</b>\n\n" . $this->translator->translate('admin.broadcast.no_users', $language));
             return;
         }
 
-        $this->telegram->sendMessage($chatId, "<b>" . $this->translator->translate('broadcast_progress', $language) . "</b>\n\n" . $this->translator->translate('progress', $language) . ": 0/".$totalUsers);
+        $this->telegram->sendMessage($chatId, "<b>" . $this->translator->translate('admin.broadcast.progress', $language) . "</b>\n\n" . $this->translator->translate('common.progress', $language) . ": 0/".$totalUsers);
 
         $success = 0;
         $failed = 0;
@@ -98,10 +98,10 @@ class BroadcastService
             usleep(50000); // 20 messages per second limit
         }
 
-        $finalMessage = "<b>" . $this->translator->translate('broadcast_completed', $language) . "</b>\n\n" .
-            $this->translator->translate('successful', $language) . ": $success\n" .
-            $this->translator->translate('errors', $language) . ": $failed\n" .
-            $this->translator->translate('total', $language) . ": $totalUsers";
+        $finalMessage = "<b>" . $this->translator->translate('admin.broadcast.completed', $language) . "</b>\n\n" .
+            $this->translator->translate('common.successful', $language) . ": $success\n" .
+            $this->translator->translate('common.errors', $language) . ": $failed\n" .
+            $this->translator->translate('common.total', $language) . ": $totalUsers";
         $this->telegram->sendMessage($chatId, $finalMessage, 'HTML');
     }
 
