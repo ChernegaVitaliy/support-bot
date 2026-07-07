@@ -1,25 +1,25 @@
 # Telegram Support Bot v3.0
 
-Telegram Support Bot переписаний на чистий ООП код з використанням сучасних бібліотек.
+Telegram Support Bot is rewritten in clean OOP code using modern libraries.
 
-## Особливості
+## Features
 
-- ✅ **Чистий ООП код** - використання класів, інтерфейсів та залежностей
-- ✅ **Бібліотека telegram-bot/api** - професійна робота з Telegram Bot API
-- ✅ **vlucas/phpdotenv** - керування конфігурацією через .env
-- ✅ **Monolog** - потужне логування з кольоровим виводом
-- ✅ **Архітектура** - поділ на Services, Models, Commands, Config
-- ✅ **Масштабованість** - легке додавання нових команд та функцій
+- ✅ **Clean OOP code** - use of classes, interfaces and dependencies
+- ✅ **telegram-bot/api library** - professional Telegram Bot API integration
+- ✅ **vlucas/phpdotenv** - configuration management via .env
+- ✅ **Monolog** - powerful logging with colored output
+- ✅ **Architecture** - separation into Services, Models, Commands, Config
+- ✅ **Scalability** - easy addition of new commands and features
 
-## Встановлення
+## Installation
 
 ```bash
 composer install
 ```
 
-## Конфігурація
+## Configuration
 
-Файл `.env`:
+`.env` file:
 ```
 BOT_TOKEN=your_bot_token
 DB_PATH=bot.db
@@ -27,22 +27,22 @@ LOG_FILE=bot.log
 DEFAULT_OWNER_ID=your_telegram_id
 ```
 
-## Запуск
+## Run
 
 ```bash
 php console app:run
 ```
 
-## Структура проекту
+## Project Structure
 
 ```
 src/
-├── Bot.php              - Основний клас бота
+├── Bot.php              - Main bot class
 ├── Config/
-│   └── Config.php       - Конфігурація
+│   └── Config.php       - Configuration
 ├── Commands/
-│   ├── BaseCommand.php  - Базовий клас команди
-│   ├── Admin/           - Адмін-команди
+│   ├── BaseCommand.php  - Base command class
+│   ├── Admin/           - Admin commands
 │   │   ├── StatsCommand.php
 │   │   ├── AddAdminCommand.php
 │   │   ├── RemoveAdminCommand.php
@@ -55,50 +55,50 @@ src/
 │   ├── ProfileCommand.php
 │   └── CancelCommand.php
 ├── Interfaces/
-│   └── CommandInterface.php - Інтерфейс команди
+│   └── CommandInterface.php - Command interface
 ├── Models/
-│   ├── User.php         - Модель користувача
-│   ├── Admin.php        - Модель адміна
-│   └── Report.php       - Модель репорту
+│   ├── User.php         - User model
+│   ├── Admin.php        - Admin model
+│   └── Report.php       - Report model
 ├── Services/
-│   ├── Logger.php       - Логування (Monolog)
-│   ├── DatabaseService.php - База даних
+│   ├── Logger.php       - Logging (Monolog)
+│   ├── DatabaseService.php - Database
 │   ├── TelegramService.php  - Telegram API
-│   ├── Translator.php   - Мульти-мовність
-│   └── SessionManager.php    - Управління сесіями
+│   ├── Translator.php   - Multi-language support
+│   └── SessionManager.php    - Session management
 ```
 
-## Команди
+## Commands
 
-### Користувацькі команди:
-- `/start` - Почати роботу з ботом
-- `/help` - Довідка
-- `/about` - Про бота
-- `/profile` - Профіль користувача
-- `/cancel` - Скасувати дію
+### User commands:
+- `/start` - Start working with the bot
+- `/help` - Help
+- `/about` - About the bot
+- `/profile` - User profile
+- `/cancel` - Cancel action
 
-### Адмін-команди:
-- `/stats` - Статистика бота
-- `/adminlist` - Список адмінів
-- `/addadmin <username/id> [rank]` - Додати адміна
-- `/removeadmin <username/id>` - Видалити адміна
-- `/setrank <username/id> <rank>` - Змінити ранг
-- `/reports [status]` - Список репортів
-- `/broadcast` - Розсилка
+### Admin commands:
+- `/stats` - Bot statistics
+- `/adminlist` - List of admins
+- `/addadmin <username/id> [rank]` - Add admin
+- `/removeadmin <username/id>` - Remove admin
+- `/setrank <username/id> <rank>` - Change rank
+- `/reports [status]` - List of reports
+- `/broadcast` - Broadcast
 
-## Консольні команди
+## Console Commands
 
-Під час роботи бота можна використовувати консольні команди:
-- `help` - Довідка
-- `stats` - Статистика
-- `users` - Кількість користувачів
-- `admins` - Список адмінів
-- `sessions` - Активні сесії
-- `exit` - Вихід
+While the bot is running, you can use console commands:
+- `help` - Help
+- `stats` - Statistics
+- `users` - Number of users
+- `admins` - List of admins
+- `sessions` - Active sessions
+- `exit` - Exit
 
-## Додавання нових команд
+## Adding New Commands
 
-1. Створіть клас команди в `src/Commands/`:
+1. Create a command class in `src/Commands/`:
 ```php
 <?php
 namespace App\Commands;
@@ -114,16 +114,16 @@ class MyCommand extends BaseCommand
 
     public function execute(Message $message, string $language = 'uk'): void
     {
-        // Ваш код
+        // Your code
     }
 }
 ```
 
-2. Зареєструйте команду в `index.php`:
+2. Register the command in `index.php`:
 ```php
 $bot->registerCommand(new \App\Commands\MyCommand(...));
 ```
 
-## Ліцензія
+## License
 
 MIT
