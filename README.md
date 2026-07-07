@@ -164,4 +164,4 @@ $this->commands[] = new \App\Commands\MyCommand($this->container);
 
 ## License
 
-MIT
+This project is licensed under the CSSM Unlimited License v2.0 (CSSM-ULv2). See the [LICENSE](LICENSE) file for details.
