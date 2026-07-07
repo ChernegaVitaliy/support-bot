@@ -49,6 +49,11 @@ class AddAdminCommand extends BaseCommand
             return;
         }
 
+        if ($rank === 'owner' && $userId !== $this->db->getDefaultOwnerId()) {
+            $this->reply($chatId, $this->t('errors.no_permission', $language));
+            return;
+        }
+
         if ($currentRank === 'admin' && $rank === 'owner') {
             $this->reply($chatId, $this->t('errors.no_permission', $language));
             return;
