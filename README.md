@@ -30,7 +30,7 @@ DEFAULT_OWNER_ID=your_telegram_id
 ## Запуск
 
 ```bash
-php index.php
+php console app:run
 ```
 
 ## Структура проекту
