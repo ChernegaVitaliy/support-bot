@@ -9,7 +9,13 @@
     </div>
 
     <div class="hero">
-        <div class="hero-avatar"><i data-lucide="user"></i></div>
+        <div class="hero-avatar">
+            {% if app_user.photo_url is defined and app_user.photo_url %}
+                <img src="{{ app_user.photo_url }}" alt="" />
+            {% else %}
+                <i data-lucide="user"></i>
+            {% endif %}
+        </div>
         <h2 class="hero-name">{{ app_user.first_name|default(app_user.username|default('Користувач')) }}</h2>
         <div class="hero-username">@{{ app_user.username|default('—') }}</div>
     </div>
