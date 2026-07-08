@@ -111,6 +111,10 @@ class Logger implements LoggerInterface
 
     private function outputToConsole(string $level, string $message, string $color): void
     {
+        if (PHP_SAPI !== 'cli') {
+            return;
+        }
+
         $date = date("Y-m-d H:i:s");
         $timeColor = "\033[2;37m";
         $resetColor = "\033[0m";

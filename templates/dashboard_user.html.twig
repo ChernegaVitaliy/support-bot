@@ -1,0 +1,59 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Головна{% endblock %}
+
+{% block body %}
+<div class="w-full max-w-600 mx-auto p-4">
+    <div class="flex items-center justify-between mb-6 pb-3 border-b-2 border-border">
+        <h1 class="text-3xl font-bold m-0 font-unbounded tracking-tight uppercase">Головна</h1>
+        <div class="w-11 h-11 rounded bg-surface border-2 border-border shadow-brutal-sm flex items-center justify-center text-primary">
+            <i data-lucide="home" class="w-6 h-6 stroke-2-5"></i>
+        </div>
+    </div>
+
+    <!-- Welcome -->
+    <div class="text-center py-6 px-4 mb-6 bg-surface rounded border-2 border-border shadow-brutal">
+        <div class="w-20 h-20 mx-auto mb-4 rounded bg-surface flex items-center justify-center text-primary border-2 border-border shadow-brutal overflow-hidden shrink-0">
+            <i data-lucide="user" class="w-10 h-10 stroke-1-5"></i>
+        </div>
+        <h2 class="text-[22px] font-bold mb-1 m-0 font-unbounded tracking-tight uppercase">{{ app_user.first_name|default(app_user.username|default('Користувач')) }}</h2>
+        <div class="text-base text-primary mb-4 leading-relaxed font-semibold">@{{ app_user.username|default('—') }}</div>
+    </div>
+
+    <!-- Quick actions -->
+    <a href="{{ path('miniapp_report_new') }}" class="flex items-center p-4 bg-surface rounded border-2 border-border mb-4 cursor-pointer transition-all shadow-brutal active:translate-brutal active:shadow-none no-underline text-inherit">
+        <div class="w-12 h-12 rounded bg-surface flex items-center justify-center text-primary mr-4 shrink-0 border-2 border-border shadow-brutal-sm">
+            <i data-lucide="plus-circle" class="w-6 h-6 stroke-2"></i>
+        </div>
+        <div class="flex-1">
+            <div class="flex items-center text-lg font-bold mb-1 font-unbounded tracking-tight uppercase">Створити репорт</div>
+            <div class="text-[14px] text-primary mb-1 leading-normal font-semibold">Поскаржитися на порушення</div>
+        </div>
+        <i data-lucide="chevron-right" class="text-muted w-6 h-6 stroke-2"></i>
+    </a>
+
+    <a href="{{ path('miniapp_reports') }}" class="flex items-center p-4 bg-surface rounded border-2 border-border mb-6 cursor-pointer transition-all shadow-brutal active:translate-brutal active:shadow-none no-underline text-inherit">
+        <div class="w-12 h-12 rounded bg-surface flex items-center justify-center text-primary mr-4 shrink-0 border-2 border-border shadow-brutal-sm">
+            <i data-lucide="flag" class="w-6 h-6 stroke-2"></i>
+        </div>
+        <div class="flex-1">
+            <div class="flex items-center text-lg font-bold mb-1 font-unbounded tracking-tight uppercase">Мої репорти</div>
+            <div class="text-[14px] text-primary mb-1 leading-normal font-semibold">Переглянути статус скарг</div>
+        </div>
+        <i data-lucide="chevron-right" class="text-muted w-6 h-6 stroke-2"></i>
+    </a>
+
+    <!-- Recent reports -->
+    <h2 class="text-xl font-bold mb-4 text-primary border-b-2 border-border pb-2 font-unbounded tracking-tight uppercase">Останні репорти</h2>
+
+    {% import 'macros.html.twig' as m %}
+    {% for report in my_reports %}
+        {{ m.reportCard(report, false, path('miniapp_report_detail', {id: report.id})) }}
+    {% else %}
+        <div class="text-center py-12 px-4 text-primary border-2 border-dashed border-border rounded my-4 bg-black-2">
+            <i data-lucide="inbox" class="w-12 h-12 stroke-1-5 opacity-80 mb-4 mx-auto block"></i>
+            <div class="font-unbounded font-bold tracking-tight uppercase">Репортів ще немає</div>
+        </div>
+    {% endfor %}
+</div>
+{% endblock %}

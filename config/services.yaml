@@ -22,6 +22,7 @@ services:
 
     App\Services\TelegramService:
         public: true
+        lazy: true
         arguments:
             $token: '%env(BOT_TOKEN)%'
 
@@ -36,6 +37,11 @@ services:
     App\Handlers\CallbackHandler: ~
     App\Services\BroadcastService: ~
     App\Commands\Admin\ReportsCommand: ~
+
+    App\Services\TelegramWebAppService:
+        public: true
+        arguments:
+            $botToken: '%env(BOT_TOKEN)%'
 
     App\Bot:
         public: true
@@ -54,6 +60,7 @@ services:
             - '../src/Services/Translator.php'
             - '../src/Services/SessionManager.php'
             - '../src/Services/ReportService.php'
+            - '../src/Services/TelegramWebAppService.php'
             - '../src/Services/BroadcastService.php'
             - '../src/Handlers/SessionHandler.php'
             - '../src/Handlers/CallbackHandler.php'
@@ -93,5 +100,8 @@ services:
     'reports_command':
         public: true
         alias: App\Commands\Admin\ReportsCommand
+    'telegram_webapp':
+        public: true
+        alias: App\Services\TelegramWebAppService
 
     Psr\Container\ContainerInterface: '@service_container'

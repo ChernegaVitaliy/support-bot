@@ -35,8 +35,7 @@ class TelegramService
             $this->botName = $botInfo->getFirstName();
             $this->logger->debug("Бот запущений: @{$this->botUsername} ({$this->botName})");
         } catch (\Exception $e) {
-            $this->logger->error("Не вдалося отримати інформацію про бота: " . $e->getMessage());
-            throw $e;
+            $this->logger->warning("Не вдалося отримати інформацію про бота: " . $e->getMessage());
         }
     }
 
@@ -318,5 +317,44 @@ class TelegramService
     public function getBot(): BotApi
     {
         return $this->bot;
+    }
+
+    /**
+     * Downloads a Telegram file (photo/video/document) and returns its binary
+     * content together with a guessed MIME type. Used by the Mini App to
+     * display report proof media without leaking the bot token.
+     */
+    public function getMediaContent(string $fileId): ?array
+    {
+        try {
+            $file = $this->bot->getFile($fileId);
+            $path = $file->getFilePath();
+            if (!$path) {
+                return null;
+            }
+
+            $content = $this->bot->downloadFile($fileId);
+            if ($content === false || $content === null) {
+                return null;
+            }
+
+            $extension = strtolower(pathinfo($path, PATHINFO_EXTENSION));
+            $mime = match ($extension) {
+                'jpg', 'jpeg' => 'image/jpeg',
+                'png' => 'image/png',
+                'gif' => 'image/gif',
+                'webp' => 'image/webp',
+                'mp4' => 'video/mp4',
+                'mov' => 'video/quicktime',
+                'webm' => 'video/webm',
+                'pdf' => 'application/pdf',
+                default => 'application/octet-stream',
+            };
+
+            return ['content' => $content, 'mime' => $mime];
+        } catch (\Exception $e) {
+            $this->logger->error("Помилка завантаження медіа $fileId: " . $e->getMessage());
+            return null;
+        }
     }
 }

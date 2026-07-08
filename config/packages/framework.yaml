@@ -1,5 +1,8 @@
 framework:
     router:
-        resource: '%kernel.project_dir%/config/routes/attributes.yaml'
+        resource: '%kernel.project_dir%/src/Controller/'
+        type: attribute
         utf8: true
     secret: 'change_me_in_production'
+    session:
+        enabled: true

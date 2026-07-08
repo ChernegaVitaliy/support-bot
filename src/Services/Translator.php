@@ -2,7 +2,10 @@
 
 namespace App\Services;
 
-class Translator
+use Symfony\Contracts\Translation\LocaleAwareInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
+
+class Translator implements TranslatorInterface, LocaleAwareInterface
 {
     private array $languages = [];
     private Logger $logger;
@@ -156,5 +159,20 @@ class Translator
         if (in_array($lang, $this->supportedLanguages)) {
             $this->defaultLanguage = $lang;
         }
+    }
+
+    public function trans(string $id, array $parameters = [], ?string $domain = null, ?string $locale = null): string
+    {
+        return $this->translate($id, $locale ?? $this->defaultLanguage, $parameters);
+    }
+
+    public function getLocale(): string
+    {
+        return $this->defaultLanguage;
+    }
+
+    public function setLocale(string $locale): void
+    {
+        $this->setDefaultLanguage($locale);
     }
 }

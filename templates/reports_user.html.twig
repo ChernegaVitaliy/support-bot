@@ -1,0 +1,25 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Мої репорти{% endblock %}
+
+{% block body %}
+<div class="w-full max-w-600 mx-auto p-4">
+    <a href="{{ path('miniapp_index') }}" class="flex items-center gap-2 mb-4 text-primary font-bold uppercase font-unbounded tracking-tight no-underline text-[14px] active:opacity-80">
+        <i data-lucide="arrow-left" class="w-5 h-5 stroke-2-5"></i> Назад
+    </a>
+
+    <div class="flex items-center justify-between mb-6 pb-3 border-b-2 border-border">
+        <h1 class="text-3xl font-bold m-0 font-unbounded tracking-tight uppercase">Мої репорти</h1>
+    </div>
+
+    {% import 'macros.html.twig' as m %}
+    {% for report in reports %}
+        {{ m.reportCard(report, false, path('miniapp_report_detail', {id: report.id})) }}
+    {% else %}
+        <div class="text-center py-12 px-4 text-primary border-2 border-dashed border-border rounded my-4 bg-black-2">
+            <i data-lucide="inbox" class="w-12 h-12 stroke-1-5 opacity-80 mb-4 mx-auto block"></i>
+            <div class="font-unbounded font-bold tracking-tight uppercase">Репортів ще немає</div>
+        </div>
+    {% endfor %}
+</div>
+{% endblock %}

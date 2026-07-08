@@ -1,0 +1,38 @@
+{% macro statusBadge(status) %}
+    {% set map = {
+        'pending': {'icon': 'clock', 'label': 'Очікує', 'cls': 'bg-black-5 text-primary'},
+        'accepted': {'icon': 'check-circle', 'label': 'Прийнято', 'cls': 'bg-black-5 text-primary'},
+        'rejected': {'icon': 'x-circle', 'label': 'Відхилено', 'cls': 'bg-black-5 text-primary'}
+    } %}
+    {% set info = map[status] ?? map['pending'] %}
+    <span class="inline-flex items-center gap-1-5 py-1 px-2 rounded border-2 border-border {{ info.cls }} text-[12px] font-bold uppercase font-unbounded">
+        <i data-lucide="{{ info.icon }}" class="w-4 h-4 stroke-2-5"></i>{{ info.label }}
+    </span>
+{% endmacro %}
+
+{% macro reportCard(report, canProcess, detailPath) %}
+    <a href="{{ detailPath }}" class="block no-underline text-inherit bg-surface border-2 border-border rounded p-4 mb-4 shadow-brutal transition-all active:translate-brutal-sm active:shadow-xs">
+        <div class="flex items-center justify-between mb-3 pb-2 border-b-2 border-border">
+            <div class="flex items-center gap-2 font-bold text-lg text-primary font-unbounded tracking-tight uppercase">
+                <i data-lucide="hash" class="w-5 h-5 stroke-2-5"></i>{{ report.id }}
+            </div>
+            {{ _self.statusBadge(report.status) }}
+        </div>
+        <div class="text-[14px] font-semibold leading-relaxed mb-1">
+            <span class="text-muted uppercase text-[12px]">Скаржник:</span> <code class="bg-black-5 px-1 rounded">{{ report.reporter_nick }}</code>
+        </div>
+        <div class="text-[14px] font-semibold leading-relaxed mb-1">
+            <span class="text-muted uppercase text-[12px]">Порушник:</span> <code class="bg-black-5 px-1 rounded">{{ report.reported_nick }}</code>
+        </div>
+        <div class="text-[14px] font-semibold leading-relaxed mb-2">
+            <span class="text-muted uppercase text-[12px]">Причина:</span> {{ report.reason }}
+        </div>
+        <div class="text-[12px] text-muted font-semibold flex items-center gap-1-5">
+            <i data-lucide="calendar" class="w-4 h-4 stroke-2-5"></i>
+            {{ report.created_at|date('d.m.Y H:i') }}
+            {% if report.proof_type != 'text' %}
+                <span class="ml-2 inline-flex items-center gap-1"><i data-lucide="paperclip" class="w-4 h-4 stroke-2-5"></i>Медіа</span>
+            {% endif %}
+        </div>
+    </a>
+{% endmacro %}

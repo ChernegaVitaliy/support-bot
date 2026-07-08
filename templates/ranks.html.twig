@@ -1,0 +1,66 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Керування рангами{% endblock %}
+
+{% block body %}
+<div class="w-full max-w-600 mx-auto p-4">
+    <a href="{{ path('miniapp_admin') }}" class="flex items-center gap-2 mb-4 text-primary font-bold uppercase font-unbounded tracking-tight no-underline text-[14px] active:opacity-80">
+        <i data-lucide="arrow-left" class="w-5 h-5 stroke-2-5"></i> Адмін
+    </a>
+
+    <div class="flex items-center justify-between mb-6 pb-3 border-b-2 border-border">
+        <h1 class="text-3xl font-bold m-0 font-unbounded tracking-tight uppercase">Ранги</h1>
+    </div>
+
+    {% if can_set_rank %}
+        <div class="bg-surface border-2 border-border rounded p-4 shadow-brutal mb-6">
+            <h2 class="text-lg font-bold mb-3 text-primary font-unbounded tracking-tight uppercase">Змінити ранг</h2>
+            <form method="post" action="{{ path('miniapp_ranks') }}" class="flex gap-2">
+                <input type="hidden" name="action" value="set_rank" />
+                <input type="text" name="identifier" required placeholder="@username або ID"
+                    class="flex-1 bg-background border-2 border-border rounded p-2-5 text-[14px] font-semibold text-primary focus:bg-white outline-none min-w-0" />
+                <select name="rank" class="bg-background border-2 border-border rounded p-2-5 text-[14px] font-semibold text-primary focus:bg-white outline-none">
+                    <option value="moderator">moderator</option>
+                    <option value="admin">admin</option>
+                    <option value="owner">owner</option>
+                </select>
+                <button type="submit" class="bg-border text-surface py-2-5 px-4 rounded font-bold text-[13px] uppercase font-unbounded border-2 border-border shadow-btn transition-all active:translate-brutal-sm active:shadow-xs">
+                    OK
+                </button>
+            </form>
+        </div>
+    {% endif %}
+
+    <h2 class="text-xl font-bold mb-4 text-primary border-b-2 border-border pb-2 font-unbounded tracking-tight uppercase">Список адмінів</h2>
+
+    <div class="space-y-3">
+        {% for admin in admins %}
+            {% set rank_icon = admin.rank == 'owner' ? 'crown' : (admin.rank == 'admin' ? 'shield' : 'wrench') %}
+            {% set is_default_owner = admin.user_id == default_owner_id %}
+            <div class="flex items-center p-3 bg-surface rounded border-2 border-border shadow-brutal-sm">
+                <div class="w-11 h-11 rounded bg-surface flex items-center justify-center text-primary mr-3 shrink-0 border-2 border-border shadow-brutal-sm">
+                    <i data-lucide="{{ rank_icon }}" class="w-6 h-6 stroke-2"></i>
+                </div>
+                <div class="flex-1 min-w-0">
+                    <div class="font-bold text-[15px] text-primary font-unbounded tracking-tight uppercase truncate">{{ admin.first_name|default(admin.username|default(admin.user_id)) }}</div>
+                    <div class="text-[12px] text-muted font-semibold">@{{ admin.username|default('—') }} · {{ admin.rank }}</div>
+                </div>
+
+                {% if can_remove and not is_default_owner and admin.user_id != app_user_id %}
+                    <form method="post" action="{{ path('miniapp_ranks') }}" onsubmit="return confirm('Видалити адміністратора?');">
+                        <input type="hidden" name="action" value="remove" />
+                        <input type="hidden" name="identifier" value="{{ admin.user_id }}" />
+                        <button type="submit" class="bg-surface text-danger py-2 px-3 rounded font-bold text-[12px] uppercase font-unbounded border-2 border-border shadow-brutal-sm transition-all active:translate-brutal-sm active:shadow-xs">
+                            <i data-lucide="user-x" class="w-4 h-4 stroke-2-5"></i>
+                        </button>
+                    </form>
+                {% endif %}
+            </div>
+        {% endfor %}
+    </div>
+
+    {% if not can_set_rank %}
+        <p class="text-[12px] text-muted font-semibold mt-4 text-center">Лише власник може змінювати ранги.</p>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,8 +1,2 @@
-miniapp_index:
-    path: /
-    controller: App\Controller\MiniAppController::index
-
-miniapp_test:
-    path: /api/miniapp/test
-    controller: App\Controller\MiniAppController::testApi
-    methods: [POST]
+# Routes are now defined via PHP attributes in src/Controller/.
+# See src/Controller/MiniAppController.php

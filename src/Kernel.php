@@ -4,6 +4,7 @@ namespace App;
 
 use Symfony\Component\HttpKernel\Kernel as BaseKernel;
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
+use Symfony\Bundle\TwigBundle\TwigBundle;
 
 class Kernel extends BaseKernel
 {
@@ -11,6 +12,7 @@ class Kernel extends BaseKernel
     {
         return [
             new FrameworkBundle(),
+            new TwigBundle(),
         ];
     }
 }
