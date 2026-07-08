@@ -7,16 +7,16 @@
    =========================================================== */
 
 :root {
-  --primary:       var(--tg-theme-text-color, #111111);
+  --primary:       #111111;
   --primary-2:     #2b2b2b;
   --primary-soft:  #ececec;
-  --surface:       var(--tg-theme-bg-color, #ffffff);
+  --surface:       #ffffff;
   --surface-2:     #f0f0ec;
-  --background:    var(--tg-theme-secondary-bg-color, #f4f4f0);
-  --border:        var(--tg-theme-text-color, #111111);
-  --border-2:      var(--tg-theme-text-color, #111111);
-  --text:          var(--tg-theme-text-color, #111111);
-  --muted:         var(--tg-theme-hint-color, #6b6b6b);
+  --background:    #f4f4f0;
+  --border:        #111111;
+  --border-2:      #111111;
+  --text:          #111111;
+  --muted:         #6b6b6b;
 
   --accent:    #ff3b30;
   --pending:   #f59e0b;
