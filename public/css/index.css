@@ -50,6 +50,8 @@ a { color: inherit; text-decoration: none; }
 code { font-family: 'Inter', monospace; }
 ::selection { background: var(--primary-soft); }
 
+body.is-tma .hide-on-tma { display: none !important; }
+
 /* ---------- Layout ---------- */
 .app-main {
   width: 100%;

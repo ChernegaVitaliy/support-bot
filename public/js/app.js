@@ -85,6 +85,23 @@
         });
     }
 
+    function setupBackButton(tg) {
+        var backLink = document.querySelector('.back-link');
+        if (!backLink) {
+            tg.BackButton.hide();
+            return;
+        }
+        tg.BackButton.show();
+        tg.BackButton.onClick(function () {
+            var href = backLink.getAttribute('href');
+            if (href) {
+                window.location.href = href;
+            } else if (window.history.length > 1) {
+                window.history.back();
+            }
+        });
+    }
+
     function initWebApp() {
         if (window.Telegram && window.Telegram.WebApp) {
             var tg = window.Telegram.WebApp;
@@ -92,6 +109,7 @@
             tg.ready();
             setStoredInitData(tg.initData || '');
             document.body.classList.add('is-tma');
+            setupBackButton(tg);
         }
         decorateLinks();
         ensureFormInitData();
