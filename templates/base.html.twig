@@ -10,11 +10,11 @@
     <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body data-route="{{ app.request.attributes.get('_route') }}">
-    <main id="main-content" class="turbo-transition">
+    <main id="main-content" class="app-main">
         {% for label, messages in app.flashes %}
             {% for message in messages %}
-                <div class="flash flash-{{ label }} bg-surface border-2 border-border rounded p-3 mb-4 shadow-brutal-sm flex items-center gap-2 text-[14px] font-bold {% if label == 'error' %}text-danger{% else %}text-primary{% endif %}">
-                    <i data-lucide="{% if label == 'error' %}alert-triangle{% else %}check-circle{% endif %}" class="w-5 h-5 stroke-2-5 shrink-0"></i>
+                <div class="flash{% if label == 'error' %} error{% endif %}">
+                    <i data-lucide="{% if label == 'error' %}alert-triangle{% else %}check-circle{% endif %}" class="icon-sm"></i>
                     <span>{{ message }}</span>
                 </div>
             {% endfor %}
@@ -25,30 +25,27 @@
 
     {% block tabbar %}
     {% set current_route = app.request.attributes.get('_route') %}
-    <nav id="main-tab-bar" class="fixed bottom-0 left-0 right-0 bg-surface border-t-2 border-border flex safe-pb z-100 max-w-600 mx-auto">
-        {% set active_classes = 'opacity-100 font-extrabold bg-black-5 border-t-3 border-border -mt-0-5' %}
-        {% set default_classes = 'opacity-60 font-bold' %}
-
-        <a href="{{ path('miniapp_index') }}" class="flex-1 flex flex-col items-center justify-center py-4 text-primary text-xs transition-all uppercase font-unbounded active:bg-black-10 {% if current_route == 'miniapp_index' %}{{ active_classes }}{% else %}{{ default_classes }}{% endif %}">
-            <i data-lucide="home" class="mb-1 w-6 h-6 stroke-2-5"></i>
+    <nav class="tabbar">
+        <a href="{{ path('miniapp_index') }}" class="tab{% if current_route == 'miniapp_index' %} active{% endif %}">
+            <i data-lucide="home"></i>
             <span>Головна</span>
         </a>
-        <a href="{{ path('miniapp_report_new') }}" class="flex-1 flex flex-col items-center justify-center py-4 text-primary text-xs transition-all uppercase font-unbounded active:bg-black-10 {% if current_route == 'miniapp_report_new' %}{{ active_classes }}{% else %}{{ default_classes }}{% endif %}">
-            <i data-lucide="plus-circle" class="mb-1 w-6 h-6 stroke-2-5"></i>
+        <a href="{{ path('miniapp_report_new') }}" class="tab{% if current_route == 'miniapp_report_new' %} active{% endif %}">
+            <i data-lucide="plus-circle"></i>
             <span>Репорт</span>
         </a>
-        <a href="{{ path('miniapp_reports') }}" class="flex-1 flex flex-col items-center justify-center py-4 text-primary text-xs transition-all uppercase font-unbounded active:bg-black-10 {% if current_route starts with 'miniapp_reports' or current_route starts with 'miniapp_report_detail' %}{{ active_classes }}{% else %}{{ default_classes }}{% endif %}">
-            <i data-lucide="flag" class="mb-1 w-6 h-6 stroke-2-5"></i>
+        <a href="{{ path('miniapp_reports') }}" class="tab{% if current_route starts with 'miniapp_reports' or current_route starts with 'miniapp_report_detail' %} active{% endif %}">
+            <i data-lucide="flag"></i>
             <span>Репорти</span>
         </a>
         {% if is_admin %}
-        <a href="{{ path('miniapp_admin') }}" class="flex-1 flex flex-col items-center justify-center py-4 text-primary text-xs transition-all uppercase font-unbounded active:bg-black-10 {% if current_route == 'miniapp_admin' or current_route == 'miniapp_ranks' %}{{ active_classes }}{% else %}{{ default_classes }}{% endif %}">
-            <i data-lucide="shield" class="mb-1 w-6 h-6 stroke-2-5"></i>
+        <a href="{{ path('miniapp_admin') }}" class="tab{% if current_route == 'miniapp_admin' or current_route == 'miniapp_ranks' %} active{% endif %}">
+            <i data-lucide="shield"></i>
             <span>Адмін</span>
         </a>
         {% endif %}
-        <a href="{{ path('miniapp_profile') }}" class="flex-1 flex flex-col items-center justify-center py-4 text-primary text-xs transition-all uppercase font-unbounded active:bg-black-10 {% if current_route == 'miniapp_profile' %}{{ active_classes }}{% else %}{{ default_classes }}{% endif %}">
-            <i data-lucide="user" class="mb-1 w-6 h-6 stroke-2-5"></i>
+        <a href="{{ path('miniapp_profile') }}" class="tab{% if current_route == 'miniapp_profile' %} active{% endif %}">
+            <i data-lucide="user"></i>
             <span>Профіль</span>
         </a>
     </nav>

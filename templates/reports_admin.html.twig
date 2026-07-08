@@ -3,17 +3,15 @@
 {% block title %}Репорти{% endblock %}
 
 {% block body %}
-<div class="w-full max-w-600 mx-auto p-4">
-    <a href="{{ path('miniapp_admin') }}" class="flex items-center gap-2 mb-4 text-primary font-bold uppercase font-unbounded tracking-tight no-underline text-[14px] active:opacity-80">
-        <i data-lucide="arrow-left" class="w-5 h-5 stroke-2-5"></i> Адмін
+    <a href="{{ path('miniapp_admin') }}" class="back-link">
+        <i data-lucide="arrow-left" class="icon-sm"></i> Адмін
     </a>
 
-    <div class="flex items-center justify-between mb-4 pb-3 border-b-2 border-border">
-        <h1 class="text-3xl font-bold m-0 font-unbounded tracking-tight uppercase">Репорти</h1>
+    <div class="page-header">
+        <h1 class="page-title">Репорти</h1>
     </div>
 
-    <!-- Filters -->
-    <div class="flex gap-2 mb-6 overflow-x-auto pb-1">
+    <div class="filters">
         {% set filters = [
             {'key': 'pending', 'label': 'Очікують', 'count': counts.pending},
             {'key': 'accepted', 'label': 'Прийнято', 'count': counts.accepted},
@@ -22,8 +20,8 @@
         ] %}
         {% for f in filters %}
             <a href="{{ path('miniapp_reports', {status: f.key}) }}"
-                class="flex items-center gap-1-5 py-2 px-3 rounded border-2 border-border text-[12px] font-bold uppercase font-unbounded whitespace-nowrap transition-all no-underline {% if status == f.key %}bg-border text-surface{% else %}bg-surface text-primary active:bg-black-10{% endif %}">
-                {{ f.label }} <span class="opacity-70">{{ f.count }}</span>
+                class="filter-chip{% if status == f.key %} active{% endif %}">
+                {{ f.label }} <span class="count">{{ f.count }}</span>
             </a>
         {% endfor %}
     </div>
@@ -32,31 +30,29 @@
     {% for report in reports %}
         {{ m.reportCard(report, true, path('miniapp_report_detail', {id: report.id})) }}
     {% else %}
-        <div class="text-center py-12 px-4 text-primary border-2 border-dashed border-border rounded my-4 bg-black-2">
-            <i data-lucide="inbox" class="w-12 h-12 stroke-1-5 opacity-80 mb-4 mx-auto block"></i>
-            <div class="font-unbounded font-bold tracking-tight uppercase">Пусто</div>
+        <div class="empty">
+            <i data-lucide="inbox"></i>
+            <div class="empty-text">Пусто</div>
         </div>
     {% endfor %}
 
-    <!-- Pagination -->
     {% if total_pages > 1 %}
-        <div class="flex items-center justify-between mt-4 mb-2">
+        <div class="pagination">
             {% if page > 1 %}
-                <a href="{{ path('miniapp_reports', {status: status, page: page - 1}) }}" class="flex items-center gap-1 py-2 px-4 rounded border-2 border-border bg-surface text-primary font-bold uppercase font-unbounded text-[12px] active:translate-brutal-sm active:shadow-xs no-underline">
-                    <i data-lucide="chevron-left" class="w-4 h-4 stroke-2-5"></i> Назад
+                <a href="{{ path('miniapp_reports', {status: status, page: page - 1}) }}" class="btn btn-ghost btn-icon">
+                    <i data-lucide="chevron-left" class="icon-sm"></i> Назад
                 </a>
             {% else %}
                 <span></span>
             {% endif %}
-            <span class="text-[13px] font-bold text-muted font-unbounded uppercase">{{ page }}/{{ total_pages }}</span>
+            <span class="page-info">{{ page }}/{{ total_pages }}</span>
             {% if page < total_pages %}
-                <a href="{{ path('miniapp_reports', {status: status, page: page + 1}) }}" class="flex items-center gap-1 py-2 px-4 rounded border-2 border-border bg-surface text-primary font-bold uppercase font-unbounded text-[12px] active:translate-brutal-sm active:shadow-xs no-underline">
-                    Далі <i data-lucide="chevron-right" class="w-4 h-4 stroke-2-5"></i>
+                <a href="{{ path('miniapp_reports', {status: status, page: page + 1}) }}" class="btn btn-ghost btn-icon">
+                    Далі <i data-lucide="chevron-right" class="icon-sm"></i>
                 </a>
             {% else %}
                 <span></span>
             {% endif %}
         </div>
     {% endif %}
-</div>
 {% endblock %}

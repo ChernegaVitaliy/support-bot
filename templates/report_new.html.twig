@@ -3,48 +3,38 @@
 {% block title %}Створити репорт{% endblock %}
 
 {% block body %}
-<div class="w-full max-w-600 mx-auto p-4">
-    <a href="{{ path('miniapp_index') }}" class="flex items-center gap-2 mb-4 text-primary font-bold uppercase font-unbounded tracking-tight no-underline text-[14px] active:opacity-80">
-        <i data-lucide="arrow-left" class="w-5 h-5 stroke-2-5"></i> Назад
+    <a href="{{ path('miniapp_index') }}" class="back-link">
+        <i data-lucide="arrow-left" class="icon-sm"></i> Назад
     </a>
 
-    <div class="flex items-center justify-between mb-6 pb-3 border-b-2 border-border">
-        <h1 class="text-3xl font-bold m-0 font-unbounded tracking-tight uppercase">Новий репорт</h1>
+    <div class="page-header">
+        <h1 class="page-title">Новий репорт</h1>
     </div>
 
-    <form method="post" action="{{ path('miniapp_report_new') }}" class="bg-surface border-2 border-border rounded p-4 shadow-brutal">
-        <label class="block mb-4">
-            <span class="block text-[12px] text-muted font-bold uppercase mb-2">Ваш нік</span>
-            <input type="text" name="reporter_nick" value="{{ values.reporter_nick|default('') }}" required
-                class="w-full bg-background border-2 border-border rounded p-3 text-[15px] font-semibold text-primary focus:bg-white outline-none"
-                placeholder="@username" />
+    <form method="post" action="{{ path('miniapp_report_new') }}" class="card">
+        <label class="field">
+            <span class="field-label">Ваш нік</span>
+            <input type="text" name="reporter_nick" value="{{ values.reporter_nick|default('') }}" required class="input" placeholder="@username" />
         </label>
 
-        <label class="block mb-4">
-            <span class="block text-[12px] text-muted font-bold uppercase mb-2">Нік порушника</span>
-            <input type="text" name="reported_nick" value="{{ values.reported_nick|default('') }}" required
-                class="w-full bg-background border-2 border-border rounded p-3 text-[15px] font-semibold text-primary focus:bg-white outline-none"
-                placeholder="@username" />
+        <label class="field">
+            <span class="field-label">Нік порушника</span>
+            <input type="text" name="reported_nick" value="{{ values.reported_nick|default('') }}" required class="input" placeholder="@username" />
         </label>
 
-        <label class="block mb-4">
-            <span class="block text-[12px] text-muted font-bold uppercase mb-2">Причина</span>
-            <input type="text" name="reason" value="{{ values.reason|default('') }}" required
-                class="w-full bg-background border-2 border-border rounded p-3 text-[15px] font-semibold text-primary focus:bg-white outline-none"
-                placeholder="Чітерство, токсична поведінка..." />
+        <label class="field">
+            <span class="field-label">Причина</span>
+            <input type="text" name="reason" value="{{ values.reason|default('') }}" required class="input" placeholder="Чітерство, токсична поведінка..." />
         </label>
 
-        <label class="block mb-6">
-            <span class="block text-[12px] text-muted font-bold uppercase mb-2">Докази (необовʼязково)</span>
-            <textarea name="proof" rows="4"
-                class="w-full bg-background border-2 border-border rounded p-3 text-[15px] font-semibold text-primary focus:bg-white outline-none resize-none">{{ values.proof|default('') }}</textarea>
-            <span class="block text-[12px] text-muted font-semibold mt-2">Медіа-файли можна додати через бота командою /report.</span>
+        <label class="field">
+            <span class="field-label">Докази (необовʼязково)</span>
+            <textarea name="proof" rows="4" class="textarea">{{ values.proof|default('') }}</textarea>
+            <span class="field-hint">Медіа-файли можна додати через бота командою /report.</span>
         </label>
 
-        <button type="submit"
-            class="w-full bg-border text-surface py-3 px-6 rounded font-bold text-[14px] uppercase flex items-center justify-center cursor-pointer border-2 border-border shadow-btn transition-all font-unbounded active:translate-brutal-sm active:shadow-xs">
-            <i data-lucide="send" class="mr-2 w-[18px] h-[18px] stroke-2-5"></i>Надіслати репорт
+        <button type="submit" class="btn btn-primary btn-block">
+            <i data-lucide="send" class="icon-sm"></i>Надіслати репорт
         </button>
     </form>
-</div>
 {% endblock %}
