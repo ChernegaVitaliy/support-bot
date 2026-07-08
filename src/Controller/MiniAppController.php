@@ -521,18 +521,16 @@ class MiniAppController extends AbstractController
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <title>Support Mini App</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <link rel="stylesheet" href="/css/index.css?v=1">
+    <link rel="stylesheet" href="/css/index.css">
 </head>
 <body>
-    <div class="w-full max-w-600 mx-auto p-4 pb-0 min-h-screen flex items-center justify-center">
-        <div class="text-center py-8 px-4 mb-8 bg-surface rounded border-2 border-border shadow-brutal w-full">
-            <div class="w-22 h-22 mx-auto mb-6 rounded bg-surface flex items-center justify-center text-primary border-2 border-border shadow-brutal overflow-hidden shrink-0">
-                <i data-lucide="shield-alert" class="w-10 h-10 stroke-1-5"></i>
-            </div>
-            <h1 class="text-[26px] font-bold mb-3 m-0 font-unbounded tracking-tight uppercase">Support</h1>
-            <p class="text-base text-primary mb-6 leading-relaxed font-semibold" id="msg">Завантаження…</p>
+    <main class="app-main">
+        <div class="hero">
+            <div class="hero-avatar"><i data-lucide="shield-alert"></i></div>
+            <h1 class="hero-name">Support</h1>
+            <p class="hero-username" id="msg">Завантаження…</p>
         </div>
-    </div>
+    </main>
     <script>
         (function () {
             function reloadWithInitData() {
