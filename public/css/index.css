@@ -586,4 +586,15 @@ a.report-card:active { transform: translate(2px, 2px); box-shadow: none; }
 /* ---------- Utilities ---------- */
 .space-y > * + * { margin-top: 12px; }
 .mt-16 { margin-top: 16px; }
-.icon-sm { width: 18px; height: 18px; } 
+.icon-sm { width: 18px; height: 18px; }
+
+.spinner {
+  width: 42px;
+  height: 42px;
+  margin: 0 auto 18px;
+  border: 4px solid var(--border);
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: spin .8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }

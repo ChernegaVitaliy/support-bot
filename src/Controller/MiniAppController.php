@@ -526,7 +526,7 @@ class MiniAppController extends AbstractController
 <body>
     <main class="app-main">
         <div class="hero">
-            <div class="hero-avatar"><i data-lucide="shield-alert"></i></div>
+            <div class="spinner"></div>
             <h1 class="hero-name">Support</h1>
             <p class="hero-username" id="msg">Завантаження…</p>
         </div>
