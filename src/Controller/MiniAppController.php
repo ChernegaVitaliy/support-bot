@@ -179,11 +179,15 @@ class MiniAppController extends AbstractController
         }
 
         $mediaFiles = [];
+        $rawTypes = ['photo', 'video', 'document', 'animation', 'voice', 'audio'];
         if (in_array($report['proof_type'], ['multiple_media', 'media'], true) && !empty($report['proof'])) {
             $decoded = json_decode($report['proof'], true);
             if (is_array($decoded)) {
                 $mediaFiles = $decoded;
             }
+        } elseif (in_array($report['proof_type'], $rawTypes, true) && !empty($report['proof'])) {
+            // Legacy/raw file_id stored directly in `proof`.
+            $mediaFiles = [['type' => $report['proof_type'], 'file_id' => $report['proof']]];
         }
 
         return $this->renderPage('report_detail.html.twig', $ctx, [
