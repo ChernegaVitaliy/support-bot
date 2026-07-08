@@ -1,0 +1,29 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Редагувати новину{% endblock %}
+
+{% block body %}
+    <a href="{{ path('miniapp_news_detail', {id: news_item.id}) }}" class="back-link hide-on-tma">
+        <i data-lucide="arrow-left" class="icon-sm"></i> Назад
+    </a>
+
+    <div class="page-header">
+        <h1 class="page-title">Редагувати новину</h1>
+    </div>
+
+    <form method="post" action="{{ path('miniapp_news_edit', {id: news_item.id}) }}" class="card">
+        <label class="field">
+            <span class="field-label">Заголовок</span>
+            <input type="text" name="title" value="{{ values.title|default(news_item.title) }}" required class="input" placeholder="Короткий заголовок" />
+        </label>
+
+        <label class="field">
+            <span class="field-label">Текст новини</span>
+            <textarea name="body" rows="6" class="textarea" required placeholder="Опис новини...">{{ values.body|default(news_item.body) }}</textarea>
+        </label>
+
+        <button type="submit" class="btn btn-primary btn-block">
+            <i data-lucide="save" class="icon-sm"></i>Зберегти
+        </button>
+    </form>
+{% endblock %}

@@ -660,3 +660,11 @@ a.news-card:active { transform: translate(2px, 2px); box-shadow: none; }
   font-weight: 600;
   color: var(--muted);
 }
+.news-author {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.btn-form {
+  display: inline-flex;
+}

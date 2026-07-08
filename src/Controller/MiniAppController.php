@@ -363,6 +363,102 @@ class MiniAppController extends AbstractController
         return $this->renderPage('news_new.html.twig', $ctx);
     }
 
+    #[Route('/news/{id}', name: 'miniapp_news_detail', methods: ['GET'])]
+    public function newsDetail(Request $request, int $id): Response
+    {
+        $ctx = $this->resolveContext($request);
+        if (!$ctx) {
+            return $this->bootstrapResponse();
+        }
+
+        $newsItem = $this->db->getNewsById($id);
+        if (!$newsItem) {
+            $this->addFlash('error', 'Новина не знайдена.');
+            return $this->redirectToRoute('miniapp_news');
+        }
+
+        return $this->renderPage('news_detail.html.twig', $ctx, [
+            'news_item' => $newsItem,
+            'can_edit_news' => $this->hasPermission('owner', $ctx['rank']),
+        ]);
+    }
+
+    #[Route('/news/{id}/edit', name: 'miniapp_news_edit', methods: ['GET', 'POST'])]
+    public function newsEdit(Request $request, int $id): Response
+    {
+        $ctx = $this->resolveContext($request);
+        if (!$ctx) {
+            return $this->bootstrapResponse();
+        }
+
+        if (!$this->hasPermission('owner', $ctx['rank'])) {
+            $this->addFlash('error', 'У вас немає прав для редагування новин.');
+            return $this->redirectToRoute('miniapp_news');
+        }
+
+        $newsItem = $this->db->getNewsById($id);
+        if (!$newsItem) {
+            $this->addFlash('error', 'Новина не знайдена.');
+            return $this->redirectToRoute('miniapp_news');
+        }
+
+        if ($request->isMethod('POST')) {
+            $title = trim((string)$request->request->get('title', ''));
+            $body = trim((string)$request->request->get('body', ''));
+
+            if ($title === '' || $body === '') {
+                $this->addFlash('error', 'Заповніть заголовок та текст новини.');
+                return $this->renderPage('news_edit.html.twig', $ctx, [
+                    'news_item' => $newsItem,
+                    'values' => $request->request->all(),
+                ]);
+            }
+
+            if ($this->db->updateNews($id, $title, $body)) {
+                $this->addFlash('success', "Новина #{$id} оновлена.");
+                return $this->redirectToRoute('miniapp_news_detail', ['id' => $id]);
+            }
+
+            $this->addFlash('error', 'Не вдалося оновити новину. Спробуйте пізніше.');
+            return $this->renderPage('news_edit.html.twig', $ctx, [
+                'news_item' => $newsItem,
+                'values' => $request->request->all(),
+            ]);
+        }
+
+        return $this->renderPage('news_edit.html.twig', $ctx, [
+            'news_item' => $newsItem,
+        ]);
+    }
+
+    #[Route('/news/{id}/delete', name: 'miniapp_news_delete', methods: ['POST'])]
+    public function newsDelete(Request $request, int $id): Response
+    {
+        $ctx = $this->resolveContext($request);
+        if (!$ctx) {
+            return $this->bootstrapResponse();
+        }
+
+        if (!$this->hasPermission('owner', $ctx['rank'])) {
+            $this->addFlash('error', 'У вас немає прав для видалення новин.');
+            return $this->redirectToRoute('miniapp_news');
+        }
+
+        $newsItem = $this->db->getNewsById($id);
+        if (!$newsItem) {
+            $this->addFlash('error', 'Новина не знайдена.');
+            return $this->redirectToRoute('miniapp_news');
+        }
+
+        if ($this->db->deleteNews($id)) {
+            $this->addFlash('success', "Новина #{$id} видалена.");
+        } else {
+            $this->addFlash('error', 'Не вдалося видалити новину.');
+        }
+
+        return $this->redirectToRoute('miniapp_news');
+    }
+
     #[Route('/api/miniapp/test', name: 'miniapp_test', methods: ['POST'])]
     public function testApi(Request $request): JsonResponse
     {

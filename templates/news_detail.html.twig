@@ -1,0 +1,39 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Новина #{{ news_item.id }}{% endblock %}
+
+{% block body %}
+    <a href="{{ path('miniapp_news') }}" class="back-link hide-on-tma">
+        <i data-lucide="arrow-left" class="icon-sm"></i> Новини
+    </a>
+
+    <div class="card">
+        <div class="news-header">
+            <h1 class="news-title">{{ news_item.title }}</h1>
+            <span class="news-date">
+                <i data-lucide="calendar" class="icon-sm"></i>
+                {{ news_item.created_at|date('d.m.Y H:i') }}
+            </span>
+        </div>
+        <div class="news-body">{{ news_item.body }}</div>
+        <div class="news-footer">
+            <span class="news-author">
+                <i data-lucide="user" class="icon-sm"></i>
+                {{ news_item.author_first_name|default(news_item.author_username|default('—')) }}
+            </span>
+        </div>
+    </div>
+
+    {% if can_edit_news %}
+    <div class="btn-row">
+        <a href="{{ path('miniapp_news_edit', {id: news_item.id}) }}" class="btn btn-primary">
+            <i data-lucide="edit" class="icon-sm"></i>Редагувати
+        </a>
+        <form method="post" action="{{ path('miniapp_news_delete', {id: news_item.id}) }}" class="btn-form" onsubmit="return confirm('Видалити новину?')">
+            <button type="submit" class="btn btn-danger">
+                <i data-lucide="trash-2" class="icon-sm"></i>Видалити
+            </button>
+        </form>
+    </div>
+    {% endif %}
+{% endblock %}

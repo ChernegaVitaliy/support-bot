@@ -1103,4 +1103,22 @@ class DatabaseService
             return false;
         }
     }
+
+    public function updateNews(int $newsId, string $title, string $body): bool
+    {
+        try {
+            $stmt = $this->pdo->prepare("UPDATE news SET title = ?, body = ? WHERE id = ?");
+            $result = $stmt->execute([$title, $body, $newsId]);
+
+            if ($result && $stmt->rowCount() > 0) {
+                $this->logger->info("Новина оновлена: ID $newsId");
+                return true;
+            }
+            $this->logger->warning("Новина не знайдена для оновлення: ID $newsId");
+            return false;
+        } catch (Exception $e) {
+            $this->logger->error("Помилка оновлення новини $newsId: " . $e->getMessage());
+            return false;
+        }
+    }
 }

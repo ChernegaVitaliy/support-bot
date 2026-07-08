@@ -13,7 +13,7 @@
     </div>
 
     {% for item in news_items %}
-        <article class="news-card">
+        <a href="{{ path('miniapp_news_detail', {id: item.id}) }}" class="news-card">
             <div class="news-header">
                 <h2 class="news-title">{{ item.title }}</h2>
                 <span class="news-date">
@@ -28,7 +28,7 @@
                     {{ item.author_first_name|default(item.author_username|default('—')) }}
                 </span>
             </div>
-        </article>
+        </a>
     {% else %}
         <div class="empty">
             <i data-lucide="inbox"></i>
