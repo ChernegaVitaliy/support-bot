@@ -36,12 +36,13 @@
                 <span class="block text-[12px] text-muted font-bold uppercase mb-2">Медіа</span>
                 <div class="grid grid-cols-2 gap-3">
                     {% for item in media_files %}
+                        {% set media_url = path('miniapp_media', {file: item.file_id, initData: init_data}) %}
                         {% if item.type == 'photo' or item.type == 'document' %}
-                            <img src="{{ path('miniapp_media', {file: item.file_id}) }}" alt="proof" class="w-full aspect-square object-cover rounded border-2 border-border bg-background" loading="lazy" />
+                            <img src="{{ media_url }}" alt="proof" class="w-full aspect-square object-cover rounded border-2 border-border bg-background" loading="lazy" />
                         {% elseif item.type == 'video' or item.type == 'animation' %}
-                            <video src="{{ path('miniapp_media', {file: item.file_id}) }}" controls class="w-full aspect-square object-cover rounded border-2 border-border bg-background"></video>
+                            <video src="{{ media_url }}" controls class="w-full aspect-square object-cover rounded border-2 border-border bg-background"></video>
                         {% else %}
-                            <a href="{{ path('miniapp_media', {file: item.file_id}) }}" class="flex items-center justify-center gap-2 p-3 bg-background border-2 border-border rounded text-primary font-bold no-underline" target="_blank" rel="noopener">
+                            <a href="{{ media_url }}" class="flex items-center justify-center gap-2 p-3 bg-background border-2 border-border rounded text-primary font-bold no-underline" target="_blank" rel="noopener">
                                 <i data-lucide="paperclip" class="w-5 h-5 stroke-2-5"></i> Відкрити файл
                             </a>
                         {% endif %}
