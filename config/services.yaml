@@ -1,0 +1,97 @@
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+
+    App\Config\Config:
+        public: true
+        arguments:
+            $basePath: '%kernel.project_dir%'
+
+    App\Services\Logger:
+        public: true
+        arguments:
+            $logFile: '%env(LOG_FILE)%'
+            $logLevel: '%env(LOG_LEVEL)%'
+
+    App\Services\DatabaseService:
+        public: true
+        arguments:
+            $dbPath: '%env(DB_PATH)%'
+            $defaultOwnerId: '%env(DEFAULT_OWNER_ID)%'
+
+    App\Services\TelegramService:
+        public: true
+        arguments:
+            $token: '%env(BOT_TOKEN)%'
+
+    App\Services\Translator:
+        public: true
+        arguments:
+            $languagesPath: '%kernel.project_dir%/languages'
+
+    App\Services\SessionManager: ~
+    App\Services\ReportService: ~
+    App\Handlers\SessionHandler: ~
+    App\Handlers\CallbackHandler: ~
+    App\Services\BroadcastService: ~
+    App\Commands\Admin\ReportsCommand: ~
+
+    App\Bot:
+        public: true
+        arguments:
+            $container: '@service_container'
+
+    App\:
+        resource: '../src/'
+        exclude:
+            - '../src/Console/ServiceContainer.php'
+            - '../src/Kernel.php'
+            - '../src/Config/Config.php'
+            - '../src/Services/Logger.php'
+            - '../src/Services/DatabaseService.php'
+            - '../src/Services/TelegramService.php'
+            - '../src/Services/Translator.php'
+            - '../src/Services/SessionManager.php'
+            - '../src/Services/ReportService.php'
+            - '../src/Services/BroadcastService.php'
+            - '../src/Handlers/SessionHandler.php'
+            - '../src/Handlers/CallbackHandler.php'
+            - '../src/Bot.php'
+            - '../src/Commands/Admin/ReportsCommand.php'
+
+    'config':
+        public: true
+        alias: App\Config\Config
+    'logger':
+        public: true
+        alias: App\Services\Logger
+    'db':
+        public: true
+        alias: App\Services\DatabaseService
+    'telegram':
+        public: true
+        alias: App\Services\TelegramService
+    'translator':
+        public: true
+        alias: App\Services\Translator
+    'session_manager':
+        public: true
+        alias: App\Services\SessionManager
+    'report_service':
+        public: true
+        alias: App\Services\ReportService
+    'session_handler':
+        public: true
+        alias: App\Handlers\SessionHandler
+    'callback_handler':
+        public: true
+        alias: App\Handlers\CallbackHandler
+    'broadcast_service':
+        public: true
+        alias: App\Services\BroadcastService
+    'reports_command':
+        public: true
+        alias: App\Commands\Admin\ReportsCommand
+
+    Psr\Container\ContainerInterface: '@service_container'

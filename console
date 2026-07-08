@@ -3,114 +3,12 @@
 
 require __DIR__ . '/vendor/autoload.php';
 
-use App\Config\Config;
-use App\Services\Logger;
-use App\Services\DatabaseService;
-use App\Services\TelegramService;
-use App\Services\Translator;
-use App\Services\SessionManager;
-use App\Console\ServiceContainer;
-use Symfony\Component\Console\Application;
-use App\Console\Commands\RunCommand;
-use App\Console\Commands\StatsCommand;
-use App\Console\Commands\AdminListCommand;
-use App\Console\Commands\AddAdminCommand;
-use App\Console\Commands\RemoveAdminCommand;
-use App\Console\Commands\SetRankCommand;
-use App\Console\Commands\FindUserCommand;
-use App\Console\Commands\BroadcastCommand;
-use App\Console\Commands\VersionCommand;
-use App\Console\Commands\HelloCommand;
-use App\Console\Commands\SetupBotCommand;
+use App\Kernel;
+use Symfony\Bundle\FrameworkBundle\Console\Application;
 
-// Initialize Config to load .env (Config is lightweight enough to be eager, but we can make it lazy if needed)
-// Actually, Config checks .env existence and exits if missing. This is fine for CLI start.
-$config = new Config(__DIR__);
+$dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
+$dotenv->load();
 
-$container = new ServiceContainer();
-
-$container->register(Config::class, fn() => $config);
-
-$container->register(Logger::class, function($c) use ($config) {
-    return new Logger(
-        $config->getLogFile(),
-        $config->getLogLevel()
-    );
-});
-
-$container->register(DatabaseService::class, function($c) use ($config) {
-    return new DatabaseService(
-        $config->getDbPath(),
-        $c->get(Logger::class),
-        $config->getDefaultOwnerId()
-    );
-});
-
-$container->register(TelegramService::class, function($c) use ($config) {
-    return new TelegramService(
-        $config->getBotToken(),
-        $c->get(Logger::class)
-    );
-});
-
-$container->register(Translator::class, function($c) use ($config) {
-    return new Translator(
-        $config->getLanguagesPath(),
-        $c->get(Logger::class)
-    );
-});
-
-$container->register(SessionManager::class, function($c) {
-    return new SessionManager($c->get(Logger::class));
-});
-
-$container->register('logger', function($c) {
-    return $c->get(Logger::class);
-});
-
-$container->register('db', function($c) {
-    return $c->get(DatabaseService::class);
-});
-
-$container->register('telegram', function($c) {
-    return $c->get(TelegramService::class);
-});
-
-$container->register('translator', function($c) {
-    return $c->get(Translator::class);
-});
-
-$container->register('session_manager', function($c) {
-    return $c->get(SessionManager::class);
-});
-
-$container->register('config', function($c) {
-    return $c->get(Config::class);
-});
-
-$container->register('report_service', function($c) {
-    return new \App\Services\ReportService(
-        $c->get('logger'),
-        $c->get('telegram'),
-        $c->get('db'),
-        $c->get('translator')
-    );
-});
-
-$application = new Application('Support Bot CLI', '2.0.0');
-
-// Register commands, injecting the container
-$application->add(new HelloCommand());
-$application->add(new RunCommand($container));
-$application->add(new StatsCommand($container));
-$application->add(new AdminListCommand($container));
-$application->add(new AddAdminCommand($container));
-$application->add(new RemoveAdminCommand($container));
-$application->add(new SetRankCommand($container));
-$application->add(new FindUserCommand($container));
-$application->add(new BroadcastCommand($container));
-$application->add(new VersionCommand($container));
-$application->add(new SetupBotCommand($container));
-
-// Run application
+$kernel = new Kernel('dev', true);
+$application = new Application($kernel);
 $application->run();

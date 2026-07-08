@@ -6,6 +6,8 @@
         "php": ">=8.1",
         "monolog/monolog": "^3.5",
         "symfony/console": "^7.4",
+        "symfony/framework-bundle": "^7.4",
+        "symfony/yaml": "^7.4",
         "telegram-bot/api": "dev-master",
         "vlucas/phpdotenv": "^5.5"
     },

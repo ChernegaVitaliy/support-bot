@@ -3,7 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Bot;
-use App\Console\ServiceContainer;
+use Psr\Container\ContainerInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -15,9 +15,9 @@ use Symfony\Component\Console\Output\OutputInterface;
 )]
 class RunCommand extends Command
 {
-    private ServiceContainer $container;
+    private ContainerInterface $container;
 
-    public function __construct(ServiceContainer $container)
+    public function __construct(ContainerInterface $container)
     {
         parent::__construct();
         $this->container = $container;
@@ -27,10 +27,7 @@ class RunCommand extends Command
     {
         $output->writeln('<info>Starting Support Bot...</info>');
         
-        // Bot class instantiates its own services.
-        // We could refactor Bot to accept services from our container, 
-        // but for now, we just run it as is.
-        $bot = new Bot(); 
+        $bot = $this->container->get(Bot::class);
         $bot->run();
 
         return Command::SUCCESS;

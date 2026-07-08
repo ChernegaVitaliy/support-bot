@@ -5,8 +5,9 @@ namespace App\Services;
 use Monolog\Logger as MonologLogger;
 use Monolog\Handler\StreamHandler;
 use Monolog\Level;
+use Psr\Log\LoggerInterface;
 
-class Logger
+class Logger implements LoggerInterface
 {
     private MonologLogger $logger;
     private bool $debugMode;
@@ -48,37 +49,64 @@ class Logger
         };
     }
 
-    public function debug(string $message): void
+    public function debug(string|\Stringable $message, array $context = []): void
     {
         if (!$this->debugMode) {
             return;
         }
-        $this->logger->debug($message);
-        $this->outputToConsole('DEBUG', $message, "\033[0;36m");
+        $this->logger->debug($message, $context);
+        $this->outputToConsole('DEBUG', (string)$message, "\033[0;36m");
     }
 
-    public function info(string $message): void
+    public function info(string|\Stringable $message, array $context = []): void
     {
-        $this->logger->info($message);
-        $this->outputToConsole('INFO', $message, "\033[0;32m");
+        $this->logger->info($message, $context);
+        $this->outputToConsole('INFO', (string)$message, "\033[0;32m");
     }
 
-    public function warning(string $message): void
+    public function warning(string|\Stringable $message, array $context = []): void
     {
-        $this->logger->warning($message);
-        $this->outputToConsole('WARNING', $message, "\033[1;33m");
+        $this->logger->warning($message, $context);
+        $this->outputToConsole('WARNING', (string)$message, "\033[1;33m");
     }
 
-    public function error(string $message): void
+    public function error(string|\Stringable $message, array $context = []): void
     {
-        $this->logger->error($message);
-        $this->outputToConsole('ERROR', $message, "\033[1;31m");
+        $this->logger->error($message, $context);
+        $this->outputToConsole('ERROR', (string)$message, "\033[1;35m");
     }
 
-    public function alert(string $message): void
+    public function emergency(string|\Stringable $message, array $context = []): void
     {
-        $this->logger->critical($message);
-        $this->outputToConsole('ALERT', $message, "\033[1;35m");
+        $this->logger->emergency($message, $context);
+    }
+
+    public function alert(string|\Stringable $message, array $context = []): void
+    {
+        $this->logger->critical($message, $context);
+        $this->outputToConsole('ALERT', (string)$message, "\033[1;35m");
+    }
+
+    public function critical(string|\Stringable $message, array $context = []): void
+    {
+        $this->logger->critical($message, $context);
+    }
+
+    public function notice(string|\Stringable $message, array $context = []): void
+    {
+        $this->logger->notice($message, $context);
+    }
+
+    public function log($level, string|\Stringable $message, array $context = []): void
+    {
+        $this->logger->log($level, $message, $context);
+    }
+
+    public function __call(string $name, array $arguments): void
+    {
+        if (method_exists($this->logger, $name)) {
+            $this->logger->$name(...$arguments);
+        }
     }
 
     private function outputToConsole(string $level, string $message, string $color): void

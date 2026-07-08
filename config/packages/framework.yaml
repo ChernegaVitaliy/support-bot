@@ -1,0 +1,5 @@
+framework:
+    router:
+        resource: '%kernel.project_dir%/config/routes/attributes.yaml'
+        utf8: true
+    secret: 'change_me_in_production'

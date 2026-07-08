@@ -10,11 +10,11 @@ use App\Services\Translator;
 use App\Services\SessionManager;
 use App\Interfaces\CommandInterface;
 use TelegramBot\Api\Types\Update;
-use App\Console\ServiceContainer;
+use Psr\Container\ContainerInterface;
 
 class Bot
 {
-    private ServiceContainer $container;
+    private ContainerInterface $container;
     private Config $config;
     private Logger $logger;
     private DatabaseService $db;
@@ -24,86 +24,16 @@ class Bot
     private array $commands = [];
     private int $lastUpdateId = 0;
 
-    public function __construct()
+    public function __construct(ContainerInterface $container)
     {
-        $this->container = new ServiceContainer();
+        $this->container = $container;
 
-        // 1. Config
-        $this->container->register('config', fn() => new Config());
-        $this->config = $this->container->get('config');
-
-        // 2. Logger
-        $this->container->register('logger', fn($c) => new Logger(
-            $c->get('config')->getLogFile(),
-            $c->get('config')->getLogLevel()
-        ));
-        $this->logger = $this->container->get('logger');
-
-        // 3. Database
-        $this->container->register('db', fn($c) => new DatabaseService(
-            $c->get('config')->getDbPath(),
-            $c->get('logger'),
-            $c->get('config')->getDefaultOwnerId()
-        ));
-        $this->db = $this->container->get('db');
-
-        // 4. Telegram
-        $this->container->register('telegram', fn($c) => new TelegramService(
-            $c->get('config')->getBotToken(),
-            $c->get('logger')
-        ));
-        $this->telegram = $this->container->get('telegram');
-
-        // 5. Translator
-        $this->container->register('translator', fn($c) => new Translator(
-            $c->get('config')->getLanguagesPath(),
-            $c->get('logger')
-        ));
-        $this->translator = $this->container->get('translator');
-
-        // 6. SessionManager
-        $this->container->register('session_manager', fn($c) => new SessionManager($c->get('logger')));
-        $this->sessionManager = $this->container->get('session_manager');
-
-        // 7. ReportService
-        $this->container->register('report_service', fn($c) => new \App\Services\ReportService(
-            $c->get('logger'),
-            $c->get('telegram'),
-            $c->get('db'),
-            $c->get('translator')
-        ));
-
-        // 8. SessionHandler
-        $this->container->register('session_handler', fn($c) => new \App\Handlers\SessionHandler(
-            $c->get('logger'),
-            $c->get('telegram'),
-            $c->get('db'),
-            $c->get('translator'),
-            $c->get('session_manager'),
-            $c->get('report_service')
-        ));
-
-        // 9. CallbackHandler
-        $this->container->register('callback_handler', fn($c) => new \App\Handlers\CallbackHandler(
-            $c->get('logger'),
-            $c->get('telegram'),
-            $c->get('db'),
-            $c->get('translator'),
-            $c->get('session_manager'),
-            $c->get('report_service'),
-            $c->get('broadcast_service')
-        ));
-
-        // 10. BroadcastService
-        $this->container->register('broadcast_service', fn($c) => new \App\Services\BroadcastService(
-            $c->get('logger'),
-            $c->get('telegram'),
-            $c->get('db'),
-            $c->get('translator')
-        ));
-
-        // 11. ReportsCommand (for pagination)
-        $this->container->register('reports_command', fn($c) => new \App\Commands\Admin\ReportsCommand($c));
+        $this->config = $container->get('config');
+        $this->logger = $container->get('logger');
+        $this->db = $container->get('db');
+        $this->telegram = $container->get('telegram');
+        $this->translator = $container->get('translator');
+        $this->sessionManager = $container->get('session_manager');
 
         $this->registerDefaultCommands();
 

@@ -8,19 +8,14 @@ use App\Services\TelegramService;
 use App\Services\DatabaseService;
 use App\Services\Translator;
 use App\Services\SessionManager;
+use Psr\Container\ContainerInterface;
 use TelegramBot\Api\Types\Message;
 
 abstract class BaseCommand implements CommandInterface
 {
-    protected Logger $logger;
-    protected TelegramService $telegram;
-    protected DatabaseService $db;
-    protected Translator $translator;
-    protected SessionManager $sessionManager;
-    protected array $config;
-    protected \App\Console\ServiceContainer $container;
+    protected ContainerInterface $container;
 
-    public function __construct(\App\Console\ServiceContainer $container)
+    public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
         $this->logger = $container->get('logger');
@@ -28,7 +23,7 @@ abstract class BaseCommand implements CommandInterface
         $this->db = $container->get('db');
         $this->translator = $container->get('translator');
         $this->sessionManager = $container->get('session_manager');
-        $this->config = []; // Config is now in container if needed, but keeping array for backward compat if used locally
+        $this->config = [];
     }
 
     abstract public function getName(): string;

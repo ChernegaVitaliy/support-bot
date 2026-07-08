@@ -4,6 +4,7 @@ namespace App\Commands;
 
 use App\Services\SessionManager;
 use App\Services\ReportService;
+use Psr\Container\ContainerInterface;
 use TelegramBot\Api\Types\Message;
 use TelegramBot\Api\Types\Inline\InlineKeyboardMarkup;
 
@@ -11,7 +12,7 @@ class ReportCommand extends BaseCommand
 {
     private ReportService $reportService;
 
-    public function __construct(\App\Console\ServiceContainer $container)
+    public function __construct(ContainerInterface $container)
     {
         parent::__construct($container);
         $this->reportService = $container->get('report_service');
