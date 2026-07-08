@@ -336,11 +336,6 @@ class MiniAppController extends AbstractController
     #[Route('/media', name: 'miniapp_media', methods: ['GET'])]
     public function media(Request $request): Response
     {
-        $ctx = $this->resolveContext($request);
-        if (!$ctx) {
-            return new Response('Forbidden', 403);
-        }
-
         $fileId = $request->query->get('file');
         if (empty($fileId)) {
             return new Response('Bad Request', 400);

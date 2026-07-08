@@ -36,7 +36,7 @@
                 <span class="block text-[12px] text-muted font-bold uppercase mb-2">Медіа</span>
                 <div class="grid grid-cols-2 gap-3">
                     {% for item in media_files %}
-                        {% set media_url = path('miniapp_media', {file: item.file_id, initData: init_data}) %}
+                        {% set media_url = path('miniapp_media', {file: item.file_id}) %}
                         {% if item.type == 'photo' or item.type == 'document' %}
                             <img src="{{ media_url }}" alt="proof" class="w-full aspect-square object-cover rounded border-2 border-border bg-background" loading="lazy" />
                         {% elseif item.type == 'video' or item.type == 'animation' %}
