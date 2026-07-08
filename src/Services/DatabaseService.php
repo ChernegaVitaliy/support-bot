@@ -24,6 +24,7 @@ class DatabaseService
         $this->createTables();
         $this->createReportsTable();
         $this->updateReportsTableStructure();
+        $this->createNewsTable();
         $this->addDefaultAdmin();
         $this->addLanguageSupport();
         $this->createIndexes();
@@ -224,6 +225,20 @@ class DatabaseService
             )
         ");
         $this->logger->info("Таблиця reports створена/перевірена");
+    }
+
+    public function createNewsTable(): void
+    {
+        $this->pdo->exec("
+            CREATE TABLE IF NOT EXISTS news (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                title TEXT NOT NULL,
+                body TEXT NOT NULL,
+                author_id TEXT NOT NULL,
+                created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+            )
+        ");
+        $this->logger->info("Таблиця news створена/перевірена");
     }
 
     private function addDefaultAdmin(): void
@@ -1013,5 +1028,79 @@ class DatabaseService
     public function getDefaultOwnerId(): string
     {
         return $this->defaultOwnerId;
+    }
+
+    public function createNews(string $title, string $body, string $authorId): ?int
+    {
+        try {
+            $stmt = $this->pdo->prepare("
+                INSERT INTO news (title, body, author_id)
+                VALUES (?, ?, ?)
+            ");
+            $result = $stmt->execute([$title, $body, $authorId]);
+
+            if ($result) {
+                $news_id = $this->pdo->lastInsertId();
+                $this->logger->info("Новина створена: ID $news_id автором $authorId");
+                return (int)$news_id;
+            }
+            return null;
+        } catch (Exception $e) {
+            $this->logger->error("Помилка створення новини: " . $e->getMessage());
+            return null;
+        }
+    }
+
+    public function getAllNews(): array
+    {
+        try {
+            $stmt = $this->pdo->prepare("
+                SELECT n.*, 
+                       COALESCE(u.username, 'unknown') AS author_username,
+                       COALESCE(u.first_name, 'Unknown') AS author_first_name
+                FROM news n
+                LEFT JOIN users u ON n.author_id = u.user_id
+                ORDER BY n.created_at DESC
+            ");
+            $stmt->execute();
+            $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            $this->logger->debug("Отримано новин: " . count($result) . " записів");
+            return $result;
+        } catch (Exception $e) {
+            $this->logger->error("Помилка отримання новин: " . $e->getMessage());
+            return [];
+        }
+    }
+
+    public function getNewsById(int $newsId): ?array
+    {
+        try {
+            $stmt = $this->pdo->prepare("SELECT * FROM news WHERE id = ?");
+            $stmt->execute([$newsId]);
+            $result = $stmt->fetch(PDO::FETCH_ASSOC);
+            $this->logger->debug("Пошук новини по ID $newsId: " . ($result ? 'знайдено' : 'не знайдено'));
+            return $result ?: null;
+        } catch (Exception $e) {
+            $this->logger->error("Помилка пошуку новини по ID $newsId: " . $e->getMessage());
+            return null;
+        }
+    }
+
+    public function deleteNews(int $newsId): bool
+    {
+        try {
+            $stmt = $this->pdo->prepare("DELETE FROM news WHERE id = ?");
+            $result = $stmt->execute([$newsId]);
+
+            if ($result && $stmt->rowCount() > 0) {
+                $this->logger->info("Новина видалена: ID $newsId");
+                return true;
+            }
+            $this->logger->warning("Новина не знайдена для видалення: ID $newsId");
+            return false;
+        } catch (Exception $e) {
+            $this->logger->error("Помилка видалення новини $newsId: " . $e->getMessage());
+            return false;
+        }
     }
 }

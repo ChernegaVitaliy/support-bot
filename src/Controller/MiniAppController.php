@@ -307,6 +307,62 @@ class MiniAppController extends AbstractController
         ]);
     }
 
+    #[Route('/news', name: 'miniapp_news', methods: ['GET'])]
+    public function news(Request $request): Response
+    {
+        $ctx = $this->resolveContext($request);
+        if (!$ctx) {
+            return $this->bootstrapResponse();
+        }
+
+        $newsItems = $this->db->getAllNews();
+
+        return $this->renderPage('news.html.twig', $ctx, [
+            'news_items' => $newsItems,
+            'can_create_news' => $this->hasPermission('owner', $ctx['rank']),
+        ]);
+    }
+
+    #[Route('/news/new', name: 'miniapp_news_new', methods: ['GET', 'POST'])]
+    public function newsNew(Request $request): Response
+    {
+        $ctx = $this->resolveContext($request);
+        if (!$ctx) {
+            return $this->bootstrapResponse();
+        }
+
+        if (!$this->hasPermission('owner', $ctx['rank'])) {
+            $this->addFlash('error', 'У вас немає прав для створення новин.');
+            return $this->redirectToRoute('miniapp_news');
+        }
+
+        if ($request->isMethod('POST')) {
+            $title = trim((string)$request->request->get('title', ''));
+            $body = trim((string)$request->request->get('body', ''));
+
+            if ($title === '' || $body === '') {
+                $this->addFlash('error', 'Заповніть заголовок та текст новини.');
+                return $this->renderPage('news_new.html.twig', $ctx, [
+                    'values' => $request->request->all(),
+                ]);
+            }
+
+            $newsId = $this->db->createNews($title, $body, $ctx['user_id']);
+
+            if (!$newsId) {
+                $this->addFlash('error', 'Не вдалося створити новину. Спробуйте пізніше.');
+                return $this->renderPage('news_new.html.twig', $ctx, [
+                    'values' => $request->request->all(),
+                ]);
+            }
+
+            $this->addFlash('success', "Новина #{$newsId} успішно створена.");
+            return $this->redirectToRoute('miniapp_news');
+        }
+
+        return $this->renderPage('news_new.html.twig', $ctx);
+    }
+
     #[Route('/api/miniapp/test', name: 'miniapp_test', methods: ['POST'])]
     public function testApi(Request $request): JsonResponse
     {

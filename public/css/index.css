@@ -606,3 +606,57 @@ a.report-card:active { transform: translate(2px, 2px); box-shadow: none; }
   animation: spin .8s linear infinite;
 }
 @keyframes spin { to { transform: rotate(360deg); } }
+
+/* ---------- News ---------- */
+.news-card {
+  display: block;
+  background: var(--surface);
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+  margin-bottom: 14px;
+  box-shadow: var(--shadow-brutal);
+  transition: transform .08s ease, box-shadow .08s ease;
+}
+a.news-card:active { transform: translate(2px, 2px); box-shadow: none; }
+.news-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+.news-title {
+  margin: 0;
+  font-family: var(--font-head);
+  font-weight: 700;
+  font-size: 17px;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+  color: var(--text);
+}
+.news-date {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+}
+.news-body {
+  font-size: 14.5px;
+  font-weight: 600;
+  line-height: 1.6;
+  margin-bottom: 12px;
+  color: var(--text);
+  white-space: pre-wrap;
+}
+.news-footer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--muted);
+}

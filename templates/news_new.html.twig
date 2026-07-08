@@ -1,0 +1,29 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Створити новину{% endblock %}
+
+{% block body %}
+    <a href="{{ path('miniapp_news') }}" class="back-link hide-on-tma">
+        <i data-lucide="arrow-left" class="icon-sm"></i> Новини
+    </a>
+
+    <div class="page-header">
+        <h1 class="page-title">Нова новина</h1>
+    </div>
+
+    <form method="post" action="{{ path('miniapp_news_new') }}" class="card">
+        <label class="field">
+            <span class="field-label">Заголовок</span>
+            <input type="text" name="title" value="{{ values.title|default('') }}" required class="input" placeholder="Короткий заголовок" />
+        </label>
+
+        <label class="field">
+            <span class="field-label">Текст новини</span>
+            <textarea name="body" rows="6" class="textarea" required placeholder="Опис новини...">{{ values.body|default('') }}</textarea>
+        </label>
+
+        <button type="submit" class="btn btn-primary btn-block">
+            <i data-lucide="send" class="icon-sm"></i>Опублікувати
+        </button>
+    </form>
+{% endblock %}

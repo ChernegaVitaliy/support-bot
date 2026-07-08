@@ -1,0 +1,38 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Новини{% endblock %}
+
+{% block body %}
+    <div class="page-header">
+        <h1 class="page-title">Новини</h1>
+        {% if can_create_news %}
+        <a href="{{ path('miniapp_news_new') }}" class="btn btn-primary btn-icon">
+            <i data-lucide="plus" class="icon-sm"></i>Створити
+        </a>
+        {% endif %}
+    </div>
+
+    {% for item in news_items %}
+        <article class="news-card">
+            <div class="news-header">
+                <h2 class="news-title">{{ item.title }}</h2>
+                <span class="news-date">
+                    <i data-lucide="calendar" class="icon-sm"></i>
+                    {{ item.created_at|date('d.m.Y H:i') }}
+                </span>
+            </div>
+            <div class="news-body">{{ item.body }}</div>
+            <div class="news-footer">
+                <span class="news-author">
+                    <i data-lucide="user" class="icon-sm"></i>
+                    {{ item.author_first_name|default(item.author_username|default('—')) }}
+                </span>
+            </div>
+        </article>
+    {% else %}
+        <div class="empty">
+            <i data-lucide="inbox"></i>
+            <div class="empty-text">Новин ще немає</div>
+        </div>
+    {% endfor %}
+{% endblock %}
