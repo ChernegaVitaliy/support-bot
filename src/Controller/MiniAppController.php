@@ -35,16 +35,6 @@ class MiniAppController extends AbstractController
             return $this->bootstrapResponse();
         }
 
-        if ($ctx['is_admin']) {
-            $stats = $this->db->getStats();
-            $admins = $this->db->getAllAdmins();
-
-            return $this->renderPage('admin.html.twig', $ctx, [
-                'stats' => $stats,
-                'admins' => $admins,
-            ]);
-        }
-
         $myReports = $this->db->query(
             "SELECT * FROM reports WHERE user_id = ? ORDER BY created_at DESC LIMIT 5",
             true,
