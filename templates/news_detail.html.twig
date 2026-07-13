@@ -12,7 +12,7 @@
             <h1 class="news-title">{{ news_item.title }}</h1>
             <span class="news-date">
                 <i data-lucide="calendar" class="icon-sm"></i>
-                {{ news_item.created_at|date('d.m.Y H:i') }}
+                <time data-utc="{{ news_item.created_at|date('c') }}">{{ news_item.created_at|date('d.m.Y H:i') }}</time>
             </span>
         </div>
         <div class="news-body">{{ news_item.body }}</div>

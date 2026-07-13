@@ -45,7 +45,7 @@
         <div class="item-icon"><i data-lucide="calendar"></i></div>
         <div class="item-body">
             <div class="item-title">Приєднався</div>
-            <div class="item-sub">{{ db_user.created_at is defined and db_user.created_at ? db_user.created_at|date('d.m.Y') : 'Невідомо' }}</div>
+            <div class="item-sub">{% if db_user.created_at is defined and db_user.created_at %}<time data-utc="{{ db_user.created_at|date('c') }}" data-date-format="date">{{ db_user.created_at|date('d.m.Y') }}</time>{% else %}Невідомо{% endif %}</div>
         </div>
     </div>
 

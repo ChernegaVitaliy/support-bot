@@ -24,7 +24,7 @@
                 <h2 class="news-title">{{ item.title }}</h2>
                 <span class="news-date">
                     <i data-lucide="calendar" class="icon-sm"></i>
-                    {{ item.created_at|date('d.m.Y H:i') }}
+                    <time data-utc="{{ item.created_at|date('c') }}">{{ item.created_at|date('d.m.Y H:i') }}</time>
                 </span>
             </div>
             <div class="news-body">{{ item.body }}</div>

@@ -20,7 +20,7 @@
             <div class="detail-row"><span class="muted-label">Скаржник:</span> <code class="code">{{ report.reporter_nick }}</code></div>
             <div class="detail-row"><span class="muted-label">Порушник:</span> <code class="code">{{ report.reported_nick }}</code></div>
             <div class="detail-row"><span class="muted-label">Причина:</span> {{ report.reason }}</div>
-            <div class="detail-row"><span class="muted-label">Створено:</span> {{ report.created_at|date('d.m.Y H:i') }}</div>
+            <div class="detail-row"><span class="muted-label">Створено:</span> <time data-utc="{{ report.created_at|date('c') }}">{{ report.created_at|date('d.m.Y H:i') }}</time></div>
         </div>
 
         {% if report.proof_type == 'text' and report.proof %}
@@ -59,7 +59,7 @@
 
         {% if report.processed_by %}
             <div class="detail-row mt-16">Обробив: <code class="code">{{ report.processed_by }}</code>
-                {% if report.processed_at %} · {{ report.processed_at|date('d.m.Y H:i') }}{% endif %}
+                {% if report.processed_at %} · <time data-utc="{{ report.processed_at|date('c') }}">{{ report.processed_at|date('d.m.Y H:i') }}</time>{% endif %}
             </div>
         {% endif %}
     </div>
