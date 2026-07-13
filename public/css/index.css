@@ -623,6 +623,12 @@ a.report-card:active { transform: translate(2px, 2px); box-shadow: none; }
   transition: transform .08s ease, box-shadow .08s ease;
 }
 a.news-card:active { transform: translate(2px, 2px); box-shadow: none; }
+.news-card.read {
+  opacity: .55;
+}
+.news-card.read .news-title {
+  font-weight: 600;
+}
 .news-header {
   display: flex;
   align-items: flex-start;

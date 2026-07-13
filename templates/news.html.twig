@@ -13,7 +13,7 @@
     </div>
 
     {% for item in news_items %}
-        <a href="{{ path('miniapp_news_detail', {id: item.id}) }}" class="news-card">
+        <a href="{{ path('miniapp_news_detail', {id: item.id}) }}" class="news-card" data-news-id="{{ item.id }}">
             <div class="news-header">
                 <h2 class="news-title">{{ item.title }}</h2>
                 <span class="news-date">
@@ -35,4 +35,19 @@
             <div class="empty-text">Новин ще немає</div>
         </div>
     {% endfor %}
+{% endblock %}
+
+{% block javascripts %}
+<script>
+(function () {
+    try {
+        var read = JSON.parse(sessionStorage.getItem('news_read') || '[]');
+        document.querySelectorAll('[data-news-id]').forEach(function (card) {
+            if (read.indexOf(card.getAttribute('data-news-id')) !== -1) {
+                card.classList.add('read');
+            }
+        });
+    } catch (e) {}
+})();
+</script>
 {% endblock %}

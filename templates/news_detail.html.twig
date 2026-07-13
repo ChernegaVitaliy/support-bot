@@ -37,3 +37,18 @@
     </div>
     {% endif %}
 {% endblock %}
+
+{% block javascripts %}
+<script>
+(function () {
+    var id = '{{ news_item.id }}';
+    try {
+        var read = JSON.parse(sessionStorage.getItem('news_read') || '[]');
+        if (read.indexOf(id) === -1) {
+            read.push(id);
+            sessionStorage.setItem('news_read', JSON.stringify(read));
+        }
+    } catch (e) {}
+})();
+</script>
+{% endblock %}
