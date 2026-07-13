@@ -587,6 +587,7 @@ a.report-card:active { transform: translate(2px, 2px); box-shadow: none; }
   border-top: 3px solid transparent;
   transition: color .15s ease, background .15s ease;
   overflow: hidden;
+  position: relative;
 }
 .tab.active {
   color: var(--primary);
@@ -594,6 +595,26 @@ a.report-card:active { transform: translate(2px, 2px); box-shadow: none; }
   background: var(--surface-2);
 }
 .tab.active i { transform: translateY(-1px); }
+.tab-label { position: relative; }
+.badge {
+  display: none;
+  position: absolute;
+  top: 6px;
+  right: 50%;
+  transform: translateX(calc(50% + 12px));
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  border-radius: 8px;
+  background: var(--accent);
+  color: #fff;
+  font-family: var(--font-head);
+  font-size: 9px;
+  font-weight: 700;
+  line-height: 16px;
+  text-align: center;
+  pointer-events: none;
+}
 
 /* ---------- Utilities ---------- */
 .space-y > * + * { margin-top: 12px; }

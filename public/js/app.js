@@ -102,6 +102,22 @@
         });
     }
 
+    function updateNewsBadge() {
+        try {
+            var badge = document.getElementById('news-badge');
+            if (!badge) return;
+            var total = parseInt(sessionStorage.getItem('news_total') || '0', 10);
+            var read = JSON.parse(sessionStorage.getItem('news_read') || '[]');
+            var unread = total - read.length;
+            if (unread > 0) {
+                badge.textContent = unread > 99 ? '99+' : String(unread);
+                badge.style.display = '';
+            } else {
+                badge.style.display = 'none';
+            }
+        } catch (e) {}
+    }
+
     function initWebApp() {
         if (window.Telegram && window.Telegram.WebApp) {
             var tg = window.Telegram.WebApp;
@@ -113,6 +129,7 @@
         }
         decorateLinks();
         ensureFormInitData();
+        updateNewsBadge();
         if (window.lucide) window.lucide.createIcons();
     }
 

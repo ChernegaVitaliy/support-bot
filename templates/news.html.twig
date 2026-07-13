@@ -41,6 +41,9 @@
 <script>
 (function () {
     try {
+        var total = document.querySelectorAll('[data-news-id]').length;
+        sessionStorage.setItem('news_total', String(total));
+
         var read = JSON.parse(sessionStorage.getItem('news_read') || '[]');
         document.querySelectorAll('[data-news-id]').forEach(function (card) {
             if (read.indexOf(card.getAttribute('data-news-id')) !== -1) {
