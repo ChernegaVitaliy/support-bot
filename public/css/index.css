@@ -279,8 +279,9 @@ body.is-tma .hide-on-tma { display: none !important; }
   gap: 12px;
   margin-top: 16px;
   margin-bottom: 8px;
+  min-width: 0;
 }
-.btn-row .btn { flex: 1; }
+.btn-row .btn { flex: 1; min-width: 0; }
 
 /* ---------- List item (nav rows / admins) ---------- */
 .list-item {
@@ -670,4 +671,5 @@ a.news-card:active { transform: translate(2px, 2px); box-shadow: none; }
 }
 .btn-form {
   display: inline-flex;
+  min-width: 0;
 }
