@@ -111,7 +111,7 @@
             var unread = total - read.length;
             if (unread > 0) {
                 badge.textContent = unread > 99 ? '99+' : String(unread);
-                badge.style.display = '';
+                badge.style.display = 'block';
             } else {
                 badge.style.display = 'none';
             }
