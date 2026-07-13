@@ -1102,7 +1102,14 @@ class DatabaseService
     public function getNewsById(int $newsId): ?array
     {
         try {
-            $stmt = $this->pdo->prepare("SELECT * FROM news WHERE id = ?");
+            $stmt = $this->pdo->prepare("
+                SELECT n.*,
+                       COALESCE(u.username, 'unknown') AS author_username,
+                       COALESCE(u.first_name, 'Unknown') AS author_first_name
+                FROM news n
+                LEFT JOIN users u ON n.author_id = u.user_id
+                WHERE n.id = ?
+            ");
             $stmt->execute([$newsId]);
             $result = $stmt->fetch(PDO::FETCH_ASSOC);
             $this->logger->debug("Пошук новини по ID $newsId: " . ($result ? 'знайдено' : 'не знайдено'));
