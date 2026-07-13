@@ -12,6 +12,12 @@
         {% endif %}
     </div>
 
+    {% if news_items %}
+    <button type="button" class="btn btn-ghost btn-block" id="mark-all-read" style="display:none">
+        <i data-lucide="check-check" class="icon-sm"></i>Прочитати все
+    </button>
+    {% endif %}
+
     {% for item in news_items %}
         <a href="{{ path('miniapp_news_detail', {id: item.id}) }}" class="news-card" data-news-id="{{ item.id }}">
             <div class="news-header">
@@ -35,12 +41,6 @@
             <div class="empty-text">Новин ще немає</div>
         </div>
     {% endfor %}
-
-    {% if news_items %}
-    <button type="button" class="btn btn-ghost btn-block" id="mark-all-read" style="display:none">
-        <i data-lucide="check-check" class="icon-sm"></i>Прочитати все
-    </button>
-    {% endif %}
 {% endblock %}
 
 {% block javascripts %}
