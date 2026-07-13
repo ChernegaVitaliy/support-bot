@@ -505,14 +505,6 @@ class MiniAppController extends AbstractController
         }
 
         $admin = $this->db->getAdminByIdentifier($identifier);
-        if (!$admin) {
-            $this->addFlash('error', 'Адміністратора не знайдено.');
-            return;
-        }
-
-        $currentRankLevel = $this->rankLevel($ctx['rank']);
-        $isDefaultOwner = $ctx['user_id'] === $this->db->getDefaultOwnerId();
-        $defaultOwnerId = $this->db->getDefaultOwnerId();
 
         if ($action === 'set_rank') {
             if (!$this->hasPermission('owner', $ctx['rank'])) {
@@ -526,18 +518,40 @@ class MiniAppController extends AbstractController
                 return;
             }
 
-            if ($admin['user_id'] === $defaultOwnerId && $newRank !== 'owner') {
-                $this->addFlash('error', 'Неможливо понизити власника.');
-                return;
-            }
+            if ($admin) {
+                $defaultOwnerId = $this->db->getDefaultOwnerId();
+                if ($admin['user_id'] === $defaultOwnerId && $newRank !== 'owner') {
+                    $this->addFlash('error', 'Неможливо понизити власника.');
+                    return;
+                }
 
-            if ($this->db->setAdminRank($admin['user_id'], $newRank, $ctx['user_id'])) {
-                $this->addFlash('success', "Ранг користувача оновлено: {$newRank}.");
+                if ($this->db->setAdminRank($admin['user_id'], $newRank, $ctx['user_id'])) {
+                    $this->addFlash('success', "Ранг користувача оновлено: {$newRank}.");
+                } else {
+                    $this->addFlash('error', 'Не вдалося оновити ранг.');
+                }
             } else {
-                $this->addFlash('error', 'Не вдалося оновити ранг.');
+                $user = $this->db->getUserByIdentifier($identifier);
+                if (!$user) {
+                    $this->addFlash('error', 'Користувача не знайдено.');
+                    return;
+                }
+
+                if ($this->db->addAdmin($user['user_id'], $user['username'] ?? '', $user['first_name'] ?? '', $newRank)) {
+                    $this->addFlash('success', "Користувача додано з рангом: {$newRank}.");
+                } else {
+                    $this->addFlash('error', 'Не вдалося додати користувача.');
+                }
             }
             return;
         }
+
+        if (!$admin) {
+            $this->addFlash('error', 'Адміністратора не знайдено.');
+            return;
+        }
+
+        $defaultOwnerId = $this->db->getDefaultOwnerId();
 
         if ($action === 'remove') {
             if (!$this->hasPermission('admin', $ctx['rank'])) {

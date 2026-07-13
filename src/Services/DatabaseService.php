@@ -876,6 +876,33 @@ class DatabaseService
         }
     }
 
+    public function getUserByIdentifier(string $identifier): ?array
+    {
+        if (empty($identifier)) {
+            return null;
+        }
+
+        if (strpos($identifier, '@') === 0) {
+            $username = substr($identifier, 1);
+        } else {
+            $username = $identifier;
+        }
+
+        if (is_numeric($identifier)) {
+            return $this->getUserById((string)$identifier);
+        }
+
+        try {
+            $stmt = $this->pdo->prepare("SELECT * FROM users WHERE username = ?");
+            $stmt->execute([$username]);
+            $result = $stmt->fetch(PDO::FETCH_ASSOC);
+            return $result ?: null;
+        } catch (Exception $e) {
+            $this->logger->error("Помилка пошуку користувача по @$username: " . $e->getMessage());
+            return null;
+        }
+    }
+
     public function query(string $sql, bool $fetchAll = false, array $params = []): ?array
     {
         try {
