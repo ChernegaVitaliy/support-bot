@@ -598,21 +598,21 @@ a.report-card:active { transform: translate(2px, 2px); box-shadow: none; }
 .badge {
   display: none;
   position: absolute;
-  top: 6px;
+  top: 4px;
   right: 50%;
-  transform: translateX(calc(50% + 12px));
-  min-width: 16px;
-  height: 16px;
-  padding: 0 4px;
+  transform: translateX(calc(50% + 14px));
+  height: 15px;
+  padding: 0 5px;
   border-radius: 8px;
   background: var(--accent);
   color: #fff;
   font-family: var(--font-head);
   font-size: 9px;
   font-weight: 700;
-  line-height: 16px;
+  line-height: 15px;
   text-align: center;
   pointer-events: none;
+  white-space: nowrap;
 }
 
 /* ---------- Utilities ---------- */
