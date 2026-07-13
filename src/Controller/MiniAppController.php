@@ -552,6 +552,8 @@ class MiniAppController extends AbstractController
         }
 
         $defaultOwnerId = $this->db->getDefaultOwnerId();
+        $isDefaultOwner = $ctx['user_id'] === $defaultOwnerId;
+        $currentRankLevel = $this->rankLevel($ctx['rank']);
 
         if ($action === 'remove') {
             if (!$this->hasPermission('admin', $ctx['rank'])) {
