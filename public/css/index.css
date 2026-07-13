@@ -586,7 +586,6 @@ a.report-card:active { transform: translate(2px, 2px); box-shadow: none; }
   letter-spacing: -0.01em;
   border-top: 3px solid transparent;
   transition: color .15s ease, background .15s ease;
-  overflow: hidden;
   position: relative;
 }
 .tab.active {
@@ -595,7 +594,7 @@ a.report-card:active { transform: translate(2px, 2px); box-shadow: none; }
   background: var(--surface-2);
 }
 .tab.active i { transform: translateY(-1px); }
-.tab-label { position: relative; }
+.tab-label { position: relative; overflow: hidden; }
 .badge {
   display: none;
   position: absolute;
