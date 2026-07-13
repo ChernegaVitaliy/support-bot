@@ -35,6 +35,12 @@
             <div class="empty-text">Новин ще немає</div>
         </div>
     {% endfor %}
+
+    {% if news_items %}
+    <button type="button" class="btn btn-ghost btn-block" id="mark-all-read" style="display:none">
+        <i data-lucide="check-check" class="icon-sm"></i>Прочитати все
+    </button>
+    {% endif %}
 {% endblock %}
 
 {% block javascripts %}
@@ -42,14 +48,33 @@
 (function () {
     try {
         var total = document.querySelectorAll('[data-news-id]').length;
-        sessionStorage.setItem('news_total', String(total));
+        localStorage.setItem('news_total', String(total));
 
-        var read = JSON.parse(sessionStorage.getItem('news_read') || '[]');
+        var read = JSON.parse(localStorage.getItem('news_read') || '[]');
+        var hasUnread = false;
         document.querySelectorAll('[data-news-id]').forEach(function (card) {
             if (read.indexOf(card.getAttribute('data-news-id')) !== -1) {
                 card.classList.add('read');
+            } else {
+                hasUnread = true;
             }
         });
+
+        var btn = document.getElementById('mark-all-read');
+        if (btn && hasUnread) {
+            btn.style.display = '';
+            btn.addEventListener('click', function () {
+                var ids = [];
+                document.querySelectorAll('[data-news-id]').forEach(function (card) {
+                    ids.push(card.getAttribute('data-news-id'));
+                    card.classList.add('read');
+                });
+                localStorage.setItem('news_read', JSON.stringify(ids));
+                btn.style.display = 'none';
+                var badge = document.getElementById('news-badge');
+                if (badge) badge.style.display = 'none';
+            });
+        }
     } catch (e) {}
 })();
 </script>
