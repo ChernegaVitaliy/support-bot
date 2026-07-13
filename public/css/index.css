@@ -568,21 +568,23 @@ a.report-card:active { transform: translate(2px, 2px); box-shadow: none; }
   box-shadow: 0 -4px 0 var(--border);
 }
 .tab {
-  flex: 1;
+  flex: 1 1 0;
+  min-width: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: 4px;
-  padding: 12px 4px;
+  padding: 12px 2px;
   color: var(--muted);
   font-family: var(--font-head);
   font-weight: 600;
-  font-size: 10.5px;
+  font-size: 10px;
   text-transform: uppercase;
   letter-spacing: -0.01em;
   border-top: 3px solid transparent;
   transition: color .15s ease, background .15s ease;
+  overflow: hidden;
 }
 .tab.active {
   color: var(--primary);

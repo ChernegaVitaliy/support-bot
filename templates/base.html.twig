@@ -30,10 +30,6 @@
             <i data-lucide="home"></i>
             <span>Головна</span>
         </a>
-        <a href="{{ path('miniapp_report_new') }}" class="tab{% if current_route == 'miniapp_report_new' %} active{% endif %}">
-            <i data-lucide="plus-circle"></i>
-            <span>Репорт</span>
-        </a>
         <a href="{{ path('miniapp_reports') }}" class="tab{% if current_route starts with 'miniapp_reports' or current_route starts with 'miniapp_report_detail' %} active{% endif %}">
             <i data-lucide="flag"></i>
             <span>Репорти</span>
