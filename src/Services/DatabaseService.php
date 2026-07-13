@@ -321,8 +321,12 @@ class DatabaseService
     {
         try {
             $stmt = $this->pdo->prepare("
-                INSERT OR REPLACE INTO users (user_id, username, first_name, language)
+                INSERT INTO users (user_id, username, first_name, language)
                 VALUES (?, ?, ?, ?)
+                ON CONFLICT(user_id) DO UPDATE SET
+                    username = excluded.username,
+                    first_name = excluded.first_name,
+                    language = excluded.language
             ");
             $result = $stmt->execute([$user_id, $username, $first_name, $language]);
             $this->logger->debug("Користувач доданий/оновлений: $user_id @$username, мова: $language");
