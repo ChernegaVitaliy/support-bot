@@ -71,10 +71,10 @@
                 });
                 localStorage.setItem('news_read', JSON.stringify(ids));
                 btn.style.display = 'none';
-                var badge = document.getElementById('news-badge');
-                if (badge) badge.style.display = 'none';
+                if (window.updateNewsBadge) window.updateNewsBadge();
             });
         }
+        if (window.updateNewsBadge) window.updateNewsBadge();
     } catch (e) {}
 })();
 </script>

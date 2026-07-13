@@ -134,6 +134,7 @@
     }
 
     document.addEventListener('DOMContentLoaded', initWebApp);
+    window.updateNewsBadge = updateNewsBadge;
     window.addEventListener('load', function () {
         if (window.lucide) window.lucide.createIcons();
     });
