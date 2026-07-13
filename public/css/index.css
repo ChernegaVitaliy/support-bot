@@ -601,14 +601,16 @@ a.report-card:active { transform: translate(2px, 2px); box-shadow: none; }
   top: 4px;
   right: 50%;
   transform: translateX(calc(50% + 14px));
-  padding: .15em .45em;
+  padding: 0 .45em;
+  height: 1.4em;
   border-radius: 8px;
   background: var(--accent);
   color: #fff;
   font-family: var(--font-head);
   font-size: 9px;
   font-weight: 700;
-  line-height: 1;
+  align-items: center;
+  justify-content: center;
   pointer-events: none;
   white-space: nowrap;
 }
