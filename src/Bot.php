@@ -1032,6 +1032,8 @@ class Bot
                 return $this->translator->translate('callbacks.admin_action', $language);
             case 'profile':
                 return $this->translator->translate('callbacks.profile_updated', $language);
+            case 'debug':
+                return '';
             default:
                 return $this->translator->translate('callbacks.processed', $language);
         }
