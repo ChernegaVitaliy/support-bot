@@ -103,21 +103,52 @@ class Bot
     {
         try {
             $language = 'uk'; // Default language for commands
-            $commands = [];
 
-            // Get all registered commands
+            $generalCommands = [];
+            $ownerCommands = [];
+
             foreach ($this->commands as $command) {
-                $commands[] = [
-                    'command' => ltrim($command->getName(), '/'),
-                    'description' => $command->getDescription($language)
-                ];
+                if ($command->getRequiredRank() === 'owner') {
+                    $ownerCommands[] = [
+                        'command' => ltrim($command->getName(), '/'),
+                        'description' => $command->getDescription($language)
+                    ];
+                } else {
+                    $generalCommands[] = [
+                        'command' => ltrim($command->getName(), '/'),
+                        'description' => $command->getDescription($language)
+                    ];
+                }
             }
 
-            // Register commands for Ukrainian
-            if ($this->telegram->setMyCommands($commands, null, $language)) {
+            // Register general commands for everyone
+            if ($this->telegram->setMyCommands($generalCommands, null, $language)) {
                 $this->logger->info("Bot commands registered for language: $language");
             } else {
                 $this->logger->warning("Failed to register bot commands for language: $language");
+            }
+
+            // Register owner-only commands only for the default owner
+            $ownerId = $this->config->getDefaultOwnerId();
+            if ($ownerId && $ownerCommands !== []) {
+                $scope = ['type' => 'chat_member', 'chat_id' => (int)$ownerId];
+                try {
+                    $botCommands = [];
+                    foreach ($ownerCommands as $cmd) {
+                        $botCommand = new \TelegramBot\Api\Types\BotCommand();
+                        $botCommand->setCommand($cmd['command']);
+                        $botCommand->setDescription($cmd['description']);
+                        $botCommands[] = $botCommand;
+                    }
+                    $this->telegram->getBot()->setMyCommands(
+                        new \TelegramBot\Api\Types\ArrayOfBotCommand($botCommands),
+                        $scope,
+                        $language
+                    );
+                    $this->logger->info("Owner-only commands registered for owner $ownerId");
+                } catch (\Exception $e) {
+                    $this->logger->warning("Failed to register owner-only commands: " . $e->getMessage());
+                }
             }
         } catch (\Exception $e) {
             $this->logger->warning("Could not register bot commands: " . $e->getMessage());
