@@ -13,10 +13,18 @@ class Translator implements TranslatorInterface, LocaleAwareInterface
     private string $defaultLanguage = 'uk';
 
     private array $supportedLanguages = [
-        'uk', 'ru', 'en', 'es', 'de', 'fr', 'it', 'pt', 'zh', 'ja',
+        'uk', 'ru', 'en', 'es', 'de', 'fr', 'it', 'pt', 'zh', 'zh_TW', 'ja',
         'ko', 'ar', 'fa', 'tr', 'pl', 'nl', 'cs', 'sr', 'bg', 'ro',
         'hu', 'fi', 'sv', 'da', 'nb', 'hi', 'id', 'vi', 'th', 'el',
         'he', 'hr', 'sk', 'uz', 'ms', 'kk', 'ca', 'be'
+    ];
+
+    private array $languageAliases = [
+        'zh-tw' => 'zh_TW',
+        'zh-hant' => 'zh_TW',
+        'zh-hk' => 'zh_TW',
+        'zh-cn' => 'zh',
+        'zh-hans' => 'zh',
     ];
 
     public function __construct(string $languagesPath, Logger $logger)
@@ -111,6 +119,11 @@ class Translator implements TranslatorInterface, LocaleAwareInterface
             if ($apiLang) {
                 $this->logger->debug("Мова з API: " . $apiLang);
 
+                $alias = $this->resolveLanguageAlias($apiLang);
+                if ($alias) {
+                    return $alias;
+                }
+
                 foreach ($this->supportedLanguages as $lang) {
                     if (strpos($apiLang, $lang) === 0) {
                         return $lang;
@@ -123,6 +136,11 @@ class Translator implements TranslatorInterface, LocaleAwareInterface
             $langCode = strtolower($from['language_code']);
             $this->logger->debug("Мова з повідомлення: " . $langCode);
 
+            $alias = $this->resolveLanguageAlias($langCode);
+            if ($alias) {
+                return $alias;
+            }
+
             foreach ($this->supportedLanguages as $lang) {
                 if (strpos($langCode, $lang) === 0) {
                     return $lang;
@@ -132,6 +150,24 @@ class Translator implements TranslatorInterface, LocaleAwareInterface
 
         $this->logger->debug("Мова не визначена, використовується за замовчуванням");
         return $this->defaultLanguage;
+    }
+
+    private function resolveLanguageAlias(string $code): ?string
+    {
+        $normalized = strtolower(str_replace('_', '-', $code));
+        $normalized = preg_replace('/^([a-z]{2}).*$/', '$1', $normalized);
+
+        if (isset($this->languageAliases[$normalized])) {
+            return $this->languageAliases[$normalized];
+        }
+
+        // Try matching the full code against aliases (e.g. zh-tw)
+        $full = strtolower(str_replace('_', '-', $code));
+        if (isset($this->languageAliases[$full])) {
+            return $this->languageAliases[$full];
+        }
+
+        return null;
     }
 
     public function hasLanguage(string $lang): bool
