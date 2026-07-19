@@ -68,7 +68,7 @@ class DebugCommand extends BaseCommand
 
         foreach (self::LOG_LEVELS as $level) {
             $indicator = ($level === $currentLevel) ? '✅ ' : '';
-            $buttons[] = ['text' => $indicator . $level, 'callback_data' => "debug_set_{$level}"];
+            $buttons[] = ['text' => $indicator . $level, 'callback_data' => "debug_set_$level"];
         }
 
         return new InlineKeyboardMarkup([$buttons]);

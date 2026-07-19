@@ -9,7 +9,9 @@ use App\Services\Translator;
 use App\Services\SessionManager;
 use App\Services\ReportService;
 use App\Services\BroadcastService;
+use Psr\Container\ContainerInterface;
 use TelegramBot\Api\Types\CallbackQuery;
+use TelegramBot\Api\Types\Inline\InlineKeyboardMarkup;
 
 class CallbackHandler
 {
@@ -20,6 +22,7 @@ class CallbackHandler
     private SessionManager $sessionManager;
     private ReportService $reportService;
     private BroadcastService $broadcastService;
+    private ContainerInterface $container;
 
     public function __construct(
         Logger $logger,
@@ -28,7 +31,8 @@ class CallbackHandler
         Translator $translator,
         SessionManager $sessionManager,
         ReportService $reportService,
-        BroadcastService $broadcastService
+        BroadcastService $broadcastService,
+        ContainerInterface $container
     ) {
         $this->logger = $logger;
         $this->telegram = $telegram;
@@ -37,6 +41,7 @@ class CallbackHandler
         $this->sessionManager = $sessionManager;
         $this->reportService = $reportService;
         $this->broadcastService = $broadcastService;
+        $this->container = $container;
     }
 
     public function handle(CallbackQuery $callbackQuery, string $language): void
@@ -60,8 +65,48 @@ class CallbackHandler
             case 'reject':
                 $this->handleReportActionCallback($callbackData, $chatId, $messageId, $language, $userId);
                 break;
+            case 'debug':
+                $this->handleDebugCallback($callbackData, $chatId, $messageId, $language, $userId);
+                break;
             // Add other types as needed
         }
+    }
+
+    public function handleDebugCallback(string $callbackData, string $chatId, int $messageId, string $language, string $userId): void
+    {
+        if (!$this->db->isAdmin($userId)) {
+            return;
+        }
+
+        $parts = explode('_', $callbackData);
+        $level = strtoupper(end($parts));
+
+        $config = $this->container->get('config');
+        $config->setLogLevel($level);
+
+        $this->telegram->editMessageText(
+            $chatId,
+            $messageId,
+            $this->translator->translate('admin.debug.current', $language, [$level])
+        );
+
+        $keyboard = $this->buildDebugKeyboard($level, $language);
+        if ($keyboard) {
+            $this->telegram->editMessageReplyMarkup($chatId, $messageId, $keyboard);
+        }
+    }
+
+    private function buildDebugKeyboard(string $currentLevel, string $language): ?InlineKeyboardMarkup
+    {
+        $levels = ['DEBUG', 'INFO', 'WARNING', 'ERROR'];
+        $buttons = [];
+
+        foreach ($levels as $level) {
+            $indicator = ($level === $currentLevel) ? '✅ ' : '';
+            $buttons[] = ['text' => $indicator . $level, 'callback_data' => "debug_set_$level"];
+        }
+
+        return new InlineKeyboardMarkup([$buttons]);
     }
 
     public function handleReportCallback(string $callbackData, string $chatId, string $userId, string $language): void
