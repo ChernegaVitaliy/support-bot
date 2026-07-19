@@ -4,6 +4,8 @@ namespace App\Console\Commands;
 
 use Psr\Container\ContainerInterface;
 use App\Services\DatabaseService;
+use App\Services\TelegramService;
+use App\Services\Translator;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -59,10 +61,26 @@ class RemoveAdminCommand extends Command
 
         if ($db->removeAdmin($admin['user_id'])) {
             $output->writeln('<info>✅ Admin removed successfully.</info>');
+
+            $this->notifyUser($admin['user_id'], $output);
+
             return Command::SUCCESS;
         } else {
             $output->writeln('<error>Failed to remove admin.</error>');
             return Command::FAILURE;
+        }
+    }
+
+    private function notifyUser(int|string $userId, OutputInterface $output): void
+    {
+        try {
+            $telegram = $this->container->get(TelegramService::class);
+            $translator = $this->container->get(Translator::class);
+            $message = $translator->translate('admin.remove.notification', 'uk');
+            $telegram->sendMessage($userId, $message);
+            $output->writeln('<info>📨 Notification sent to user.</info>');
+        } catch (\Exception $e) {
+            $output->writeln('<comment>⚠️ Could not notify user: ' . $e->getMessage() . '</comment>');
         }
     }
 }

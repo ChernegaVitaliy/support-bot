@@ -4,6 +4,8 @@ namespace App\Console\Commands;
 
 use Psr\Container\ContainerInterface;
 use App\Services\DatabaseService;
+use App\Services\TelegramService;
+use App\Services\Translator;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -56,10 +58,26 @@ class SetRankCommand extends Command
 
         if ($db->setAdminRank($admin['user_id'], $rank)) {
             $output->writeln("<info>✅ Rank updated to '$rank' for user {$admin['user_id']}.</info>");
+
+            $this->notifyUser($admin['user_id'], $rank, $output);
+
             return Command::SUCCESS;
         } else {
             $output->writeln('<error>Failed to update rank.</error>');
             return Command::FAILURE;
+        }
+    }
+
+    private function notifyUser(int|string $userId, string $rank, OutputInterface $output): void
+    {
+        try {
+            $telegram = $this->container->get(TelegramService::class);
+            $translator = $this->container->get(Translator::class);
+            $message = $translator->translate('admin.rank.notification', 'uk', [$rank]);
+            $telegram->sendMessage($userId, $message);
+            $output->writeln('<info>📨 Notification sent to user.</info>');
+        } catch (\Exception $e) {
+            $output->writeln('<comment>⚠️ Could not notify user: ' . $e->getMessage() . '</comment>');
         }
     }
 }

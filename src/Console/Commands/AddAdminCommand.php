@@ -4,6 +4,8 @@ namespace App\Console\Commands;
 
 use Psr\Container\ContainerInterface;
 use App\Services\DatabaseService;
+use App\Services\TelegramService;
+use App\Services\Translator;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -77,10 +79,26 @@ class AddAdminCommand extends Command
         if ($db->addAdmin($userId, $username ?? '', $firstName, $rank)) {
             $output->writeln("<info>✅ Admin added successfully!</info>");
             $output->writeln("ID: $userId, Rank: $rank");
+
+            $this->notifyUser($userId, $rank, $output);
+
             return Command::SUCCESS;
         } else {
             $output->writeln('<error>Failed to add admin.</error>');
             return Command::FAILURE;
+        }
+    }
+
+    private function notifyUser(string $userId, string $rank, OutputInterface $output): void
+    {
+        try {
+            $telegram = $this->container->get(TelegramService::class);
+            $translator = $this->container->get(Translator::class);
+            $message = $translator->translate('admin.add.notification', 'uk', [$rank]);
+            $telegram->sendMessage($userId, $message);
+            $output->writeln('<info>📨 Notification sent to user.</info>');
+        } catch (\Exception $e) {
+            $output->writeln('<comment>⚠️ Could not notify user: ' . $e->getMessage() . '</comment>');
         }
     }
 }
