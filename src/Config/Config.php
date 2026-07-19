@@ -68,12 +68,6 @@ class Config
 
     public function get(string $key, $default = null)
     {
-        // Logging level lives in config.php (updated at runtime by /debug),
-        // so config takes priority over .env for this key.
-        if ($key === 'logging.level') {
-            return $this->config['logging']['level'] ?? $default;
-        }
-
         $envValue = $this->getEnv($key);
         if ($envValue !== null) {
             return $envValue;
@@ -145,7 +139,7 @@ class Config
 
     public function getLogLevel(): string
     {
-        return $this->get('logging.level', 'INFO');
+        return $this->getEnv('LOG_LEVEL', 'INFO');
     }
 
     public function toggleLogLevel(): string
@@ -164,7 +158,28 @@ class Config
             $this->config['logging']['level'] = $level;
             unset($this->config['debug_mode']);
             $this->saveConfig();
+            $this->saveEnvLogLevel($level);
         }
+    }
+
+    private function saveEnvLogLevel(string $level): void
+    {
+        $envFile = $this->basePath . '/.env';
+
+        if (!file_exists($envFile)) {
+            return;
+        }
+
+        $content = file_get_contents($envFile);
+        $pattern = '/^LOG_LEVEL=.*$/m';
+
+        if (preg_match($pattern, $content)) {
+            $content = preg_replace($pattern, "LOG_LEVEL=$level", $content);
+        } else {
+            $content .= "\nLOG_LEVEL=$level\n";
+        }
+
+        file_put_contents($envFile, $content);
     }
 
     public function getMaxFileSize(): int
