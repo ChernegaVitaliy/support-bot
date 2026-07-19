@@ -73,7 +73,9 @@ class SetRankCommand extends Command
         try {
             $telegram = $this->container->get(TelegramService::class);
             $translator = $this->container->get(Translator::class);
-            $message = $translator->translate('admin.rank.notification', 'uk', [$rank]);
+            $db = $this->container->get(DatabaseService::class);
+            $language = $db->getUserLanguage((string)$userId) ?: 'uk';
+            $message = $translator->translate('admin.rank.notification', $language, [$rank]);
             $telegram->sendMessage($userId, $message);
             $output->writeln('<info>📨 Notification sent to user.</info>');
         } catch (\Exception $e) {

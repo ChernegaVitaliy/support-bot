@@ -76,7 +76,9 @@ class RemoveAdminCommand extends Command
         try {
             $telegram = $this->container->get(TelegramService::class);
             $translator = $this->container->get(Translator::class);
-            $message = $translator->translate('admin.remove.notification', 'uk');
+            $db = $this->container->get(DatabaseService::class);
+            $language = $db->getUserLanguage((string)$userId) ?: 'uk';
+            $message = $translator->translate('admin.remove.notification', $language);
             $telegram->sendMessage($userId, $message);
             $output->writeln('<info>📨 Notification sent to user.</info>');
         } catch (\Exception $e) {

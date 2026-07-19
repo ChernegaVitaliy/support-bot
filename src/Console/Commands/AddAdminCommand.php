@@ -94,7 +94,9 @@ class AddAdminCommand extends Command
         try {
             $telegram = $this->container->get(TelegramService::class);
             $translator = $this->container->get(Translator::class);
-            $message = $translator->translate('admin.add.notification', 'uk', [$rank]);
+            $db = $this->container->get(DatabaseService::class);
+            $language = $db->getUserLanguage((string)$userId) ?: 'uk';
+            $message = $translator->translate('admin.add.notification', $language, [$rank]);
             $telegram->sendMessage($userId, $message);
             $output->writeln('<info>📨 Notification sent to user.</info>');
         } catch (\Exception $e) {
