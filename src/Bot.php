@@ -889,7 +889,7 @@ class Bot
         }
     }
 
-    private function handleDebugCallback(string $callbackData, string $chatId, int $messageId, string $language, string $userId): void
+    private function handleDebugCallback(string $callbackData, string $chatId, int $messageId, string $language, string $userId, string $callbackQueryId): void
     {
         if (!$this->db->isAdmin($userId)) {
             return;
@@ -903,21 +903,27 @@ class Bot
         if (count($parts) >= 3 && $parts[0] === 'debug' && $parts[1] === 'set') {
             $newLevel = $parts[2];
             $config = $this->container->get('config');
-            $config->setLogLevel($newLevel);
+            $oldLevel = $config->getLogLevel();
 
-            $currentLevel = $config->getLogLevel();
-            $keyboard = $this->buildDebugKeyboard($currentLevel, $language);
+            if ($newLevel !== $oldLevel) {
+                $config->setLogLevel($newLevel);
 
-            $this->telegram->editMessageText($chatId, $messageId,
-                $this->translator->translate('admin.debug.current', $language, [$currentLevel]),
-                'HTML',
-                $keyboard
-            );
+                $currentLevel = $config->getLogLevel();
+                $keyboard = $this->buildDebugKeyboard($currentLevel, $language);
 
-            $this->telegram->sendMessage($chatId,
-                $this->translator->translate('admin.debug.changed', $language, [$newLevel]),
-                'HTML'
-            );
+                $this->telegram->editMessageText($chatId, $messageId,
+                    $this->translator->translate('admin.debug.current', $language, [$currentLevel]),
+                    'HTML',
+                    $keyboard
+                );
+
+                $this->telegram->sendMessage($chatId,
+                    $this->translator->translate('admin.debug.changed', $language, [$newLevel]),
+                    'HTML'
+                );
+            } else {
+                $this->telegram->answerCallbackQuery($callbackQueryId, '');
+            }
         }
     }
 
@@ -1001,7 +1007,7 @@ class Bot
                 $this->handleProfileCallback($callbackData, $chatId, $messageId, $language);
                 break;
             case 'debug':
-                $this->handleDebugCallback($callbackData, $chatId, $messageId, $language, $userId);
+                $this->handleDebugCallback($callbackData, $chatId, $messageId, $language, $userId, $callbackQueryId);
                 break;
             default:
                 $this->logger->warning("Невідомий тип callback: $type");
