@@ -143,7 +143,9 @@
             "username": "📛 Nome utente: @%s",
             "language": "🌐 Lingua: %s",
             "joined": "📅 Dal: %s",
-            "rank": "🎖️ Grado: %s"
+            "rank": "🎖️ Grado: %s",
+            "usage": "❌ Utilizzo: /profile [id|@username] — visualizza il tuo profilo o (per gli admin) il profilo di un altro utente",
+            "other_title": "📋 <b>Profilo utente:</b>"
         },
         "descriptions": {
             "start": "Inizia a usare il bot",
@@ -206,10 +208,10 @@
             "notification": "🎉 Il tuo grado è stato aggiornato a: %s"
         },
         "debug": {
-             "title": "🔧 Modalità registrazione",
-             "current": "🔧 Livello di registrazione attuale: <b>%s</b>",
-             "changed": "🔧 Livello di registrazione modificato in: <b>%s</b>",
-             "invalid": "❌ Livello sconosciuto. Disponibili: %s"
+            "title": "🔧 Modalità registrazione",
+            "current": "🔧 Livello di registrazione attuale: <b>%s</b>",
+            "changed": "🔧 Livello di registrazione modificato in: <b>%s</b>",
+            "invalid": "❌ Livello sconosciuto. Disponibili: %s"
         },
         "broadcast": {
             "title": "📢 Sistema di trasmissione",

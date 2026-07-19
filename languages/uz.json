@@ -143,7 +143,9 @@
             "username": "📛 Foydalanuvchi nomi: @%s",
             "language": "🌐 Til: %s",
             "joined": "📅 Dan: %s",
-            "rank": "🎖️ Daraja: %s"
+            "rank": "🎖️ Daraja: %s",
+            "usage": "❌ Foydalanish: /profile [id|@username] — o'z profilingizni yoki (adminlar uchun) boshqa foydalanuvchi profilini ko'rish",
+            "other_title": "📋 <b>Foydalanuvchi profili:</b>"
         },
         "descriptions": {
             "start": "Bot bilan ishlashni boshlash",
@@ -206,10 +208,10 @@
             "notification": "🎉 Sizning darajangiz quyiga yangilandi: %s"
         },
         "debug": {
-             "title": "🔧 Loglash rejimi",
-             "current": "🔧 Joriy loglash darajasi: <b>%s</b>",
-             "changed": "🔧 Loglash darajasi quyiga o'zgartirildi: <b>%s</b>",
-             "invalid": "❌ Noma'lum daraja. Mavjud: %s"
+            "title": "🔧 Loglash rejimi",
+            "current": "🔧 Joriy loglash darajasi: <b>%s</b>",
+            "changed": "🔧 Loglash darajasi quyiga o'zgartirildi: <b>%s</b>",
+            "invalid": "❌ Noma'lum daraja. Mavjud: %s"
         },
         "broadcast": {
             "title": "📢 E'lon tizimi",

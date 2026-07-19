@@ -143,7 +143,9 @@
             "username": "📛 Gebruikersnaam: @%s",
             "language": "🌐 Taal: %s",
             "joined": "📅 Sinds: %s",
-            "rank": "🎖️ Rang: %s"
+            "rank": "🎖️ Rang: %s",
+            "usage": "❌ Gebruik: /profile [id|@username] — bekijk je eigen profiel of (voor admins) profiel van een andere gebruiker",
+            "other_title": "📋 <b>Gebruikersprofiel:</b>"
         },
         "descriptions": {
             "start": "Begin met de bot",
@@ -206,10 +208,10 @@
             "notification": "🎉 Je rang is gewijzigd naar: %s"
         },
         "debug": {
-             "title": "🔧 Logmodus",
-             "current": "🔧 Huidig logniveau: <b>%s</b>",
-             "changed": "🔧 Logniveau gewijzigd naar: <b>%s</b>",
-             "invalid": "❌ Onbekend niveau. Beschikbaar: %s"
+            "title": "🔧 Logmodus",
+            "current": "🔧 Huidig logniveau: <b>%s</b>",
+            "changed": "🔧 Logniveau gewijzigd naar: <b>%s</b>",
+            "invalid": "❌ Onbekend niveau. Beschikbaar: %s"
         },
         "broadcast": {
             "title": "📢 Uitzendsysteem",

@@ -143,7 +143,9 @@
             "username": "📛 Nom d'utilisateur : @%s",
             "language": "🌐 Langue : %s",
             "joined": "📅 Depuis : %s",
-            "rank": "🎖️ Rang : %s"
+            "rank": "🎖️ Rang : %s",
+            "usage": "❌ Utilisation : /profile [id|@username] — afficher votre propre profil ou (pour les admins) le profil d'un autre utilisateur",
+            "other_title": "📋 <b>Profil utilisateur :</b>"
         },
         "descriptions": {
             "start": "Commencer avec le bot",
@@ -206,10 +208,10 @@
             "notification": "🎉 Votre rang a été mis à jour : %s"
         },
         "debug": {
-             "title": "🔧 Mode journalisation",
-             "current": "🔧 Niveau de journalisation actuel : <b>%s</b>",
-             "changed": "🔧 Niveau de journalisation changé en : <b>%s</b>",
-             "invalid": "❌ Niveau inconnu. Disponibles : %s"
+            "title": "🔧 Mode journalisation",
+            "current": "🔧 Niveau de journalisation actuel : <b>%s</b>",
+            "changed": "🔧 Niveau de journalisation changé en : <b>%s</b>",
+            "invalid": "❌ Niveau inconnu. Disponibles : %s"
         },
         "broadcast": {
             "title": "📢 Système de diffusion",

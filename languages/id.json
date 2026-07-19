@@ -143,7 +143,9 @@
             "username": "📛 Nama pengguna: @%s",
             "language": "🌐 Bahasa: %s",
             "joined": "📅 Sejak: %s",
-            "rank": "🎖️ Pangkat: %s"
+            "rank": "🎖️ Pangkat: %s",
+            "usage": "❌ Penggunaan: /profile [id|@username] — lihat profil Anda sendiri atau (untuk admin) profil pengguna lain",
+            "other_title": "📋 <b>Profil pengguna:</b>"
         },
         "descriptions": {
             "start": "Mulai menggunakan bot",
@@ -206,10 +208,10 @@
             "notification": "🎉 Pangkat Anda telah diperbarui menjadi: %s"
         },
         "debug": {
-             "title": "🔧 Mode pencatatan",
-             "current": "🔧 Level pencatatan saat ini: <b>%s</b>",
-             "changed": "🔧 Level pencatatan diubah menjadi: <b>%s</b>",
-             "invalid": "❌ Level tidak dikenal. Tersedia: %s"
+            "title": "🔧 Mode pencatatan",
+            "current": "🔧 Level pencatatan saat ini: <b>%s</b>",
+            "changed": "🔧 Level pencatatan diubah menjadi: <b>%s</b>",
+            "invalid": "❌ Level tidak dikenal. Tersedia: %s"
         },
         "broadcast": {
             "title": "📢 Sistem siaran",

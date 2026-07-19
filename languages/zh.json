@@ -143,7 +143,9 @@
             "username": "📛 用户名：@%s",
             "language": "🌐 语言：%s",
             "joined": "📅 加入时间：%s",
-            "rank": "🎖️ 等级：%s"
+            "rank": "🎖️ 等级：%s",
+            "usage": "❌ 用法：/profile [id|@username] — 查看您自己的资料或（管理员）查看其他用户的资料",
+            "other_title": "📋 <b>用户资料：</b>"
         },
         "descriptions": {
             "start": "开始使用机器人",
@@ -206,10 +208,10 @@
             "notification": "🎉 您的等级已更新为：%s"
         },
         "debug": {
-             "title": "🔧 日志模式",
-             "current": "🔧 当前日志级别：<b>%s</b>",
-             "changed": "🔧 日志级别已更改为：<b>%s</b>",
-             "invalid": "❌ 未知级别。可用：%s"
+            "title": "🔧 日志模式",
+            "current": "🔧 当前日志级别：<b>%s</b>",
+            "changed": "🔧 日志级别已更改为：<b>%s</b>",
+            "invalid": "❌ 未知级别。可用：%s"
         },
         "broadcast": {
             "title": "📢 广播系统",

@@ -143,7 +143,9 @@
             "username": "📛 Používateľské meno: @%s",
             "language": "🌐 Jazyk: %s",
             "joined": "📅 Od: %s",
-            "rank": "🎖️ Hodnosť: %s"
+            "rank": "🎖️ Hodnosť: %s",
+            "usage": "❌ Použitie: /profile [id|@username] — zobraziť vlastný profil alebo (pre administrátorov) profil iného používateľa",
+            "other_title": "📋 <b>Profil používateľa:</b>"
         },
         "descriptions": {
             "start": "Začať používať bota",
@@ -206,10 +208,10 @@
             "notification": "🎉 Vaša hodnosť bola aktualizovaná na: %s"
         },
         "debug": {
-             "title": "🔧 Režim logovania",
-             "current": "🔧 Aktuálna úroveň logovania: <b>%s</b>",
-             "changed": "🔧 Úroveň logovania zmenená na: <b>%s</b>",
-             "invalid": "❌ Neznáma úroveň. Dostupné: %s"
+            "title": "🔧 Režim logovania",
+            "current": "🔧 Aktuálna úroveň logovania: <b>%s</b>",
+            "changed": "🔧 Úroveň logovania zmenená na: <b>%s</b>",
+            "invalid": "❌ Neznáma úroveň. Dostupné: %s"
         },
         "broadcast": {
             "title": "📢 Systém vysielania",

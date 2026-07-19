@@ -143,7 +143,9 @@
             "username": "📛 Nom d'usuari: @%s",
             "language": "🌐 Idioma: %s",
             "joined": "📅 Des de: %s",
-            "rank": "🎖️ Rang: %s"
+            "rank": "🎖️ Rang: %s",
+            "usage": "❌ Ús: /profile [id|@username] — veure el teu perfil o (per a admins) el perfil d'un altre usuari",
+            "other_title": "📋 <b>Perfil d'usuari:</b>"
         },
         "descriptions": {
             "start": "Comença a fer servir el bot",
@@ -206,10 +208,10 @@
             "notification": "🎉 El teu rang s'ha actualitzat a: %s"
         },
         "debug": {
-             "title": "🔧 Mode de registre",
-             "current": "🔧 Nivell de registre actual: <b>%s</b>",
-             "changed": "🔧 Nivell de registre canviat a: <b>%s</b>",
-             "invalid": "❌ Nivell desconegut. Disponibles: %s"
+            "title": "🔧 Mode de registre",
+            "current": "🔧 Nivell de registre actual: <b>%s</b>",
+            "changed": "🔧 Nivell de registre canviat a: <b>%s</b>",
+            "invalid": "❌ Nivell desconegut. Disponibles: %s"
         },
         "broadcast": {
             "title": "📢 Sistema de difusió",

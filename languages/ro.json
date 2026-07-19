@@ -143,7 +143,9 @@
             "username": "📛 Nume de utilizator: @%s",
             "language": "🌐 Limbă: %s",
             "joined": "📅 Din: %s",
-            "rank": "🎖️ Rang: %s"
+            "rank": "🎖️ Rang: %s",
+            "usage": "❌ Utilizare: /profile [id|@username] — vizualizează-ți profilul sau (pentru administratori) profilul altui utilizator",
+            "other_title": "📋 <b>Profil utilizator:</b>"
         },
         "descriptions": {
             "start": "Începe să folosești botul",
@@ -206,10 +208,10 @@
             "notification": "🎉 Rangul tău a fost actualizat la: %s"
         },
         "debug": {
-             "title": "🔧 Mod de logare",
-             "current": "🔧 Nivel de logare curent: <b>%s</b>",
-             "changed": "🔧 Nivel de logare schimbat la: <b>%s</b>",
-             "invalid": "❌ Nivel necunoscut. Disponibile: %s"
+            "title": "🔧 Mod de logare",
+            "current": "🔧 Nivel de logare curent: <b>%s</b>",
+            "changed": "🔧 Nivel de logare schimbat la: <b>%s</b>",
+            "invalid": "❌ Nivel necunoscut. Disponibile: %s"
         },
         "broadcast": {
             "title": "📢 Sistem de difuzare",

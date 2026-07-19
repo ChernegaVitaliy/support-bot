@@ -143,7 +143,9 @@
             "username": "📛 Användarnamn: @%s",
             "language": "🌐 Språk: %s",
             "joined": "📅 Sedan: %s",
-            "rank": "🎖️ Rank: %s"
+            "rank": "🎖️ Rank: %s",
+            "usage": "❌ Användning: /profile [id|@username] — visa din egen profil eller (för administratörer) en annan användares profil",
+            "other_title": "📋 <b>Användarprofil:</b>"
         },
         "descriptions": {
             "start": "Börja arbeta med boten",
@@ -206,10 +208,10 @@
             "notification": "🎉 Din rank har uppdaterats till: %s"
         },
         "debug": {
-             "title": "🔧 Loggningsläge",
-             "current": "🔧 Aktuell loggningsnivå: <b>%s</b>",
-             "changed": "🔧 Loggningsnivå ändrad till: <b>%s</b>",
-             "invalid": "❌ Okänd nivå. Tillgängliga: %s"
+            "title": "🔧 Loggningsläge",
+            "current": "🔧 Aktuell loggningsnivå: <b>%s</b>",
+            "changed": "🔧 Loggningsnivå ändrad till: <b>%s</b>",
+            "invalid": "❌ Okänd nivå. Tillgängliga: %s"
         },
         "broadcast": {
             "title": "📢 Utskickssystem",

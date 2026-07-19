@@ -143,7 +143,9 @@
             "username": "📛 Benutzername: @%s",
             "language": "🌐 Sprache: %s",
             "joined": "📅 Seit: %s",
-            "rank": "🎖️ Rang: %s"
+            "rank": "🎖️ Rang: %s",
+            "usage": "❌ Nutzung: /profile [id|@username] — eigenes Profil anzeigen oder (für Admins) Profil eines anderen Benutzers",
+            "other_title": "📋 <b>Benutzerprofil:</b>"
         },
         "descriptions": {
             "start": "Mit dem Bot beginnen",
@@ -206,10 +208,10 @@
             "notification": "🎉 Dein Rang wurde geändert auf: %s"
         },
         "debug": {
-             "title": "🔧 Protokoll-Modus",
-             "current": "🔧 Aktuelles Protokoll-Level: <b>%s</b>",
-             "changed": "🔧 Protokoll-Level geändert auf: <b>%s</b>",
-             "invalid": "❌ Unbekannter Level. Verfügbar: %s"
+            "title": "🔧 Protokoll-Modus",
+            "current": "🔧 Aktuelles Protokoll-Level: <b>%s</b>",
+            "changed": "🔧 Protokoll-Level geändert auf: <b>%s</b>",
+            "invalid": "❌ Unbekannter Level. Verfügbar: %s"
         },
         "broadcast": {
             "title": "📢 Broadcast-System",

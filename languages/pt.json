@@ -143,7 +143,9 @@
             "username": "📛 Nome de usuário: @%s",
             "language": "🌐 Idioma: %s",
             "joined": "📅 Desde: %s",
-            "rank": "🎖️ Rank: %s"
+            "rank": "🎖️ Rank: %s",
+            "usage": "❌ Uso: /profile [id|@username] — visualize seu próprio perfil ou (para admins) o perfil de outro usuário",
+            "other_title": "📋 <b>Perfil de usuário:</b>"
         },
         "descriptions": {
             "start": "Começar a usar o bot",
@@ -206,10 +208,10 @@
             "notification": "🎉 Seu rank foi atualizado para: %s"
         },
         "debug": {
-             "title": "🔧 Modo de registro",
-             "current": "🔧 Nível de registro atual: <b>%s</b>",
-             "changed": "🔧 Nível de registro alterado para: <b>%s</b>",
-             "invalid": "❌ Nível desconhecido. Disponíveis: %s"
+            "title": "🔧 Modo de registro",
+            "current": "🔧 Nível de registro atual: <b>%s</b>",
+            "changed": "🔧 Nível de registro alterado para: <b>%s</b>",
+            "invalid": "❌ Nível desconhecido. Disponíveis: %s"
         },
         "broadcast": {
             "title": "📢 Sistema de transmissão",

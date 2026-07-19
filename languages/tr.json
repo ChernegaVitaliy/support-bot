@@ -143,7 +143,9 @@
             "username": "📛 Kullanıcı adı: @%s",
             "language": "🌐 Dil: %s",
             "joined": "📅 Beri: %s",
-            "rank": "🎖️ Rütbe: %s"
+            "rank": "🎖️ Rütbe: %s",
+            "usage": "❌ Kullanımı: /profile [id|@username] — kendi profilinizi görüntüleyin veya (yöneticiler için) başka bir kullanıcının profilini görüntüleyin",
+            "other_title": "📋 <b>Kullanıcı profili:</b>"
         },
         "descriptions": {
             "start": "Bot ile çalışmaya başla",
@@ -206,10 +208,10 @@
             "notification": "🎉 Rütbeniz şu şekilde güncellendi: %s"
         },
         "debug": {
-             "title": "🔧 Günlük kaydı modu",
-             "current": "🔧 Geçerli günlük kaydı seviyesi: <b>%s</b>",
-             "changed": "🔧 Günlük kaydı seviyesi şu şekilde değiştirildi: <b>%s</b>",
-             "invalid": "❌ Bilinmeyen seviye. Mevcut: %s"
+            "title": "🔧 Günlük kaydı modu",
+            "current": "🔧 Geçerli günlük kaydı seviyesi: <b>%s</b>",
+            "changed": "🔧 Günlük kaydı seviyesi şu şekilde değiştirildi: <b>%s</b>",
+            "invalid": "❌ Bilinmeyen seviye. Mevcut: %s"
         },
         "broadcast": {
             "title": "📢 Yayın sistemi",

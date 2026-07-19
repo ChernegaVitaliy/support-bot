@@ -143,7 +143,9 @@
             "username": "📛 Käyttäjänimi: @%s",
             "language": "🌐 Kieli: %s",
             "joined": "📅 Liittynyt: %s",
-            "rank": "🎖️ Arvo: %s"
+            "rank": "🎖️ Arvo: %s",
+            "usage": "❌ Käyttö: /profile [id|@käyttäjänimi] — näytä oma profiilisi tai (ylläpitäjille) toisen käyttäjän profiili",
+            "other_title": "📋 <b>Käyttäjän profiili:</b>"
         },
         "descriptions": {
             "start": "Aloita botin käyttö",
@@ -206,10 +208,10 @@
             "notification": "🎉 Arvosi on päivitetty: %s"
         },
         "debug": {
-             "title": "🔧 Lokitustila",
-             "current": "🔧 Nykyinen lokitaso: <b>%s</b>",
-             "changed": "🔧 Lokitaso muutettu: <b>%s</b>",
-             "invalid": "❌ Tuntematon taso. Saatavilla: %s"
+            "title": "🔧 Lokitustila",
+            "current": "🔧 Nykyinen lokitaso: <b>%s</b>",
+            "changed": "🔧 Lokitaso muutettu: <b>%s</b>",
+            "invalid": "❌ Tuntematon taso. Saatavilla: %s"
         },
         "broadcast": {
             "title": "📢 Lähetysjärjestelmä",

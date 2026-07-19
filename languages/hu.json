@@ -143,7 +143,9 @@
             "username": "📛 Felhasználónév: @%s",
             "language": "🌐 Nyelv: %s",
             "joined": "📅 Résztvevő: %s",
-            "rank": "🎖️ Rang: %s"
+            "rank": "🎖️ Rang: %s",
+            "usage": "❌ Használat: /profile [id|@username] — saját profil megtekintése vagy (adminoknak) másik felhasználó profilja",
+            "other_title": "📋 <b>Felhasználói profil:</b>"
         },
         "descriptions": {
             "start": "A bot használatának megkezdése",
@@ -206,10 +208,10 @@
             "notification": "🎉 A rangod frissítve erre: %s"
         },
         "debug": {
-             "title": "🔧 Naplózási mód",
-             "current": "🔧 Jelenlegi naplózási szint: <b>%s</b>",
-             "changed": "🔧 Naplózási szint megváltoztatva erre: <b>%s</b>",
-             "invalid": "❌ Ismeretlen szint. Elérhető: %s"
+            "title": "🔧 Naplózási mód",
+            "current": "🔧 Jelenlegi naplózási szint: <b>%s</b>",
+            "changed": "🔧 Naplózási szint megváltoztatva erre: <b>%s</b>",
+            "invalid": "❌ Ismeretlen szint. Elérhető: %s"
         },
         "broadcast": {
             "title": "📢 Közvetítő rendszer",

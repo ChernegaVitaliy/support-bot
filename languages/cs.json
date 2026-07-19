@@ -143,7 +143,9 @@
             "username": "📛 Uživatelské jméno: @%s",
             "language": "🌐 Jazyk: %s",
             "joined": "📅 Od: %s",
-            "rank": "🎖️ Hodnost: %s"
+            "rank": "🎖️ Hodnost: %s",
+            "usage": "❌ Použití: /profile [id|@username] — zobrazit svůj profil nebo (pro administrátory) profil jiného uživatele",
+            "other_title": "📋 <b>Profil uživatele:</b>"
         },
         "descriptions": {
             "start": "Začněte pracovat s botem",
@@ -206,10 +208,10 @@
             "notification": "🎉 Vaše hodnost byla změněna na: %s"
         },
         "debug": {
-             "title": "🔧 Režim logování",
-             "current": "🔧 Aktuální úroveň logování: <b>%s</b>",
-             "changed": "🔧 Úroveň logování změněna na: <b>%s</b>",
-             "invalid": "❌ Neznámá úroveň. Dostupné: %s"
+            "title": "🔧 Režim logování",
+            "current": "🔧 Aktuální úroveň logování: <b>%s</b>",
+            "changed": "🔧 Úroveň logování změněna na: <b>%s</b>",
+            "invalid": "❌ Neznámá úroveň. Dostupné: %s"
         },
         "broadcast": {
             "title": "📢 Systém hromadného rozesílání",

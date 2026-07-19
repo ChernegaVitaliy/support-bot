@@ -138,6 +138,8 @@
         },
         "profile": {
             "title": "📋 <b>Your profile:</b>",
+            "other_title": "📋 <b>User profile:</b>",
+            "usage": "❌ Usage: /profile [id|@username] — view your own profile or (for admins) another user's profile",
             "id": "🆔 ID: <code>%s</code>",
             "name": "👤 Name: %s",
             "username": "📛 Username: @%s",

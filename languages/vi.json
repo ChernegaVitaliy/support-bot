@@ -143,7 +143,9 @@
             "username": "📛 Tên người dùng: @%s",
             "language": "🌐 Ngôn ngữ: %s",
             "joined": "📅 Từ: %s",
-            "rank": "🎖️ Cấp bậc: %s"
+            "rank": "🎖️ Cấp bậc: %s",
+            "usage": "❌ Cách dùng: /profile [id|@username] — xem hồ sơ của bạn hoặc (đối với quản trị viên) hồ sơ người dùng khác",
+            "other_title": "📋 <b>Hồ sơ người dùng:</b>"
         },
         "descriptions": {
             "start": "Bắt đầu làm việc với bot",
@@ -206,10 +208,10 @@
             "notification": "🎉 Cấp bậc của bạn đã được cập nhật thành: %s"
         },
         "debug": {
-             "title": "🔧 Chế độ ghi log",
-             "current": "🔧 Mức ghi log hiện tại: <b>%s</b>",
-             "changed": "🔧 Mức ghi log đã đổi thành: <b>%s</b>",
-             "invalid": "❌ Mức không xác định. Có sẵn: %s"
+            "title": "🔧 Chế độ ghi log",
+            "current": "🔧 Mức ghi log hiện tại: <b>%s</b>",
+            "changed": "🔧 Mức ghi log đã đổi thành: <b>%s</b>",
+            "invalid": "❌ Mức không xác định. Có sẵn: %s"
         },
         "broadcast": {
             "title": "📢 Hệ thống gửi tin",
