@@ -26,6 +26,19 @@ class Logger implements LoggerInterface
         $this->logger->pushHandler(new StreamHandler($logFile, $level));
     }
 
+    /**
+     * Updates the active log level of the running logger immediately,
+     * without requiring a bot restart.
+     */
+    public function setLevel(string $logLevel): void
+    {
+        $level = $this->convertLogLevel($logLevel);
+        $this->debugMode = ($logLevel === 'DEBUG');
+
+        $this->logger = new MonologLogger('telegram-bot');
+        $this->logger->pushHandler(new StreamHandler($this->logFile, $level));
+    }
+
     private function ensureLogFileExists(): void
     {
         if (!file_exists($this->logFile)) {

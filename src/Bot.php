@@ -938,6 +938,7 @@ class Bot
 
             if ($newLevel !== $oldLevel) {
                 $config->setLogLevel($newLevel);
+                $this->container->get('logger')->setLevel($newLevel);
 
                 $currentLevel = $config->getLogLevel();
                 $keyboard = $this->buildDebugKeyboard($currentLevel, $language);

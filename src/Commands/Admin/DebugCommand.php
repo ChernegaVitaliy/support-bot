@@ -41,6 +41,7 @@ class DebugCommand extends BaseCommand
             $requestedLevel = strtoupper($parts[1]);
             if (in_array($requestedLevel, self::LOG_LEVELS)) {
                 $config->setLogLevel($requestedLevel);
+                $this->container->get('logger')->setLevel($requestedLevel);
                 $this->reply($chatId, $this->t('admin.debug.changed', $language, [$requestedLevel]));
                 return;
             } else {
