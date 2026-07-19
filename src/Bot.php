@@ -889,8 +889,12 @@ class Bot
         }
     }
 
-    private function handleDebugCallback(string $callbackData, string $chatId, int $messageId, string $language): void
+    private function handleDebugCallback(string $callbackData, string $chatId, int $messageId, string $language, string $userId): void
     {
+        if (!$this->db->isAdmin($userId)) {
+            return;
+        }
+
         $parts = explode('_', $callbackData);
         if (count($parts) >= 3 && $parts[0] === 'debug' && $parts[1] === 'set') {
             $newLevel = $parts[2];
@@ -993,7 +997,7 @@ class Bot
                 $this->handleProfileCallback($callbackData, $chatId, $messageId, $language);
                 break;
             case 'debug':
-                $this->handleDebugCallback($callbackData, $chatId, $messageId, $language);
+                $this->handleDebugCallback($callbackData, $chatId, $messageId, $language, $userId);
                 break;
             default:
                 $this->logger->warning("Невідомий тип callback: $type");
