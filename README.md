@@ -68,7 +68,6 @@ src/
 │       ├── AdminListCommand.php
 │       ├── BroadcastCommand.php
 │       ├── FindUserCommand.php
-│       ├── HelloCommand.php
 │       ├── RemoveAdminCommand.php
 │       ├── RunCommand.php
 │       ├── SetRankCommand.php
@@ -121,17 +120,16 @@ src/
 ## Console Commands
 
 While the bot is running, you can use console commands:
-- `help` - Help
-- `hello` - Hello world
+- `help` - Show help for console commands
 - `stats` - Statistics
-- `version` - Show version
+- `app:version` - Show version
 - `admin:list` - List of admins
 - `admin:add <username/id> [rank]` - Add admin
 - `admin:remove <username/id>` - Remove admin
-- `admin:setrank <username/id> <rank>` - Change rank
+- `admin:rank <username/id> <rank>` - Change rank
 - `broadcast` - Broadcast message
-- `find-user <query>` - Find user
-- `setup` - Setup bot
+- `user:find <query>` - Find user by ID, username or name
+- `bot:setup` - Setup bot
 - `app:run` - Run the bot
 
 ## Adding New Commands
