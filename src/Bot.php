@@ -895,6 +895,10 @@ class Bot
             return;
         }
 
+        if ($this->db->getAdminRank($userId) !== 'owner') {
+            return;
+        }
+
         $parts = explode('_', $callbackData);
         if (count($parts) >= 3 && $parts[0] === 'debug' && $parts[1] === 'set') {
             $newLevel = $parts[2];
