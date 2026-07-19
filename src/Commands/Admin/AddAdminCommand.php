@@ -93,7 +93,8 @@ class AddAdminCommand extends BaseCommand
             
             // Notify new admin
             try {
-                $this->telegram->sendMessage($user['user_id'], $this->t('admin.add.notification', $language, [$rank]));
+                $targetLanguage = $this->db->getUserLanguage((string)$user['user_id']) ?: 'uk';
+                $this->telegram->sendMessage($user['user_id'], $this->t('admin.add.notification', $targetLanguage, [$rank]));
             } catch (\Exception $e) {
                 // Ignore if cannot send message
             }

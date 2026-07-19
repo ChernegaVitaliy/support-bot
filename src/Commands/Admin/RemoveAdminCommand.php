@@ -73,7 +73,8 @@ class RemoveAdminCommand extends BaseCommand
             $this->reply($chatId, $this->t('admin.remove.success', $language));
              // Notify removed admin
             try {
-                $this->telegram->sendMessage($admin['user_id'], $this->t('admin.remove.notification', $language));
+                $targetLanguage = $this->db->getUserLanguage((string)$admin['user_id']) ?: 'uk';
+                $this->telegram->sendMessage($admin['user_id'], $this->t('admin.remove.notification', $targetLanguage));
             } catch (\Exception $e) {
                 // Ignore
             }

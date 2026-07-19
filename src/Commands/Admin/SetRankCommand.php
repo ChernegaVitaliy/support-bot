@@ -81,7 +81,8 @@ class SetRankCommand extends BaseCommand
             $this->reply($chatId, $this->t('admin.rank.success', $language, [$newRank]));
              // Notify user
             try {
-                $this->telegram->sendMessage($admin['user_id'], $this->t('admin.rank.notification', $language, [$newRank]));
+                $targetLanguage = $this->db->getUserLanguage((string)$admin['user_id']) ?: 'uk';
+                $this->telegram->sendMessage($admin['user_id'], $this->t('admin.rank.notification', $targetLanguage, [$newRank]));
             } catch (\Exception $e) {
                 // Ignore
             }
