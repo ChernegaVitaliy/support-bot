@@ -920,7 +920,7 @@ class Bot
 
         foreach ($levels as $level) {
             $indicator = ($level === $currentLevel) ? '✅ ' : '';
-            $buttons[] = ['text' => $indicator . $level, 'callback_data' => "debug_set_{$level}"];
+            $buttons[] = ['text' => $indicator . $level, 'callback_data' => "debug_set_$level"];
         }
 
         return new \TelegramBot\Api\Types\Inline\InlineKeyboardMarkup([$buttons]);
@@ -960,6 +960,8 @@ class Bot
         } elseif ($type === 'report' || $type === 'accept' || $type === 'reject') {
             $hasSession = $this->sessionManager->hasReportSession($userId) ||
                           $this->sessionManager->hasAdminActionSession($userId);
+        } elseif ($type === 'debug') {
+            $hasSession = true;
         }
 
         if (!$hasSession) {
