@@ -1006,7 +1006,7 @@ class Bot
             $hasSession = $this->sessionManager->hasReportSession($userId) ||
                           $this->sessionManager->hasAdminActionSession($userId);
         } elseif ($type === 'debug') {
-            $hasSession = true;
+            $hasSession = $this->db->isAdmin($userId) && $this->db->getAdminRank($userId) === 'owner';
         }
 
         if (!$hasSession) {
