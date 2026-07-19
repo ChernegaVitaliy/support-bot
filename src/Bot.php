@@ -1033,7 +1033,7 @@ class Bot
             case 'profile':
                 return $this->translator->translate('callbacks.profile_updated', $language);
             case 'debug':
-                return '';
+                return $this->translator->translate('callbacks.processed', $language);
             default:
                 return $this->translator->translate('callbacks.processed', $language);
         }
