@@ -10,9 +10,7 @@ services:
 
     App\Services\Logger:
         public: true
-        arguments:
-            $logFile: '%env(LOG_FILE)%'
-            $logLevel: '%env(LOG_LEVEL)%'
+        factory: ['@App\Config\Config', 'createLogger']
 
     App\Services\DatabaseService:
         public: true

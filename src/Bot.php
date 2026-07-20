@@ -30,6 +30,7 @@ class Bot
 
         $this->config = $container->get('config');
         $this->logger = $container->get('logger');
+        $this->logger->setLevel($this->config->getLogLevel());
         $this->db = $container->get('db');
         $this->telegram = $container->get('telegram');
         $this->translator = $container->get('translator');

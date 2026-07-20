@@ -6,3 +6,5 @@ framework:
     secret: 'change_me_in_production'
     session:
         enabled: true
+    php_errors:
+        log: false

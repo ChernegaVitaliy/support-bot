@@ -137,9 +137,14 @@ class Config
         return $this->getEnv('LOG_FILE', 'bot.log');
     }
 
+    public function createLogger(): \App\Services\Logger
+    {
+        return new \App\Services\Logger($this->getLogFile(), $this->getLogLevel());
+    }
+
     public function getLogLevel(): string
     {
-        return $this->getEnv('LOG_LEVEL', 'INFO');
+        return $this->get('logging.level', 'INFO');
     }
 
     public function toggleLogLevel(): string
@@ -158,28 +163,7 @@ class Config
             $this->config['logging']['level'] = $level;
             unset($this->config['debug_mode']);
             $this->saveConfig();
-            $this->saveEnvLogLevel($level);
         }
-    }
-
-    private function saveEnvLogLevel(string $level): void
-    {
-        $envFile = $this->basePath . '/.env';
-
-        if (!file_exists($envFile)) {
-            return;
-        }
-
-        $content = file_get_contents($envFile);
-        $pattern = '/^LOG_LEVEL=.*$/m';
-
-        if (preg_match($pattern, $content)) {
-            $content = preg_replace($pattern, "LOG_LEVEL=$level", $content);
-        } else {
-            $content .= "\nLOG_LEVEL=$level\n";
-        }
-
-        file_put_contents($envFile, $content);
     }
 
     public function getMaxFileSize(): int

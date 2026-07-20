@@ -12,18 +12,15 @@ class Logger implements LoggerInterface
     private MonologLogger $logger;
     private bool $debugMode;
     private string $logFile;
+    private Level $currentLevel;
 
     public function __construct(string $logFile, string $logLevel = 'INFO')
     {
         $this->logFile = $logFile;
-        $this->debugMode = ($logLevel === 'DEBUG');
 
         $this->ensureLogFileExists();
 
-        $level = $this->convertLogLevel($logLevel);
-
-        $this->logger = new MonologLogger('telegram-bot');
-        $this->logger->pushHandler(new StreamHandler($logFile, $level));
+        $this->applyLevel($logLevel);
     }
 
     /**
@@ -32,11 +29,22 @@ class Logger implements LoggerInterface
      */
     public function setLevel(string $logLevel): void
     {
+        $this->applyLevel($logLevel);
+    }
+
+    private function applyLevel(string $logLevel): void
+    {
         $level = $this->convertLogLevel($logLevel);
         $this->debugMode = ($logLevel === 'DEBUG');
+        $this->currentLevel = $level;
 
         $this->logger = new MonologLogger('telegram-bot');
         $this->logger->pushHandler(new StreamHandler($this->logFile, $level));
+    }
+
+    private function isHandling(Level $level): bool
+    {
+        return $level->value >= $this->currentLevel->value;
     }
 
     private function ensureLogFileExists(): void
@@ -64,55 +72,75 @@ class Logger implements LoggerInterface
 
     public function debug(string|\Stringable $message, array $context = []): void
     {
-        if (!$this->debugMode) {
-            return;
+        if ($this->isHandling(Level::Debug)) {
+            $this->logger->debug($message, $context);
         }
-        $this->logger->debug($message, $context);
         $this->outputToConsole('DEBUG', (string)$message, "\033[0;36m");
     }
 
     public function info(string|\Stringable $message, array $context = []): void
     {
-        $this->logger->info($message, $context);
+        if ($this->isHandling(Level::Info)) {
+            $this->logger->info($message, $context);
+        }
         $this->outputToConsole('INFO', (string)$message, "\033[0;32m");
     }
 
     public function warning(string|\Stringable $message, array $context = []): void
     {
-        $this->logger->warning($message, $context);
+        if ($this->isHandling(Level::Warning)) {
+            $this->logger->warning($message, $context);
+        }
         $this->outputToConsole('WARNING', (string)$message, "\033[1;33m");
     }
 
     public function error(string|\Stringable $message, array $context = []): void
     {
-        $this->logger->error($message, $context);
+        if ($this->isHandling(Level::Error)) {
+            $this->logger->error($message, $context);
+        }
         $this->outputToConsole('ERROR', (string)$message, "\033[1;35m");
     }
 
     public function emergency(string|\Stringable $message, array $context = []): void
     {
-        $this->logger->emergency($message, $context);
+        if ($this->isHandling(Level::Emergency)) {
+            $this->logger->emergency($message, $context);
+        }
+        $this->outputToConsole('EMERGENCY', (string)$message, "\033[1;35m");
     }
 
     public function alert(string|\Stringable $message, array $context = []): void
     {
-        $this->logger->critical($message, $context);
+        if ($this->isHandling(Level::Alert)) {
+            $this->logger->critical($message, $context);
+        }
         $this->outputToConsole('ALERT', (string)$message, "\033[1;35m");
     }
 
     public function critical(string|\Stringable $message, array $context = []): void
     {
-        $this->logger->critical($message, $context);
+        if ($this->isHandling(Level::Critical)) {
+            $this->logger->critical($message, $context);
+        }
+        $this->outputToConsole('CRITICAL', (string)$message, "\033[1;35m");
     }
 
     public function notice(string|\Stringable $message, array $context = []): void
     {
-        $this->logger->notice($message, $context);
+        if ($this->isHandling(Level::Notice)) {
+            $this->logger->notice($message, $context);
+        }
+        $this->outputToConsole('NOTICE', (string)$message, "\033[0;32m");
     }
 
     public function log($level, string|\Stringable $message, array $context = []): void
     {
-        $this->logger->log($level, $message, $context);
+        $monologLevel = $this->convertLogLevel((string)$level);
+        if ($this->isHandling($monologLevel)) {
+            $this->logger->log($level, $message, $context);
+        }
+        $this->outputToConsole((string)$level, (string)$message, "\033[0;37m");
     }
 
     public function __call(string $name, array $arguments): void
