@@ -13,10 +13,10 @@ class Translator implements TranslatorInterface, LocaleAwareInterface
     private string $defaultLanguage = 'uk';
 
     private array $supportedLanguages = [
-        'uk', 'ru', 'en', 'es', 'de', 'fr', 'it', 'pt', 'zh', 'zh_TW', 'ja',
-        'ko', 'ar', 'fa', 'tr', 'pl', 'nl', 'cs', 'sr', 'bg', 'ro',
-        'hu', 'fi', 'sv', 'da', 'nb', 'hi', 'id', 'vi', 'th', 'el',
-        'he', 'hr', 'sk', 'uz', 'ms', 'kk', 'ca', 'be'
+        'uk', 'en', 'es', 'de', 'fr', 'it', 'pt', 'zh', 'zh_TW', 'ko',
+        'ar', 'fa', 'tr', 'pl', 'nl', 'cs', 'sr', 'ro',
+        'hu', 'fi', 'sv', 'nb', 'id', 'vi',
+        'he', 'hr', 'sk', 'uz', 'ms', 'kk', 'ca'
     ];
 
     private array $languageAliases = [
