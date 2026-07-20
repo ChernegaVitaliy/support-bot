@@ -72,75 +72,58 @@ class Logger implements LoggerInterface
 
     public function debug(string|\Stringable $message, array $context = []): void
     {
-        if ($this->isHandling(Level::Debug)) {
-            $this->logger->debug($message, $context);
-        }
-        $this->outputToConsole('DEBUG', (string)$message, "\033[0;36m");
+        $this->write(Level::Debug, fn() => $this->logger->debug($message, $context), 'DEBUG', (string)$message, "\033[0;36m");
     }
 
     public function info(string|\Stringable $message, array $context = []): void
     {
-        if ($this->isHandling(Level::Info)) {
-            $this->logger->info($message, $context);
-        }
-        $this->outputToConsole('INFO', (string)$message, "\033[0;32m");
+        $this->write(Level::Info, fn() => $this->logger->info($message, $context), 'INFO', (string)$message, "\033[0;32m");
     }
 
     public function warning(string|\Stringable $message, array $context = []): void
     {
-        if ($this->isHandling(Level::Warning)) {
-            $this->logger->warning($message, $context);
-        }
-        $this->outputToConsole('WARNING', (string)$message, "\033[1;33m");
+        $this->write(Level::Warning, fn() => $this->logger->warning($message, $context), 'WARNING', (string)$message, "\033[1;33m");
     }
 
     public function error(string|\Stringable $message, array $context = []): void
     {
-        if ($this->isHandling(Level::Error)) {
-            $this->logger->error($message, $context);
-        }
-        $this->outputToConsole('ERROR', (string)$message, "\033[1;35m");
+        $this->write(Level::Error, fn() => $this->logger->error($message, $context), 'ERROR', (string)$message, "\033[1;35m");
     }
 
     public function emergency(string|\Stringable $message, array $context = []): void
     {
-        if ($this->isHandling(Level::Emergency)) {
-            $this->logger->emergency($message, $context);
-        }
-        $this->outputToConsole('EMERGENCY', (string)$message, "\033[1;35m");
+        $this->write(Level::Emergency, fn() => $this->logger->emergency($message, $context), 'EMERGENCY', (string)$message, "\033[1;35m");
     }
 
     public function alert(string|\Stringable $message, array $context = []): void
     {
-        if ($this->isHandling(Level::Alert)) {
-            $this->logger->critical($message, $context);
-        }
-        $this->outputToConsole('ALERT', (string)$message, "\033[1;35m");
+        $this->write(Level::Alert, fn() => $this->logger->critical($message, $context), 'ALERT', (string)$message, "\033[1;35m");
     }
 
     public function critical(string|\Stringable $message, array $context = []): void
     {
-        if ($this->isHandling(Level::Critical)) {
-            $this->logger->critical($message, $context);
-        }
-        $this->outputToConsole('CRITICAL', (string)$message, "\033[1;35m");
+        $this->write(Level::Critical, fn() => $this->logger->critical($message, $context), 'CRITICAL', (string)$message, "\033[1;35m");
     }
 
     public function notice(string|\Stringable $message, array $context = []): void
     {
-        if ($this->isHandling(Level::Notice)) {
-            $this->logger->notice($message, $context);
-        }
-        $this->outputToConsole('NOTICE', (string)$message, "\033[0;32m");
+        $this->write(Level::Notice, fn() => $this->logger->notice($message, $context), 'NOTICE', (string)$message, "\033[0;32m");
     }
 
     public function log($level, string|\Stringable $message, array $context = []): void
     {
         $monologLevel = $this->convertLogLevel((string)$level);
-        if ($this->isHandling($monologLevel)) {
-            $this->logger->log($level, $message, $context);
+        $this->write($monologLevel, fn() => $this->logger->log($level, $message, $context), (string)$level, (string)$message, "\033[0;37m");
+    }
+
+    private function write(Level $level, callable $fileWrite, string $label, string $message, string $color): void
+    {
+        if (!$this->isHandling($level)) {
+            return;
         }
-        $this->outputToConsole((string)$level, (string)$message, "\033[0;37m");
+
+        $fileWrite();
+        $this->outputToConsole($label, $message, $color);
     }
 
     public function __call(string $name, array $arguments): void
