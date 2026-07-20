@@ -33,6 +33,17 @@ DEFAULT_OWNER_ID=your_telegram_id
 php console app:run
 ```
 
+## Run Mini App
+
+The Mini App is a Symfony web application (controllers under `src/Controller/`).
+Start the local web server with the built-in PHP server:
+
+```bash
+php -S 127.0.0.1:8000 -t public
+```
+
+Then open `https://127.0.0.1:8000`.
+
 ## Project Structure
 
 ```
