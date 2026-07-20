@@ -39,10 +39,10 @@ The Mini App is a Symfony web application (controllers under `src/Controller/`).
 Start the local web server with the built-in PHP server:
 
 ```bash
-php -S 127.0.0.1:8000 -t public
+php -S 127.0.0.1:8080 -t public public/index.php
 ```
 
-Then open `https://127.0.0.1:8000`.
+Then open `https://127.0.0.1:8080`.
 
 ## Project Structure
 
