@@ -47,61 +47,62 @@ Then open `https://127.0.0.1:8080`.
 ## Project Structure
 
 ```
-src/
-├── Bot.php                    - Main bot class
-├── Config/
-│   └── Config.php             - Configuration
-├── Commands/
-│   ├── BaseCommand.php        - Base command class
-│   ├── AboutCommand.php
-│   ├── CancelCommand.php
-│   ├── HelpCommand.php
-│   ├── MyIdCommand.php
-│   ├── MyRankCommand.php
-│   ├── ProfileCommand.php
-│   ├── ReportCommand.php
-│   ├── StartCommand.php
-│   ├── StatsCommand.php
-│   └── Admin/
-│       ├── AcceptReportCommand.php
-│       ├── AddAdminCommand.php
-│       ├── AdminListCommand.php
-│       ├── BroadcastCommand.php
-│       ├── DebugCommand.php
-│       ├── RejectReportCommand.php
-│       ├── RemoveAdminCommand.php
-│       ├── ReportsCommand.php
-│       └── SetRankCommand.php
-├── Console/
-│   ├── ServiceContainer.php
-│   └── Commands/
-│       ├── AddAdminCommand.php
-│       ├── AdminListCommand.php
-│       ├── BroadcastCommand.php
-│       ├── FindUserCommand.php
-│       ├── RemoveAdminCommand.php
-│       ├── RunCommand.php
-│       ├── SetRankCommand.php
-│       ├── SetupBotCommand.php
-│       ├── StatsCommand.php
-│       └── VersionCommand.php
-├── Handlers/
-│   ├── CallbackHandler.php
-│   └── SessionHandler.php
-├── Interfaces/
-│   └── CommandInterface.php
-├── Models/
-│   ├── Admin.php
-│   ├── Report.php
-│   └── User.php
-├── Services/
-│   ├── BroadcastService.php
-│   ├── DatabaseService.php
-│   ├── Logger.php
-│   ├── ReportService.php
-│   ├── SessionManager.php
-│   ├── TelegramService.php
-│   └── Translator.php
+support-bot/
++-- src/
+|   +-- Bot.php                       # Main bot class
+|   +-- Config/                       # Configuration
+|   |   \-- Config.php
+|   +-- Commands/                     # Base command class
+|   |   +-- BaseCommand.php
+|   |   +-- AboutCommand.php
+|   |   +-- CancelCommand.php
+|   |   +-- HelpCommand.php
+|   |   +-- MyIdCommand.php
+|   |   +-- MyRankCommand.php
+|   |   +-- ProfileCommand.php
+|   |   +-- ReportCommand.php
+|   |   +-- StartCommand.php
+|   |   +-- StatsCommand.php
+|   |   \-- Admin/
+|   |       +-- AcceptReportCommand.php
+|   |       +-- AddAdminCommand.php
+|   |       +-- AdminListCommand.php
+|   |       +-- BroadcastCommand.php
+|   |       +-- DebugCommand.php
+|   |       +-- RejectReportCommand.php
+|   |       +-- RemoveAdminCommand.php
+|   |       +-- ReportsCommand.php
+|   |       \-- SetRankCommand.php
+|   +-- Console/
+|   |   +-- ServiceContainer.php
+|   |   \-- Commands/
+|   |       +-- AddAdminCommand.php
+|   |       +-- AdminListCommand.php
+|   |       +-- BroadcastCommand.php
+|   |       +-- FindUserCommand.php
+|   |       +-- RemoveAdminCommand.php
+|   |       +-- RunCommand.php
+|   |       +-- SetRankCommand.php
+|   |       +-- SetupBotCommand.php
+|   |       +-- StatsCommand.php
+|   |       \-- VersionCommand.php
+|   +-- Handlers/
+|   |   +-- CallbackHandler.php
+|   |   \-- SessionHandler.php
+|   +-- Interfaces/
+|   |   \-- CommandInterface.php
+|   +-- Models/
+|   |   +-- Admin.php
+|   |   +-- Report.php
+|   |   \-- User.php
+|   \-- Services/
+|       +-- BroadcastService.php
+|       +-- DatabaseService.php
+|       +-- Logger.php
+|       +-- ReportService.php
+|       +-- SessionManager.php
+|       +-- TelegramService.php
+|       \-- Translator.php
 ```
 
 ## Commands
