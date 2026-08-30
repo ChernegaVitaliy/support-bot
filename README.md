@@ -1,4 +1,4 @@
-# Telegram Support Bot v3.0
+# Telegram Support Bot
 
 Telegram Support Bot is rewritten in clean OOP code using modern libraries.
 
