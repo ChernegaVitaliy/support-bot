@@ -10,8 +10,12 @@ services:
       LOG_FILE: /app/storage/bot.log
     volumes:
       - bot-storage:/app/storage
-    ports:
-      - "8081:8080"
+    networks:
+      - proxy-net
 
 volumes:
   bot-storage:
+
+networks:
+  proxy-net:
+    external: true
