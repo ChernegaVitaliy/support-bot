@@ -27,13 +27,15 @@ LOG_FILE=bot.log
 DEFAULT_OWNER_ID=your_telegram_id
 ```
 
-## Run
+## Running the Project
+
+### Local (console)
 
 ```bash
 php console app:run
 ```
 
-## Docker
+### Docker
 
 ```bash
 docker compose build
@@ -52,7 +54,7 @@ To stop:
 docker compose down
 ```
 
-## Run Mini App
+### Mini App
 
 The Mini App is a Symfony web application (controllers under `src/Controller/`).
 Start the local web server with the built-in PHP server:
@@ -124,9 +126,10 @@ support-bot/
 |       \-- Translator.php
 ```
 
-## Commands
+## Usage
 
-### User commands:
+### User Commands
+
 - `/start` - Start working with the bot
 - `/help` - Help
 - `/about` - About the bot
@@ -136,7 +139,8 @@ support-bot/
 - `/report` - Submit a report
 - `/cancel` - Cancel current action
 
-### Admin commands:
+### Admin Commands
+
 - `/stats` - Bot statistics
 - `/adminlist` - List of admins
 - `/addadmin <username/id> [rank]` - Add admin (admin+)
@@ -148,7 +152,7 @@ support-bot/
 - `/broadcast` - Broadcast message (owner only)
 - `/debug <level>` - Debug settings (owner only)
 
-## Console Commands
+### Console Commands
 
 While the bot is running, you can use console commands:
 - `help` - Show help for console commands
