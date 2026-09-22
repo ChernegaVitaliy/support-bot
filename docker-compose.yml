@@ -1,0 +1,17 @@
+services:
+  support-bot:
+    build: .
+    container_name: support-bot
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      DB_PATH: /app/storage/bot.db
+      LOG_FILE: /app/storage/bot.log
+    volumes:
+      - bot-storage:/app/storage
+    ports:
+      - "8081:8080"
+
+volumes:
+  bot-storage:
