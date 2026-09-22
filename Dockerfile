@@ -31,7 +31,7 @@ RUN mkdir -p /app/storage /app/var/cache /app/var/log /app/var/sessions \
     && chmod -R 777 /app/storage /app/var
 
 # Copy supervisor config
-COPY supervisord.conf /etc/supervisor/conf.d/support-bot.conf
+COPY supervisord.conf /etc/supervisord.conf
 
 EXPOSE 8080
 
