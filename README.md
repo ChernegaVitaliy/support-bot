@@ -132,42 +132,42 @@ support-bot/
 
 ### User Commands
 
-- `/start` - Start working with the bot
-- `/help` - Help
-- `/about` - About the bot
-- `/profile` - User profile
-- `/myid` - Show your Telegram ID
-- `/myrank` - Show your admin rank
-- `/report` - Submit a report
-- `/cancel` - Cancel current action
+- `/start` — Start working with the bot
+- `/help` — Help
+- `/about` — About the bot
+- `/profile` — User profile
+- `/myid` — Show your Telegram ID
+- `/myrank` — Show your admin rank
+- `/report` — Submit a report
+- `/cancel` — Cancel current action
 
 ### Admin Commands
 
-- `/stats` - Bot statistics
-- `/adminlist` - List of admins
-- `/addadmin <username/id> [rank]` - Add admin (admin+)
-- `/removeadmin <username/id>` - Remove admin (admin+)
-- `/setrank <username/id> <rank>` - Change rank (owner only)
-- `/reports [status]` - List of reports (moderator+)
-- `/accept <report_id> [comment]` - Accept report (moderator+)
-- `/reject <report_id> [reason]` - Reject report (moderator+)
-- `/broadcast` - Broadcast message (owner only)
-- `/debug <level>` - Debug settings (owner only)
+- `/stats` — Bot statistics
+- `/adminlist` — List of admins
+- `/addadmin <username/id> [rank]` — Add admin (admin+)
+- `/removeadmin <username/id>` — Remove admin (admin+)
+- `/setrank <username/id> <rank>` — Change rank (owner only)
+- `/reports [status]` — List of reports (moderator+)
+- `/accept <report_id> [comment]` — Accept report (moderator+)
+- `/reject <report_id> [reason]` — Reject report (moderator+)
+- `/broadcast` — Broadcast message (owner only)
+- `/debug <level>` — Debug settings (owner only)
 
 ### Console Commands
 
 While the bot is running, you can use console commands:
-- `help` - Show help for console commands
-- `stats` - Statistics
-- `app:version` - Show version
-- `admin:list` - List of admins
-- `admin:add <username/id> [rank]` - Add admin
-- `admin:remove <username/id>` - Remove admin
-- `admin:rank <username/id> <rank>` - Change rank
-- `broadcast` - Broadcast message
-- `user:find <query>` - Find user by ID, username or name
-- `bot:setup` - Setup bot
-- `app:run` - Run the bot
+- `help` — Show help for console commands
+- `stats` — Statistics
+- `app:version` — Show version
+- `admin:list` — List of admins
+- `admin:add <username/id> [rank]` — Add admin
+- `admin:remove <username/id>` — Remove admin
+- `admin:rank <username/id> <rank>` — Change rank
+- `broadcast` — Broadcast message
+- `user:find <query>` — Find user by ID, username or name
+- `bot:setup` — Setup bot
+- `app:run` — Run the bot
 
 ## Adding New Commands
 
