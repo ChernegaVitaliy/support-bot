@@ -1,5 +1,7 @@
 # Telegram Support Bot
 
+[![Docker Image CI](https://github.com/ChernegaVitaliy/support-bot/actions/workflows/docker-image.yml/badge.svg)](https://github.com/ChernegaVitaliy/support-bot/actions/workflows/docker-image.yml)
+
 Telegram Support Bot is rewritten in clean OOP code using modern libraries.
 
 ## Features
