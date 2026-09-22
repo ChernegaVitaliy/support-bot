@@ -33,6 +33,25 @@ DEFAULT_OWNER_ID=your_telegram_id
 php console app:run
 ```
 
+## Docker
+
+```bash
+docker compose build
+docker compose up -d
+```
+
+The bot will be available on port 8081, Mini App on the same port.
+
+To view logs:
+```bash
+docker compose logs -f
+```
+
+To stop:
+```bash
+docker compose down
+```
+
 ## Run Mini App
 
 The Mini App is a Symfony web application (controllers under `src/Controller/`).
