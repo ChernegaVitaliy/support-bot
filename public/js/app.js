@@ -87,19 +87,15 @@
 
     function setupBackButton(tg) {
         var backLink = document.querySelector('.back-link');
-        if (!backLink) {
-            tg.BackButton.hide();
-            return;
-        }
-        tg.BackButton.show();
-        tg.BackButton.onClick(function () {
-            var href = backLink.getAttribute('href');
-            if (href) {
-                window.location.href = href;
-            } else if (window.history.length > 1) {
+        var hasBackParam = new URLSearchParams(window.location.search).get('back') === '1';
+        if (backLink || hasBackParam) {
+            tg.BackButton.show();
+            tg.BackButton.onClick(function () {
                 window.history.back();
-            }
-        });
+            });
+        } else {
+            tg.BackButton.hide();
+        }
     }
 
     function formatLocalDates() {
