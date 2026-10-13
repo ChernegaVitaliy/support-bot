@@ -2,3 +2,5 @@
 bot.db
 bot.log
 vendor/
+var/cache/
+var/log/
