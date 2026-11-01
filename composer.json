@@ -8,7 +8,7 @@
         "symfony/console": "^7.4",
         "symfony/framework-bundle": "^7.4",
         "symfony/twig-bundle": "^7.4",
-        "symfony/yaml": "^7.4",
+        "symfony/yaml": "^8.1",
         "telegram-bot/api": "dev-master",
         "twig/twig": "^3.0",
         "vlucas/phpdotenv": "^5.5"
